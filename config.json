@@ -1,0 +1,9 @@
+{
+	"src_font_table_file":"font_table/anex86.json",
+	"src_data_file": "workspace/S01_VIS_jpn.BIN",
+	"src_script_file": "workspace/S01_VIS_jpn.json",
+	"length_threshold": 2,
+	"dst_font_table_file": "font_table/anex86kor.json",
+	"dst_script_file": "workspace/S01_VIS_kor.json",
+	"dst_data_file": "workspace/S01_VIS.BIN"
+}
