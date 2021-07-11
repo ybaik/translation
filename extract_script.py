@@ -69,6 +69,16 @@ def main():
             length = 0
         i += 1
 
+    # check a result of the end of data
+    if length >= length_threshold:
+        address = f'{hex(i-length*2)}={hex(i-1)}'
+        script[address] = sentence
+        if sentence_log:
+            script_log[address] = sentence_log
+        sentence = ''
+        sentence_log = ''
+        length = 0
+
     # save the extracted scripts
     with open(src_script_path, 'w') as f:
        json.dump(script, f, ensure_ascii=False, indent=4)
