@@ -1,11 +1,11 @@
 import json
+from module.font_table import check_file, FontTable
 
-from font_table import check_file, read_font_table
 
 def check_script(scripts, font_table):
 
     # value-table
-    letters = list(set(font_table.values()))
+    letters = list(set(font_table.char2code.keys()))
 
     # check script
     iteration = scripts.keys()
@@ -35,6 +35,30 @@ def check_script(scripts, font_table):
     return count_false_length, count_false_letters
 
 
+def diff_address(src_scripts, dst_scripts):
+
+    reversed = False
+    if len(src_scripts.keys()) >= len(dst_scripts):
+        scripts_1 = src_scripts
+        scripts_2 = dst_scripts
+    else:
+        scripts_1 = dst_scripts
+        scripts_2 = src_scripts
+        reversed = True
+
+    count_diff = 0
+    for key, _ in scripts_1.items():
+           if scripts_2.get(key) is None:
+                if reversed:
+                    print(f'Diff = src address [], dst address [{key}]')
+                else:
+                    print(f'Diff = src address [{key}], dst address []')
+                count_diff += 1
+
+    print(f'Number of diff = {count_diff}')
+    return count_diff
+
+
 def main():
     # read config
     config_path = 'config.json'
@@ -50,10 +74,10 @@ def main():
 
     print (f'check {src_script_path}...')
     with open(src_script_path, 'r') as f:
-        scripts = json.load(f)
+        src_scripts = json.load(f)
 
-    font_table, _, _ = read_font_table(src_font_table_path)
-    count_false_length, count_false_letters = check_script(scripts, font_table)
+    font_table = FontTable(src_font_table_path)
+    count_false_length, count_false_letters = check_script(src_scripts, font_table)
     print (f'False sentence length and letter count: {count_false_length}, {count_false_letters}')
 
     # check destination script
@@ -64,11 +88,13 @@ def main():
 
     print (f'check {dst_script_path}...')
     with open(dst_script_path, 'r') as f:
-        scripts = json.load(f)
+        dst_scripts = json.load(f)
 
-    font_table, _, _ = read_font_table(dst_font_table_path)
-    count_false_length, count_false_letters = check_script(scripts, font_table)
+    font_table = FontTable(dst_font_table_path)
+    count_false_length, count_false_letters = check_script(dst_scripts, font_table)
     print (f'False sentence length and letter count: {count_false_length}, {count_false_letters}')
+
+    diff_address(src_scripts, dst_scripts)
 
 
 if __name__ == "__main__":

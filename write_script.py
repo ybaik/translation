@@ -1,5 +1,5 @@
 import json
-from font_table import check_file, read_font_table
+from module.font_table import check_file, FontTable
 from check_script import check_script
 
 
@@ -21,7 +21,7 @@ def main():
 
     # read a font table
     if not check_file(dst_font_table_path): return
-    font_table, _, _ = read_font_table(dst_font_table_path)
+    font_table = FontTable(dst_font_table_path)
 
     # check scripts
     count_false_length, count_false_letters = check_script(scripts, font_table)
@@ -38,12 +38,6 @@ def main():
     data = bytearray(data)        
     print(f'Data size: {src_data_path}({len(data):,} bytes)')
 
-    # make a letter to code table
-    letter_to_code = dict()
-    for k, v in font_table.items():
-        if letter_to_code.get(v) is None:
-            letter_to_code[v] = k
-
     # write scripts
     for range, sentence in scripts.items():
         [code_hex_start, code_hex_end] = range.split('=')
@@ -52,8 +46,8 @@ def main():
         pos = spos
         # write letters in the sentence
         for i, letter in enumerate(sentence):
-            if letter_to_code.get(letter) is not None:
-                code_hex = letter_to_code.get(letter)                
+            if font_table.get_code(letter) is not None:
+                code_hex = font_table.get_code(letter)
                 code_int = int(code_hex, 16)
 
                 code1 = (code_int & 0xff00) >> 8

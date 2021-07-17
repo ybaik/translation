@@ -1,5 +1,5 @@
 import json
-from font_table import check_file, read_font_table
+from module.font_table import check_file, FontTable
 
 
 def main():
@@ -19,8 +19,8 @@ def main():
     length_threshold = config['length_threshold']
 
     # read a font table
-    if not check_file(src_font_table_path): return 
-    font_table, code_int_min, code_int_max = read_font_table(src_font_table_path)
+    if not check_file(src_font_table_path): return
+    font_table = FontTable(src_font_table_path)
 
     # read the target (jpn) data
     if not check_file(src_data_path): return
@@ -42,9 +42,9 @@ def main():
         code_hex = hex(code_int)
 
         # check if value is in range of the source font table
-        if code_int_min <= code_int <= code_int_max:
+        if font_table.range(code_int):
             # find a character in the font table
-            character = font_table.get(code_hex)
+            character = font_table.get_char(code_hex)
 
             if character: # character is in the font table
                 sentence += character
