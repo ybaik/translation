@@ -1,6 +1,7 @@
 import json
-
-from font_table import check_file, read_font_table
+import sys
+sys.path.append('../')
+from module.font_table import check_file, read_font_table
 
 def diff_address(src_scripts, dst_scripts):
 

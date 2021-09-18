@@ -14,7 +14,7 @@ def main():
     font_table_path = 'font_table/anex86kor.json'
     font_table = FontTable(font_table_path)
 
-    sentence_to_find = '1999년'
+    sentence_to_find = '쫓'
     address_to_find_hex = font_table.get_codes(sentence_to_find)
 
     address_to_find_int = []

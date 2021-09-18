@@ -1,5 +1,6 @@
 import json
 from module.font_table import check_file, FontTable
+from module.script import write_scripts
 from check_script import check_script
 
 
@@ -38,25 +39,8 @@ def main():
     data = bytearray(data)        
     print(f'Data size: {src_data_path}({len(data):,} bytes)')
 
-    # write scripts
-    for range, sentence in scripts.items():
-        [code_hex_start, code_hex_end] = range.split('=')
-        spos = int(code_hex_start, 16) 
-        epos = int(code_hex_end, 16)
-        pos = spos
-        # write letters in the sentence
-        for i, letter in enumerate(sentence):
-            if font_table.get_code(letter) is not None:
-                code_hex = font_table.get_code(letter)
-                code_int = int(code_hex, 16)
-
-                code1 = (code_int & 0xff00) >> 8
-                code2 = (code_int & 0x00ff)
-                data[pos] = code1
-                data[pos+1] = code2
-            else:
-                assert 0, f'{letter} is not in the font table.'
-            pos += 2
+    # write script
+    data = write_scripts(data, font_table, scripts)
 
     # save data
     with open(dst_data_path, 'wb') as f:

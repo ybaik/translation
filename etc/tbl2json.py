@@ -1,15 +1,18 @@
 import json
-from font_table import check_file, read_font_table
+#from font_table import check_file, read_font_table
 
 
 def main():
 
-    tbl_font_table_path = '../anex86-j.tbl'
+    tbl_font_table_path = '../macross.tbl'
     json_font_table_path = '../anex86.json'
-    json_font_table_path_new = '../anex86-j.json'
+    json_font_table_path_new = '../anex86dos.json'
+
     # read json font table
-    if not check_file(json_font_table_path): return  
-    font_table, _, _ = read_font_table(json_font_table_path)
+    #if not check_file(json_font_table_path): return  
+    #font_table, _, _ = read_font_table(json_font_table_path)
+
+    font_table = dict()
 
     with open(tbl_font_table_path, 'rb') as f:
         for line in f:

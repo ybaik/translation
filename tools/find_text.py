@@ -3,11 +3,11 @@ import json
 
 def main():
     
-    #base_path = '../workspace/Macross3_final/scripts/s01'
-    base_path = '../workspace'
+    base_path = '../workspace/Macross3_final/scripts/s01'
+    #base_path = '../workspace'
     path_list = os.listdir(base_path)
 
-    sentence_to_find = '쒸병'
+    sentence_to_find = '숙소'
 
     for file in path_list:
         if not '_kor.json' in file:
