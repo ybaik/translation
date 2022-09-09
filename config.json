@@ -1,9 +1,9 @@
 {
 	"src_font_table_file":"font_table/anex86jpn-full.json",
-	"src_data_file": "../workspace/Macross3_jpn/S02_C07.BIN",
-	"src_script_file": "../workspace/S02_C07_jpn.json",
+	"src_data_file": "../workspace/Macross2_jpn/S01_ADV.BIN",
+	"src_script_file": "../workspace/S01_ADV_jpn_full.json",
 	"length_threshold": 1,
 	"dst_font_table_file": "font_table/anex86kor.json",
-	"dst_script_file": "../workspace/S02_C07_kor.json",
-	"dst_data_file": "../workspace/Macross3_final/S02_C07.BIN"
+	"dst_script_file": "../workspace/S01_ADV_kor.json",
+	"dst_data_file": "../workspace/Macross2_final/S01_ADV.BIN"
 }

@@ -7,10 +7,12 @@ from check_script import check_script, diff_address
 
 def main():
 
-    src_path = '../workspace/Macross3_jpn'
-    dst_path = '../workspace/Macross3_final'
-    script_path = '../workspace/Macross3_final/scripts'
+    src_path = '../workspace/Macross2_jpn'
+    dst_path = '../workspace/Macross2_final'
+    script_path = '../workspace/script'
     dst_font_table_path = 'font_table/anex86kor.json'
+
+    #===================================================================
 
     files = os.listdir(src_path)
 

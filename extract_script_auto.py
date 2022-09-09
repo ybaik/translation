@@ -5,11 +5,14 @@ from module.script import extract_scripts
 
 
 def main():
-    bin_path = '../workspace/Macross3_jpn'
+
+    bin_path = '../workspace/Macross2_jpn'
     font_table_path = 'font_table/anex86jpn.json'
+    extended_word = '_jpn'
     script_path = '../workspace'
     length_threshold = 1
-    extended_word = '_jpn'
+
+    #=================================================================
 
     files = os.listdir(bin_path)
 
