@@ -26,7 +26,7 @@ def main():
 
         print(f"{file} ===========================================")
 
-        tag = file.split(".")[0]
+        tag = file
         src_script_path = f"{script_path}/{tag}_jpn.json"
         dst_script_path = f"{script_path}/{tag}_kor.json"
         if not os.path.isfile(src_script_path):
