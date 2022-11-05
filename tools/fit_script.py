@@ -1,17 +1,18 @@
 import os
 import json
 
+
 def main():
     script_range = [
-    "0x19fd=0x1a1e",
-    "0x1a38=0x1a4b",
-    "0x1a6b=0x1a92",
-    "0x1aac=0x1ad1",
-    "0x1aeb=0x1b04",
-    "0x1b1e=0x1b39",
-    "0x1b53=0x1b72",
-    "0x1b8c=0x1bab",
-    "0x1bc5=0x1be6",
+        "0x19fd=0x1a1e",
+        "0x1a38=0x1a4b",
+        "0x1a6b=0x1a92",
+        "0x1aac=0x1ad1",
+        "0x1aeb=0x1b04",
+        "0x1b1e=0x1b39",
+        "0x1b53=0x1b72",
+        "0x1b8c=0x1bab",
+        "0x1bc5=0x1be6",
     ]
 
     script = "\
@@ -25,25 +26,22 @@ def main():
 특별 감사 _후쿠하라_카즈히코\
 특별 감사  신도_에미코    \
 "
-    script = script.replace(' ', '_')
+    script = script.replace(" ", "_")
     length = len(script)
     start = 0
     for line in script_range:
-        codes = line.split('=')
+        codes = line.split("=")
         s_code_int = int(codes[0], 16)
         e_code_int = int(codes[1], 16)
-        l_len = (e_code_int - s_code_int + 1)//2
+        l_len = (e_code_int - s_code_int + 1) // 2
 
         if start + l_len <= length:
-            print(l_len, script[start:start+l_len])
+            print(l_len, script[start : start + l_len])
         else:
             print(l_len, script[start:])
         start += l_len
 
     print(length - start)
-
-
-
 
 
 if __name__ == "__main__":
