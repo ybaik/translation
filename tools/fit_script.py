@@ -1,4 +1,3 @@
-
 def main():
     script_range = [
         "0x19fd=0x1a1e",
