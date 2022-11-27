@@ -8,7 +8,7 @@ from module.font_table import FontTable
 def main():
 
     # read font table
-    font_table = FontTable("font_table/anex86kor.json")
+    font_table = FontTable("font_table/font_table-kor-jin.json")
 
     # code to letter
     # codes = ['0x88d7', '0x94ca']

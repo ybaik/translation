@@ -1,6 +1,3 @@
-import os
-import json
-
 
 def main():
     script_range = [

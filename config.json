@@ -1,10 +1,10 @@
 {
-	"src_font_table_file":"font_table/anex86jpn-full.json",
+	"src_font_table_file":"font_table/font_table-jpn-full.json",
 	"src_data_file": "../workspace/Macross2_jpn/S01_ADV.BIN",
 	"src_script_file": "../workspace/S01_ADV_jpn_full.json",
 	"length_threshold": 1,
 	"restriction": false,
-	"dst_font_table_file": "font_table/anex86kor.json",
+	"dst_font_table_file": "font_table/font_table-kor-jin.json",
 	"dst_script_file": "../workspace/S01_ADV_kor.json",
 	"dst_data_file": "../workspace/Macross2_final/S01_ADV.BIN"
 }

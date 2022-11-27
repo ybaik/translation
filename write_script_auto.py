@@ -10,7 +10,7 @@ def main():
     src_path = "../workspace/Macross2_jpn"
     dst_path = "../workspace/Macross2_final"
     script_path = "../workspace/script"
-    dst_font_table_path = "font_table/anex86kor.json"
+    dst_font_table_path = "font_table/font_table-jin.json"
 
     # ===================================================================
 

@@ -12,7 +12,7 @@ def main():
     base_path = "../workspace/Macross3_final"
     path_list = os.listdir(base_path)
 
-    font_table_path = "font_table/anex86kor.json"
+    font_table_path = "font_table/font_table-kor-jin.json"
     font_table = FontTable(font_table_path)
 
     sentence_to_find = "쫓"

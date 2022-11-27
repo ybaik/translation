@@ -7,7 +7,7 @@ from module.script import extract_scripts
 def main():
 
     bin_path = "../workspace/Macross2_jpn"
-    font_table_path = "font_table/anex86jpn.json"
+    font_table_path = "font_table/font_table-jpn.json"
     extended_word = "_jpn"
     script_path = "../workspace"
 
