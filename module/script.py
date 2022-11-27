@@ -1,4 +1,4 @@
-def extract_scripts(data, font_table, length_threshold):
+def extract_scripts(data, font_table, length_threshold, restriction=False):
 
     i = 0
     length = 0  # sentence length
@@ -23,7 +23,9 @@ def extract_scripts(data, font_table, length_threshold):
                     sentence_log += f":{code_hex}" if sentence_log else f"{code_hex}"
                 length += 1
                 i += 1
-            else:  # character is not in the font table
+            elif (
+                not restriction
+            ):  # allow characters to be added to the sentence even if they are not in the font table
                 sentence += "@"
                 sentence_log += f":@{code_hex}" if sentence_log else f"@{code_hex}"
                 length += 1

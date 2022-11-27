@@ -6,12 +6,13 @@ from module.script import extract_scripts
 
 def main():
 
-    # bin_path = '../workspace/Macross2_jpn'
-    # font_table_path = 'font_table/anex86jpn.json'
-    # extended_word = '_jpn'
-    # script_path = '../workspace'    
+    bin_path = "../workspace/Macross2_jpn"
+    font_table_path = "font_table/anex86jpn.json"
+    extended_word = "_jpn"
+    script_path = "../workspace"
 
     length_threshold = 1
+    restriction = False
     # =================================================================
 
     files = os.listdir(bin_path)
@@ -39,7 +40,7 @@ def main():
         print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
         # extract scripts
-        script, _ = extract_scripts(data, font_table, length_threshold)
+        script, _ = extract_scripts(data, font_table, length_threshold, restriction)
 
         # save data
         with open(dst_script_path, "w") as f:

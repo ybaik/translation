@@ -19,6 +19,7 @@ def main():
 
     # read a threshold
     length_threshold = config["length_threshold"]
+    restriction = config["restriction"]
 
     # read a font table
     if not check_file(src_font_table_path):
@@ -33,7 +34,9 @@ def main():
     print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
     # extract scripts
-    script, script_log = extract_scripts(data, font_table, length_threshold)
+    script, script_log = extract_scripts(
+        data, font_table, length_threshold, restriction
+    )
 
     # save the extracted scripts
     with open(src_script_path, "w") as f:
