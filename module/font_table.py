@@ -1,29 +1,6 @@
 import os
 import json
-
-"""
-def uint(val):
-    if val < 0:
-        return val + (1<<32)
-    return val
-"""
-
-
-def is_char_sjis_valid(code_int):
-    char_1st = (code_int & 0xFF00) >> 8
-    char_2nd = code_int & 0x00FF
-
-    if 0x81 <= char_1st <= 0x9F or 0xE0 <= char_1st <= 0xFC:
-        pass
-    else:
-        return False
-
-    if 0x40 <= char_2nd <= 0x7E or 0x80 <= char_2nd <= 0xFC:
-        pass
-    else:
-        return False
-
-    return True
+from .sjis_code import is_sjis_valid
 
 
 def check_file(path):
@@ -88,7 +65,7 @@ class FontTable:
 
         codes = list(font_table.keys())
         for code in codes:
-            if not is_char_sjis_valid(int(code, 16)):
+            if not is_sjis_valid(code):
                 print(f"code {code} is invalid for sjis.")
 
         codes.sort()
@@ -105,12 +82,12 @@ class FontTable:
             lines = f.readlines()
             for line in lines:
                 line = line.rstrip()
-                code_hex, character = line.split("=")
-                code_int = int(code_hex, 16)
-                code_hex = hex(code_int)
+                idx = line.find("=")
+                code_hex = line[:idx].upper()
+                character = line[idx + 1 :]
 
                 # check if the code is value based on shift-jis
-                if not is_char_sjis_valid(code_int):
+                if not is_sjis_valid(code_hex):
                     print(f"code {code_hex} is invalid for sjis.")
 
                 if font_table.get(code_hex) is None:
@@ -128,13 +105,12 @@ class FontTable:
 
         font_table = dict(sorted(self.code2char.items()))
         with open(file_path, "w") as f:
-            json.dump(font_table, f, ensure_ascii=False, indent=4)
+            json.dump(font_table, f, ensure_ascii=False, indent=2)
 
     def _write_tbl(self, file_path: str):
 
         table_for_tbl = ""
         for code, letter in sorted(self.code2char.items()):
-            code = code.replace("0x", "")
             table_for_tbl += f"{code}={letter}\n"
 
         with open(file_path, "w") as f:
@@ -144,17 +120,11 @@ class FontTable:
         return True if self.code_int_min <= code_int <= self.code_int_max else False
 
     def get_char(self, code_hex: str):
-        if "0x" not in code_hex:
-            code_hex = "0x" + code_hex
         return self.code2char.get(code_hex)
 
-    def get_chars(self, codes_hex, check_sjis=False):  # list
+    def get_chars(self, codes_hex):  # list
         word = ""
         for code_hex in codes_hex:
-            code_hex = code_hex.lower()
-            if "0x" not in code_hex:
-                code_hex = "0x" + code_hex
-
             if self.code2char.get(code_hex):
                 word += self.code2char.get(code_hex)
             else:

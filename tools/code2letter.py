@@ -11,9 +11,8 @@ def main():
     font_table = FontTable("font_table/font_table-kor-jin.json")
 
     # code to letter
-    # codes = ['0x88d7', '0x94ca']
     codes = ["88d7", "94ca"]
-    letter = font_table.get_char(codes[0])
+    letter = font_table.get_char(codes[0].upper())
     word = font_table.get_chars(codes)
     print(letter, word)
 

@@ -1,3 +1,6 @@
+from .sjis_code import is_sjis_valid
+
+
 def extract_scripts(data, font_table, length_threshold, restriction=False):
 
     i = 0
@@ -10,10 +13,18 @@ def extract_scripts(data, font_table, length_threshold, restriction=False):
     while i < len(data) - 1:
         # extract a 2byte code
         code_int = (data[i] << 8) + data[i + 1]
-        code_hex = hex(code_int)
+        code_hex = f"{code_int:X}"
 
-        # check if value is in range of the source font table
-        if font_table.range(code_int):
+        do_stop = True
+
+        if restriction:
+            if is_sjis_valid(code_hex):
+                do_stop = False
+        else:
+            if font_table.range(code_int):
+                do_stop = False
+
+        if not do_stop:
             # find a character in the font table
             character = font_table.get_char(code_hex)
 
@@ -23,9 +34,7 @@ def extract_scripts(data, font_table, length_threshold, restriction=False):
                     sentence_log += f":{code_hex}" if sentence_log else f"{code_hex}"
                 length += 1
                 i += 1
-            elif (
-                not restriction
-            ):  # allow characters to be added to the sentence even if they are not in the font table
+            else:
                 sentence += "@"
                 sentence_log += f":@{code_hex}" if sentence_log else f"@{code_hex}"
                 length += 1
@@ -33,7 +42,7 @@ def extract_scripts(data, font_table, length_threshold, restriction=False):
         else:
             # check sentence length and save
             if length >= length_threshold:
-                address = f"{hex(i-length*2)}={hex(i-1)}"
+                address = f"{i-length*2:X}={i-1:X}"
                 script[address] = sentence
                 if sentence_log:
                     script_log[address] = sentence_log
@@ -44,7 +53,7 @@ def extract_scripts(data, font_table, length_threshold, restriction=False):
 
     # check a result of the end of data
     if length >= length_threshold:
-        address = f"{hex(i-length*2)}={hex(i-1)}"
+        address = f"{i-length*2:X}={i-1:X}"
         script[address] = sentence
         if sentence_log:
             script_log[address] = sentence_log
@@ -64,7 +73,7 @@ def write_scripts(data, font_table, scripts):
         epos = int(code_hex_end, 16)
         pos = spos
         # write letters in the sentence
-        for i, letter in enumerate(sentence):
+        for letter in sentence:
             if font_table.get_code(letter) is not None:
                 code_hex = font_table.get_code(letter)
                 code_int = int(code_hex, 16)
@@ -86,14 +95,13 @@ def extract_table(data, scripts, font_table=dict()):
     for range, sentence in scripts.items():
         [code_hex_start, code_hex_end] = range.split("=")
         spos = int(code_hex_start, 16)
-        epos = int(code_hex_end, 16)
         pos = spos
 
         # write letters in the sentence
         for i, letter in enumerate(sentence):
             # extract a 2byte code
             code_int = (data[pos] << 8) + data[pos + 1]
-            code_hex = hex(code_int)
+            code_hex = f"{code_int:X}"
 
             if font_table.get(code_hex) is None:
                 font_table[code_hex] = letter
