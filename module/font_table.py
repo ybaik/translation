@@ -36,11 +36,13 @@ class FontTable:
             return False
 
         # make char2code table
-        char2code = dict()
+        self.char2code = dict()
         for k, v in self.code2char.items():
-            if char2code.get(v) is None:
-                char2code[v] = k
-        self.char2code = char2code
+            if self.char2code.get(v) is None:
+                self.char2code[v] = k
+            else:
+                print(f"Invalid code: {k}")
+
         return True
 
     def write_font_table(self, file_path: str):
