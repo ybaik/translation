@@ -4,6 +4,7 @@ def is_sjis_valid(code_hex):
     elif len(code_hex) == 2:
         return True if code_hex in sjis_1byte_code_list else False
 
+
 sjis_1byte_code_list = [
     "20",
     # "21",

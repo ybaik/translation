@@ -6,20 +6,24 @@ from module.script import extract_scripts
 
 def main():
 
-    bin_path = "../workspace/Macross2_jpn"
+    bin_path = "../workspace/m2_jpn"
     font_table_path = "font_table/font_table-jpn.json"
     extended_word = "_jpn"
+    bin_path = "../workspace/m2_dos"
+    font_table_path = "../workspace/anex86dos_m2.tbl"
+    extended_word = "_dos"
     script_path = "../workspace"
 
-    length_threshold = 1
+    length_threshold = 2
     restriction = False
     # =================================================================
 
     files = os.listdir(bin_path)
 
     for file in files:
+        fn = os.path.splitext(file)[0]
         src_data_path = f"{bin_path}/{file}"
-        dst_script_path = f"{script_path}/{file}"
+        dst_script_path = f"{script_path}/{fn}"
         dst_script_path = f"{dst_script_path}{extended_word}.json"
 
         if not os.path.isfile(src_data_path):

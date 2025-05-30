@@ -1,27 +1,42 @@
-def main():
+import json
+from pathlib import Path
+
+
+def main(script_path: Path):
+
+    with open(script_path, "r") as f:
+        src_script = json.load(f)
+
     script_range = [
-        "0x19fd=0x1a1e",
-        "0x1a38=0x1a4b",
-        "0x1a6b=0x1a92",
-        "0x1aac=0x1ad1",
-        "0x1aeb=0x1b04",
-        "0x1b1e=0x1b39",
-        "0x1b53=0x1b72",
-        "0x1b8c=0x1bab",
-        "0x1bc5=0x1be6",
+        "1DF7=1E12",
+        "1E16=1E21",
+        "1E2C=1E45",
+        "1E49=1E58",
+        "1E63=1E78",
+        "1E7C=1E93",
+        "1E9E=1EB7",
+        "1EBB=1ED4",
+        "1EDF=1EFC",
+        "1F00=1F09",
     ]
 
+    # …
     script = "\
-기획/시나리오_야마시타_카츠히로\
-프로그램__나카모리\
-사운드__TOYO_KUSANAGI__\
-그래픽_수석__야미츠다_마키코___\
-그래픽_ 요코야마 리  \
-그래픽__스기모토_미노루시\
-특별 감사 _이카라시_칸   \
-특별 감사 _후쿠하라_카즈히코\
-특별 감사  신도_에미코    \
+그래서,아버지랑 어머니도\
+이렇게 말씀하셨어.\
+오빠가가 얼마나 고생했는지\
+알고나 있는거냐!\
+말을 듣지 않으면\
+부모자식 인연을 끊겠다!!\
+그래서 이렇게 말했어.\
+오랜시간 신세졌습니다.\
+나는 반드시 가수가 될 겁니다!!\
+라고……\
 "
+
+    confirmed = False
+    # confirmed = True
+
     script = script.replace(" ", "_")
     length = len(script)
     start = 0
@@ -32,13 +47,21 @@ def main():
         l_len = (e_code_int - s_code_int + 1) // 2
 
         if start + l_len <= length:
-            print(l_len, script[start : start + l_len])
+            dialogue = script[start : start + l_len]
         else:
-            print(l_len, script[start:])
+            dialogue = script[start:]
+        print(l_len, dialogue)
+        src_script[line] = dialogue
         start += l_len
-
     print(length - start)
+
+    if confirmed and length - start == 0:
+        with open(script_path, "w") as f:
+            json.dump(src_script, f, ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":
-    main()
+
+    base_dir = Path("c:/work_han/workspace")
+    script_path = base_dir / "S06_VIS_kor.json"
+    main(script_path)

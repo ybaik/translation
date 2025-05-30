@@ -7,10 +7,10 @@ from check_script import check_script, diff_address
 
 def main():
 
-    src_path = "../workspace/Macross2_jpn"
-    dst_path = "../workspace/Macross2_final"
-    script_path = "../workspace/script"
-    dst_font_table_path = "font_table/font_table-jin.json"
+    src_path = "../workspace/m3_jpn"
+    dst_path = "../workspace/m3_final"
+    script_path = "../workspace/m3_final/scripts"
+    dst_font_table_path = "font_table/font_table-kor-jin.json"
 
     # ===================================================================
 
@@ -26,7 +26,7 @@ def main():
 
         print(f"{file} ===========================================")
 
-        tag = file
+        tag = os.path.splitext(file)[0]
         src_script_path = f"{script_path}/{tag}_jpn.json"
         dst_script_path = f"{script_path}/{tag}_kor.json"
         if not os.path.isfile(src_script_path):

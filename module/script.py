@@ -89,6 +89,27 @@ def write_scripts(data, font_table, scripts):
     return data
 
 
+def write_code(data, hex_start, hex_end, code_hex, count):
+
+    spos = int(hex_start, 16)
+    epos = int(hex_end, 16)
+    pos = spos
+
+    for i in range(count):
+        if pos >= epos:
+            break
+
+        code_int = int(code_hex, 16)
+        code_int += i
+        code1 = (code_int & 0xFF00) >> 8
+        code2 = code_int & 0x00FF
+        data[pos] = code1
+        data[pos + 1] = code2
+        pos += 2
+
+    return data
+
+
 def extract_table(data, scripts, font_table=dict()):
 
     # write scripts
@@ -108,3 +129,48 @@ def extract_table(data, scripts, font_table=dict()):
             pos += 2
 
     return font_table
+
+
+def find_dialogue(script: dict, dialogue: str) -> bool:
+    """Find a dialogue.
+
+    Args:
+        script (dict): A dictionary of scripts.
+        dialogue (str): A dialogue to find.
+
+    Returns:
+        bool: True if the dialogue is found.
+    """
+
+    found = False
+    for key, value in script.items():
+        if value == dialogue:
+            found = True
+
+    return found
+
+
+def find_dialogue_and_update(script: dict, dialogue: str, new_dialogue: str) -> bool:
+    """Find a dialogue and update it.
+
+    Args:
+        script (dict): A dictionary of scripts.
+        dialogue (str): A dialogue to find.
+        new_dialogue (str): A new dialogue to update. The length should be matched.
+
+    Returns:
+        bool: True if the dialogue is found and updated.
+    """
+
+    dlength = len(dialogue)
+    nlength = len(new_dialogue)
+    if dlength != nlength:
+        assert 0, f"Dialogue length is not matched. {dlength} != {nlength}"
+
+    is_updated = False
+    for key, value in script.items():
+        if value == dialogue:
+            script[key] = new_dialogue
+            is_updated = True
+
+    return is_updated
