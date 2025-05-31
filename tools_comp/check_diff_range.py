@@ -44,14 +44,14 @@ def main():
             if src_data[i] != dst_data[i]:
                 if start < 0:
                     start = i
-            else: # same byte
+            else:  # same byte
                 if start >= 0:
                     # check
                     range_list.append([start, i])
                     start = -1
         if len(range_list) == 0:
             continue
-        
+
         # Read code
         json_path = base_dir / f"{ref_file}_kor.json"
         with open(json_path) as f:
@@ -71,7 +71,7 @@ def main():
         json_path = base_dir / f"{ref_file}_kor_filtered.json"
         with open(json_path, "w") as f:
             json.dump(json_data_filtered, f, ensure_ascii=False, indent=4)
-   
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

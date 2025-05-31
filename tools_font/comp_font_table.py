@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from module.font_table import FontTable
 
+
 def find_code(char, tbl):
     for code in tbl.keys():
         if tbl[code] == char:
@@ -22,7 +23,7 @@ def main():
         c = ft_dst.get_char(k)
         if c != v:
             print(k, v, c)
-            count +=1
+            count += 1
 
     print(count)
 
@@ -33,7 +34,6 @@ def main():
     #     dst_tbl = json.load(f)
 
     # print(len(src_tbl.keys()), len(dst_tbl.keys()))
-
 
     # print(find_code("권", dst_tbl))
     # print(find_code("곁", dst_tbl))
@@ -50,5 +50,5 @@ def main():
             continue
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

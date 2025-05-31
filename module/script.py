@@ -15,16 +15,16 @@ def extract_scripts(data, font_table, length_threshold, restriction=False):
         code_int = (data[i] << 8) + data[i + 1]
         code_hex = f"{code_int:X}"
 
-        do_stop = True
+        need_to_stop = True
 
         if restriction:
             if is_sjis_valid(code_hex):
-                do_stop = False
+                need_to_stop = False
         else:
             if font_table.range(code_int):
-                do_stop = False
+                need_to_stop = False
 
-        if not do_stop:
+        if not need_to_stop:
             # find a character in the font table
             character = font_table.get_char(code_hex)
 

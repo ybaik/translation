@@ -31,7 +31,7 @@ def main():
         for address, src_dialogue in src.items():
             if "@" not in src_dialogue:
                 continue
-            
+
             cnt += 1
 
             # print(src_dialogue)
@@ -44,7 +44,7 @@ def main():
 
             [code_hex_start, code_hex_end] = address.split("=")
             spos = int(code_hex_start, 16)
-            pos = spos + at_index*2
+            pos = spos + at_index * 2
 
             code_int = (data[pos] << 8) + data[pos + 1]
             code_hex = f"{code_int:X}"
@@ -58,7 +58,7 @@ def main():
             else:
                 src_dialogue = list(src_dialogue)
                 src_dialogue[at_index] = character
-                src_dialogue = ''.join(src_dialogue)
+                src_dialogue = "".join(src_dialogue)
                 src[address] = src_dialogue
                 is_updated = True
 
@@ -70,6 +70,7 @@ def main():
     code_set.sort()
     print(code_set)
     print(cnt)
-            
+
+
 if __name__ == "__main__":
     main()

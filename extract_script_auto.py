@@ -1,5 +1,6 @@
 import os
 import json
+from pathlib import Path
 from module.font_table import check_file, FontTable
 from module.script import extract_scripts
 
@@ -21,10 +22,8 @@ def main():
     files = os.listdir(bin_path)
 
     for file in files:
-        fn = os.path.splitext(file)[0]
         src_data_path = f"{bin_path}/{file}"
-        dst_script_path = f"{script_path}/{fn}"
-        dst_script_path = f"{dst_script_path}{extended_word}.json"
+        dst_script_path = f"{script_path}/{file}{extended_word}.json"
 
         if not os.path.isfile(src_data_path):
             continue

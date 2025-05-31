@@ -1,44 +1,42 @@
-import os
 import json
+from pathlib import Path
 from module.font_table import check_file, FontTable
 from module.script import write_scripts
 from check_script import check_script, diff_address
+from rich.console import Console
 
 
 def main():
-
-    src_path = "../workspace/m3_jpn"
-    dst_path = "../workspace/m3_final"
-    script_path = "../workspace/m3_final/scripts"
+    script_base_dir = Path("../workspace/m3")
+    src_bin_base_dir = Path("../workspace/Macross3_jpn")
+    dst_bin_base_dir = Path("../workspace/m3_kor")
     dst_font_table_path = "font_table/font_table-kor-jin.json"
 
     # ===================================================================
 
-    files = os.listdir(src_path)
-
-    for file in files:
-
-        src_data_path = f"{src_path}/{file}"
-        dst_data_path = f"{dst_path}/{file}"
-
-        if not os.path.isfile(src_data_path):
+    for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
+        if not "_kor.json" in file.name:
             continue
 
-        print(f"{file} ===========================================")
-
-        tag = os.path.splitext(file)[0]
-        src_script_path = f"{script_path}/{tag}_jpn.json"
-        dst_script_path = f"{script_path}/{tag}_kor.json"
-        if not os.path.isfile(src_script_path):
-            continue
-        if not os.path.isfile(dst_script_path):
+        # Check paths
+        dst_script_path = file
+        src_script_path = file.parent / file.name.replace("_kor.json", "_jpn.json")
+        if not src_script_path.exists():
+            print(f"{src_script_path.name} is not exists.")
             continue
 
-        # read scripts
-        print(src_script_path)
+        # Check src data path
+        src_data_path = src_bin_base_dir / file.name.replace("_kor.json", "")
+        if not src_data_path.exists():
+            print(f"{src_data_path.name} is not exists.")
+            continue
+
+        # Check src data path
+        dst_data_path = dst_bin_base_dir / src_data_path.name
+
+        # Read scripts
         with open(src_script_path, "r") as f:
             src_scripts = json.load(f)
-        print(dst_script_path)
         with open(dst_script_path, "r") as f:
             dst_scripts = json.load(f)
 
@@ -54,13 +52,17 @@ def main():
 
         # check scripts
         count_false_length, count_false_letters = check_script(dst_scripts, font_table)
-        print(
-            f"False sentence length and letter count: {count_false_length}, {count_false_letters}"
-        )
 
         if count_false_length or count_false_letters:
-            print("False sentence length or letters should be fixed.")
+            console = Console()
+            console.print(
+                f"[yellow] False length/letter count:{count_false_length},{count_false_letters}[/yellow]"
+            )
+            console.print(
+                f"[yellow]The error should be fixed for[/yellow] [green]{src_data_path}[/green]"
+            )
             return
+        print(f"False length/letter count:{count_false_length},{count_false_letters}")
 
         # read the target (jpn) data
         if not check_file(src_data_path):
