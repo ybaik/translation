@@ -4,7 +4,7 @@ from typing import List
 from .sjis_code import is_sjis_valid
 
 
-def check_file(path) -> bool:
+def check_file(path: str) -> bool:
     if os.path.exists(path):
         return True
     print(f"{path} does not exist.")
@@ -19,7 +19,7 @@ class FontTable:
         self.code_int_min = 0xFFFF
         self.code_int_max = 0
 
-        # For 1-byte charaters
+        # For 1-byte characters
         self.char2code_1byte = dict()
 
         # Read font table
