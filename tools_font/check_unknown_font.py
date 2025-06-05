@@ -28,19 +28,19 @@ def main():
         is_updated = False
 
         # check address
-        for address, src_dialogue in src.items():
-            if "@" not in src_dialogue:
+        for address, src_sentence in src.items():
+            if "@" not in src_sentence:
                 continue
 
             cnt += 1
 
-            # print(src_dialogue)
+            # print(src_sentence)
             if data == None:
                 with open(file, "rb") as f:
                     data = f.read()
 
             # Find the position of "@" in the string
-            at_index = src_dialogue.find("@")
+            at_index = src_sentence.find("@")
 
             [code_hex_start, code_hex_end] = address.split("=")
             spos = int(code_hex_start, 16)
@@ -53,13 +53,13 @@ def main():
             if character is None:
                 # print(json_path.name)
                 # print(code_hex)
-                # print(src_dialogue)
+                # print(src_sentence)
                 code_set.add(code_hex)
             else:
-                src_dialogue = list(src_dialogue)
-                src_dialogue[at_index] = character
-                src_dialogue = "".join(src_dialogue)
-                src[address] = src_dialogue
+                src_sentence = list(src_sentence)
+                src_sentence[at_index] = character
+                src_sentence = "".join(src_sentence)
+                src[address] = src_sentence
                 is_updated = True
 
         if is_updated:

@@ -35,37 +35,37 @@ def main():
 
         # check address
         modified = False
-        for address, src_dialogue in src.items():
-            if not src_dialogue in annoying:
+        for address, src_sentence in src.items():
+            if not src_sentence in annoying:
                 continue
 
             if address in dst:
-                dst_dialogue = dst[address]
-                if len(src_dialogue) != len(dst_dialogue):
+                dst_sentence = dst[address]
+                if len(src_sentence) != len(dst_sentence):
                     print(file.name, address)
                     assert (
                         0
-                    ), f"Dialogue length is not matched. {src_dialogue} != {dst_dialogue}"
+                    ), f"sentence length is not matched. {src_sentence} != {dst_sentence}"
                     continue
 
                 # print(file.name, address)
-                # print(src_dialogue)
-                # print(dst_dialogue)
+                # print(src_sentence)
+                # print(dst_sentence)
                 # print(1)
-                # if annoying[src_dialogue]["count"] > 1:
+                # if annoying[src_sentence]["count"] > 1:
                 #     continue
-                # new_dialogue = annoying[src_dialogue]["translated"][0]
-                # if new_dialogue != dst_dialogue:
-                #     dst[address] = new_dialogue
+                # new_sentence = annoying[src_sentence]["translated"][0]
+                # if new_sentence != dst_sentence:
+                #     dst[address] = new_sentence
                 #     modified = True
 
-                if "modify" in annoying[src_dialogue]:
-                    idx = annoying[src_dialogue]["modify"]
-                    new_dialogue = annoying[src_dialogue]["translated"][idx]
-                    if new_dialogue != dst_dialogue:
-                        dst[address] = new_dialogue
+                if "modify" in annoying[src_sentence]:
+                    idx = annoying[src_sentence]["modify"]
+                    new_sentence = annoying[src_sentence]["translated"][idx]
+                    if new_sentence != dst_sentence:
+                        dst[address] = new_sentence
                         print(file.name, address)
-                        print(new_dialogue)
+                        print(new_sentence)
                         modified = True
 
         if modified:

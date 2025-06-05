@@ -160,46 +160,46 @@ def extract_table(
     return font_table
 
 
-def find_dialogue(script: Dict, dialogue: str) -> bool:
-    """Find a dialogue.
+def find_sentence(script: Dict, sentence: str) -> bool:
+    """Find a sentence.
 
     Args:
         script (dict): A dictionary of scripts.
-        dialogue (str): A dialogue to find.
+        sentence (str): A sentence to find.
 
     Returns:
-        bool: True if the dialogue is found.
+        bool: True if the sentence is found.
     """
 
     found = False
     for key, value in script.items():
-        if value == dialogue:
+        if value == sentence:
             found = True
 
     return found
 
 
-def find_dialogue_and_update(script: Dict, dialogue: str, new_dialogue: str) -> bool:
-    """Find a dialogue and update it.
+def find_sentence_and_update(script: Dict, sentence: str, new_sentence: str) -> bool:
+    """Find a sentence and update it.
 
     Args:
         script (dict): A dictionary of scripts.
-        dialogue (str): A dialogue to find.
-        new_dialogue (str): A new dialogue to update. The length should be matched.
+        sentence (str): A sentence to find.
+        new_sentence (str): A new sentence to update. The length should be matched.
 
     Returns:
-        bool: True if the dialogue is found and updated.
+        bool: True if the sentence is found and updated.
     """
 
-    dlength = len(dialogue)
-    nlength = len(new_dialogue)
+    dlength = len(sentence)
+    nlength = len(new_sentence)
     if dlength != nlength:
-        assert 0, f"Dialogue length is not matched. {dlength} != {nlength}"
+        assert 0, f"sentence length is not matched. {dlength} != {nlength}"
 
     is_updated = False
     for key, value in script.items():
-        if value == dialogue:
-            script[key] = new_dialogue
+        if value == sentence:
+            script[key] = new_sentence
             is_updated = True
 
     return is_updated

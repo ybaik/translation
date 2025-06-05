@@ -13,10 +13,10 @@ def main():
         with open(file, "r") as f:
             src = json.load(f)
 
-        for address, src_dialogue in src.items():
-            if "“" in src_dialogue:
+        for address, src_sentence in src.items():
+            if "“" in src_sentence:
                 print(file)
-                print(address, src_dialogue)
+                print(address, src_sentence)
 
 
 if __name__ == "__main__":

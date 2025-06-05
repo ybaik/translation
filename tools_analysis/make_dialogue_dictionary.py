@@ -32,26 +32,26 @@ def main():
             dst = json.load(f)
 
         # check address
-        for address, src_dialogue in src.items():
-            if not src_dialogue in dictionary:
-                dictionary[src_dialogue] = {
+        for address, src_sentence in src.items():
+            if not src_sentence in dictionary:
+                dictionary[src_sentence] = {
                     "count": 0,
                     "reference": 0,
                     "translated": [],
                 }
 
             if address in dst:
-                dst_dialogue = dst[address]
-                if len(src_dialogue) != len(dst_dialogue):
+                dst_sentence = dst[address]
+                if len(src_sentence) != len(dst_sentence):
                     print(file.name, address)
                     assert (
                         0
-                    ), f"Dialogue length is not matched. {address}/{len(src_dialogue)} != {len(dst_dialogue)}"
+                    ), f"sentence length is not matched. {address}/{len(src_sentence)} != {len(dst_sentence)}"
                     continue
-                dictionary[src_dialogue]["reference"] += 1
-                if not dst_dialogue in dictionary[src_dialogue]["translated"]:
-                    dictionary[src_dialogue]["count"] += 1
-                    dictionary[src_dialogue]["translated"].append(dst_dialogue)
+                dictionary[src_sentence]["reference"] += 1
+                if not dst_sentence in dictionary[src_sentence]["translated"]:
+                    dictionary[src_sentence]["count"] += 1
+                    dictionary[src_sentence]["translated"].append(dst_sentence)
 
     # save dictionary
     with open(dictionary_path, "w") as f:

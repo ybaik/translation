@@ -11,9 +11,9 @@ def main():
 
     find_source = True
 
-    dialogue = "エキセドル"
-    dialogue_kor = "기록참모 엑세돌 "
-    dialogue_kor = dialogue_kor.replace(" ", "_")
+    sentence = "エキセドル"
+    sentence_kor = "기록참모 엑세돌 "
+    sentence_kor = sentence_kor.replace(" ", "_")
 
     count = 0
 
@@ -33,24 +33,24 @@ def main():
 
         # check address
         buf_address = ""
-        buf_src_dialogue = ""
-        buf_dst_dialogue = ""
+        buf_src_sentence = ""
+        buf_dst_sentence = ""
 
         if not find_source:
-            for address, dst_dialogue in dst.items():
-                if dialogue_kor not in dst_dialogue:
+            for address, dst_sentence in dst.items():
+                if sentence_kor not in dst_sentence:
                     buf_address = address
-                    buf_dst_dialogue = dst_dialogue
-                    buf_src_dialogue = src[address]
+                    buf_dst_sentence = dst_sentence
+                    buf_src_sentence = src[address]
                     continue
 
                 print("=============================")
                 print(buf_address)
-                print(buf_src_dialogue)
-                print(buf_dst_dialogue)
+                print(buf_src_sentence)
+                print(buf_dst_sentence)
                 print(file.name, address)
                 print(src[address])
-                print(dst_dialogue)
+                print(dst_sentence)
                 print("=============================")
         else:
 
@@ -72,14 +72,14 @@ def main():
 
             addresses = []
             new_addresses = []
-            new_dialogues = []
+            new_sentences = []
 
-            for address, src_dialogue in src.items():
-                # if dialogue not in src_dialogue:
+            for address, src_sentence in src.items():
+                # if sentence not in src_sentence:
                 #     continue
                 # stop = False
                 # for candidate in candidates:
-                #     if candidate in src_dialogue:
+                #     if candidate in src_sentence:
                 #         stop = True
                 #         break
                 # if stop:
@@ -89,7 +89,7 @@ def main():
                 spos = int(code_hex_start, 16)
                 epos = int(code_hex_end, 16)
 
-                if len(src_dialogue) * 2 != epos - spos + 1:
+                if len(src_sentence) * 2 != epos - spos + 1:
                     continue
 
                 if epos < len(data) + 6:
@@ -106,16 +106,16 @@ def main():
                         if len(string) > 0:
                             additional_byte = len(string) // 2
                             new_address = f"{spos:05X}={epos+additional_byte:05X}"
-                            new_dialogue = src_dialogue + string
+                            new_sentence = src_sentence + string
 
                             addresses.append(address)
                             new_addresses.append(new_address)
-                            new_dialogues.append(new_dialogue)
+                            new_sentences.append(new_sentence)
                             count += 1
 
                             print("=============================")
                             print(file.name, address)
-                            print(src_dialogue + string)
+                            print(src_sentence + string)
                             # print(dst[address])
                             print("=============================")
 
@@ -124,7 +124,7 @@ def main():
                     src[new_addresses[i]] = src.pop(
                         addresses[i]
                     )  # To preserve the original order
-                    src[new_addresses[i]] = new_dialogues[i]
+                    src[new_addresses[i]] = new_sentences[i]
                 need_update = True
 
             if need_update:

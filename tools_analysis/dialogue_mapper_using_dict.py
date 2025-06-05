@@ -31,36 +31,36 @@ def main():
 
         # check address
         modified = False
-        for address, src_dialogue in src.items():
-            if not src_dialogue in dictionary:
+        for address, src_sentence in src.items():
+            if not src_sentence in dictionary:
                 continue
 
             if address in dst:
-                dst_dialogue = dst[address]
-                if len(src_dialogue) != len(dst_dialogue):
+                dst_sentence = dst[address]
+                if len(src_sentence) != len(dst_sentence):
                     print(file.name, address)
                     assert (
                         0
-                    ), f"Dialogue length is not matched. {src_dialogue} != {dst_dialogue}"
+                    ), f"Sentence length is not matched. {src_sentence} != {dst_sentence}"
                     continue
 
                 # print(file.name, address)
-                # print(src_dialogue)
-                # print(dst_dialogue)
-                translated = dictionary[src_dialogue]["translated"]
+                # print(src_sentence)
+                # print(dst_sentence)
+                translated = dictionary[src_sentence]["translated"]
 
                 if len(translated) == 1:
                     if dst[address] != translated[0]:
                         dst[address] = translated[0]
                         modified = True
                         print(file.name, address)
-                        print(src_dialogue)
+                        print(src_sentence)
                         print(translated[0])
                 # else:
                 #     print(len(translated))
                 #     print(file.name, address)
-                #     print(src_dialogue)
-                #     print(dst_dialogue)
+                #     print(src_sentence)
+                #     print(dst_sentence)
 
         if modified:
             print(dst_path)

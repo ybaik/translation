@@ -23,7 +23,7 @@ def main():
             spos = int(code_hex_start, 16)
             epos = int(code_hex_end, 16)
 
-            # Check dialogue length
+            # Check sentence length
             if epos - spos + 1 != len(scripts[address]) * 2:
                 print(file.name, address)
 
