@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from module.font_table import check_file, FontTable
 from module.script import write_scripts
-from check_script import check_script, diff_address
+from module.check_script import check_script, diff_address
 from rich.console import Console
 
 
@@ -13,6 +13,8 @@ def main():
     dst_font_table_path = "font_table/font_table-kor-jin.json"
 
     # ===================================================================
+    # For debugging prints
+    console = Console()
 
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         if not "_kor.json" in file.name:
@@ -33,6 +35,10 @@ def main():
 
         # Check src data path
         dst_data_path = dst_bin_base_dir / src_data_path.name
+        if dst_data_path.exists():
+            continue
+
+        console.print(f"[yellow] Start:{src_data_path}[/yellow]")
 
         # Read scripts
         with open(src_script_path, "r") as f:
@@ -54,7 +60,6 @@ def main():
         count_false_length, count_false_letters = check_script(dst_scripts, font_table)
 
         if count_false_length or count_false_letters:
-            console = Console()
             console.print(
                 f"[yellow] False length/letter count:{count_false_length},{count_false_letters}[/yellow]"
             )
@@ -63,6 +68,7 @@ def main():
             )
             return
         print(f"False length/letter count:{count_false_length},{count_false_letters}")
+        console.print(f"[yellow] End:{src_data_path}[/yellow]")
 
         # read the target (jpn) data
         if not check_file(src_data_path):

@@ -1,27 +1,31 @@
 import os
 import json
+from typing import List
 from .sjis_code import is_sjis_valid
 
 
-def check_file(path):
-    if not os.path.exists(path):
-        print(f"No {path} exist")
-        return False
-    return True
+def check_file(path) -> bool:
+    if os.path.exists(path):
+        return True
+    print(f"{path} does not exist.")
+    return False
 
 
 class FontTable:
-    def __init__(self, file_path: str):
-        # initialize
-        self.code2char = None
-        self.char2code = None
+    def __init__(self, file_path: str) -> None:
+        # Initialize
+        self.code2char = dict()
+        self.char2code = dict()
         self.code_int_min = 0xFFFF
         self.code_int_max = 0
 
-        # read font table
+        # For 1-byte charaters
+        self.char2code_1byte = dict()
+
+        # Read font table
         self.read_font_table(file_path)
 
-    def read_font_table(self, file_path: str):
+    def read_font_table(self, file_path: str) -> bool:
 
         if not os.path.isfile(file_path):
             print(f"No {file_path} exist.")
@@ -38,14 +42,20 @@ class FontTable:
         # make char2code table
         self.char2code = dict()
         for k, v in self.code2char.items():
-            if self.char2code.get(v) is None:
-                self.char2code[v] = k
+            if len(k) == 2:  # 1-byte code
+                if self.char2code_1byte.get(v) is None:
+                    self.char2code_1byte[v] = k
+                else:
+                    print(f"Invalid 1-byte code: {k}")
             else:
-                print(f"Invalid code: {k}")
+                if self.char2code.get(v) is None:
+                    self.char2code[v] = k
+                else:
+                    print(f"Invalid 2-byte code: {k}")
 
         return True
 
-    def write_font_table(self, file_path: str):
+    def write_font_table(self, file_path: str) -> bool:
         if self.code2char is None:
             print("No font table to write.")
             return False
@@ -75,7 +85,7 @@ class FontTable:
         self.code_int_max = int(codes[-1], 16)
         self.code2char = font_table
 
-    def _read_tbl(self, file_path: str):
+    def _read_tbl(self, file_path: str) -> None:
 
         font_table = dict()
 
@@ -103,13 +113,13 @@ class FontTable:
         self.code_int_max = int(codes[-1], 16)
         self.code2char = font_table
 
-    def _write_json(self, file_path: str):
+    def _write_json(self, file_path: str) -> None:
 
         font_table = dict(sorted(self.code2char.items()))
         with open(file_path, "w") as f:
             json.dump(font_table, f, ensure_ascii=False, indent=2)
 
-    def _write_tbl(self, file_path: str):
+    def _write_tbl(self, file_path: str) -> None:
 
         table_for_tbl = ""
         for code, letter in sorted(self.code2char.items()):
@@ -118,13 +128,13 @@ class FontTable:
         with open(file_path, "w") as f:
             f.write(table_for_tbl)
 
-    def range(self, code_int: int):
+    def range(self, code_int: int) -> bool:
         return True if self.code_int_min <= code_int <= self.code_int_max else False
 
-    def get_char(self, code_hex: str):
+    def get_char(self, code_hex: str) -> str:
         return self.code2char.get(code_hex)
 
-    def get_chars(self, codes_hex):  # list
+    def get_chars(self, codes_hex) -> str:
         word = ""
         for code_hex in codes_hex:
             if self.code2char.get(code_hex):
@@ -133,13 +143,16 @@ class FontTable:
                 word += "@"
         return word
 
-    def get_code(self, letter: str):
-        return self.char2code.get(letter)
+    def get_code(self, character: str) -> str:
+        return self.char2code.get(character)
 
-    def get_codes(self, script: str):
+    def get_code_1byte(self, character: str) -> str:
+        return self.char2code_1byte.get(character)
+
+    def get_codes(self, sentence: str) -> List[str]:
         codes_hex = []
-        for letter in script:
-            code_hex = self.char2code.get(letter)
+        for character in sentence:
+            code_hex = self.char2code.get(character)
             codes_hex.append(code_hex)
 
         return codes_hex

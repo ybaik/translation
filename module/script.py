@@ -1,7 +1,14 @@
+from typing import Dict, Tuple
+from .font_table import FontTable
 from .sjis_code import is_sjis_valid
 
 
-def extract_scripts(data, font_table, length_threshold, restriction=False):
+def extract_scripts(
+    data: bytearray,
+    font_table: FontTable,
+    length_threshold: int,
+    restriction: bool = False,
+) -> Tuple[Dict, Dict]:
 
     i = 0
     length = 0  # sentence length
@@ -42,7 +49,7 @@ def extract_scripts(data, font_table, length_threshold, restriction=False):
         else:
             # check sentence length and save
             if length >= length_threshold:
-                address = f"{i-length*2:X}={i-1:X}"
+                address = f"{i-length*2:05X}={i-1:05X}"
                 script[address] = sentence
                 if sentence_log:
                     script_log[address] = sentence_log
@@ -53,7 +60,7 @@ def extract_scripts(data, font_table, length_threshold, restriction=False):
 
     # check a result of the end of data
     if length >= length_threshold:
-        address = f"{i-length*2:X}={i-1:X}"
+        address = f"{i-length*2:05X}={i-1:05X}"
         script[address] = sentence
         if sentence_log:
             script_log[address] = sentence_log
@@ -64,32 +71,52 @@ def extract_scripts(data, font_table, length_threshold, restriction=False):
     return script, script_log
 
 
-def write_scripts(data, font_table, scripts):
+def write_scripts(data: bytearray, font_table: FontTable, scripts: Dict) -> bytearray:
 
     # write scripts
-    for range, sentence in scripts.items():
-        [code_hex_start, code_hex_end] = range.split("=")
+    for address, sentence in scripts.items():
+        [code_hex_start, code_hex_end] = address.split("=")
         spos = int(code_hex_start, 16)
         epos = int(code_hex_end, 16)
         pos = spos
-        # write letters in the sentence
-        for letter in sentence:
-            if font_table.get_code(letter) is not None:
-                code_hex = font_table.get_code(letter)
-                code_int = int(code_hex, 16)
 
-                code1 = (code_int & 0xFF00) >> 8
-                code2 = code_int & 0x00FF
-                data[pos] = code1
-                data[pos + 1] = code2
-            else:
-                assert 0, f"{letter} is not in the font table."
-            pos += 2
+        # write characters in the sentence
+        idx_char = 0
+        while idx_char < len(sentence):
+            character = sentence[idx_char]
+
+            # Check if the letter is a one byte character
+            if character == "|":
+                idx_char += 1
+                character = sentence[idx_char]
+
+                if font_table.get_code_1byte(character) is not None:
+                    code_hex = font_table.get_code_1byte(character)
+                    code_int = int(code_hex, 16)
+                    data[pos] = code_int
+                else:
+                    assert 0, f"{character} is not in the 1-byte font table."
+                pos += 1
+            else:  # Input two bytes character
+                if font_table.get_code(character) is not None:
+                    code_hex = font_table.get_code(character)
+                    code_int = int(code_hex, 16)
+
+                    code1 = (code_int & 0xFF00) >> 8
+                    code2 = code_int & 0x00FF
+                    data[pos] = code1
+                    data[pos + 1] = code2
+                else:
+                    assert 0, f"{character} is not in the 2-byte font table."
+                pos += 2
+            idx_char += 1
 
     return data
 
 
-def write_code(data, hex_start, hex_end, code_hex, count):
+def write_code(
+    data: bytearray, hex_start: str, hex_end: str, code_hex: str, count: int
+) -> bytearray:
 
     spos = int(hex_start, 16)
     epos = int(hex_end, 16)
@@ -110,7 +137,9 @@ def write_code(data, hex_start, hex_end, code_hex, count):
     return data
 
 
-def extract_table(data, scripts, font_table=dict()):
+def extract_table(
+    data: bytearray, scripts: Dict, font_table: FontTable = dict()
+) -> FontTable:
 
     # write scripts
     for range, sentence in scripts.items():
@@ -131,7 +160,7 @@ def extract_table(data, scripts, font_table=dict()):
     return font_table
 
 
-def find_dialogue(script: dict, dialogue: str) -> bool:
+def find_dialogue(script: Dict, dialogue: str) -> bool:
     """Find a dialogue.
 
     Args:
@@ -150,7 +179,7 @@ def find_dialogue(script: dict, dialogue: str) -> bool:
     return found
 
 
-def find_dialogue_and_update(script: dict, dialogue: str, new_dialogue: str) -> bool:
+def find_dialogue_and_update(script: Dict, dialogue: str, new_dialogue: str) -> bool:
     """Find a dialogue and update it.
 
     Args:

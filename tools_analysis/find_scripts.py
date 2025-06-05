@@ -6,8 +6,14 @@ from pathlib import Path
 def main():
     base_dir = Path("c:/work_han/workspace")
     script_base_dir = base_dir / "m2"
+    script_base_dir = base_dir
+    data_base_dir = base_dir / "m2_kor"
 
-    dialogue = "わたし、書類選考に受かっちゃったの!"
+    find_source = True
+
+    dialogue = "|"
+    dialogue_kor = "기록참모 엑세돌 "
+    dialogue_kor = dialogue_kor.replace(" ", "_")
 
     # read a pair of scripts
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
@@ -26,19 +32,13 @@ def main():
         buf_address = ""
         buf_src_dialogue = ""
         buf_dst_dialogue = ""
-        for address, src_dialogue in src.items():
-            if dialogue != src_dialogue:
-                buf_address = address
-                buf_src_dialogue = src_dialogue
-                buf_dst_dialogue = dst[address]
-                continue
-            if address in dst:
-                dst_dialogue = dst[address]
-                if len(src_dialogue) != len(dst_dialogue):
-                    print(file.name, address)
-                    assert (
-                        0
-                    ), f"Dialogue length is not matched. {src_dialogue} != {dst_dialogue}"
+
+        if not find_source:
+            for address, dst_dialogue in dst.items():
+                if dialogue_kor not in dst_dialogue:
+                    buf_address = address
+                    buf_dst_dialogue = dst_dialogue
+                    buf_src_dialogue = src[address]
                     continue
 
                 print("=============================")
@@ -46,9 +46,33 @@ def main():
                 print(buf_src_dialogue)
                 print(buf_dst_dialogue)
                 print(file.name, address)
-                print(src_dialogue)
+                print(src[address])
                 print(dst_dialogue)
                 print("=============================")
+        else:
+            for address, src_dialogue in src.items():
+                if dialogue != src_dialogue:
+                    buf_address = address
+                    buf_src_dialogue = src_dialogue
+                    buf_dst_dialogue = dst[address]
+                    continue
+                if address in dst:
+                    dst_dialogue = dst[address]
+                    if len(src_dialogue) != len(dst_dialogue):
+                        print(file.name, address)
+                        assert (
+                            0
+                        ), f"Dialogue length is not matched. {src_dialogue} != {dst_dialogue}"
+                        continue
+
+                    print("=============================")
+                    print(buf_address)
+                    print(buf_src_dialogue)
+                    print(buf_dst_dialogue)
+                    print(file.name, address)
+                    print(src_dialogue)
+                    print(dst_dialogue)
+                    print("=============================")
 
 
 if __name__ == "__main__":

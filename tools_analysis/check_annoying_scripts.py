@@ -6,8 +6,8 @@ from pathlib import Path
 def main():
     base_dir = Path("c:/work_han/workspace")
 
-    ref = "m3"
-    src = "m3"
+    ref = "m2"
+    src = "m2"
     script_base_dir = base_dir / src
 
     # read a dictionary
