@@ -72,7 +72,7 @@ class FontTable:
 
     def _read_json(self, file_path: str):
 
-        with open(file_path) as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             font_table = json.load(f)
 
         codes = list(font_table.keys())
@@ -90,7 +90,7 @@ class FontTable:
         font_table = dict()
 
         # read font table
-        with open(file_path, "r") as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
             for line in lines:
                 line = line.rstrip()
@@ -116,7 +116,7 @@ class FontTable:
     def _write_json(self, file_path: str) -> None:
 
         font_table = dict(sorted(self.code2char.items()))
-        with open(file_path, "w") as f:
+        with open(file_path, "w", encoding="utf-8") as f:
             json.dump(font_table, f, ensure_ascii=False, indent=2)
 
     def _write_tbl(self, file_path: str) -> None:
@@ -125,7 +125,7 @@ class FontTable:
         for code, letter in sorted(self.code2char.items()):
             table_for_tbl += f"{code}={letter}\n"
 
-        with open(file_path, "w") as f:
+        with open(file_path, "w", encoding="utf-8") as f:
             f.write(table_for_tbl)
 
     def range(self, code_int: int) -> bool:
