@@ -98,6 +98,8 @@ def write_scripts(data: bytearray, font_table: FontTable, scripts: Dict) -> byte
                     assert 0, f"{character} is not in the 1-byte font table."
                 pos += 1
             else:  # Input two bytes character
+                if character in ["■", "@"]:
+                    pass
                 if font_table.get_code(character) is not None:
                     code_hex = font_table.get_code(character)
                     code_int = int(code_hex, 16)

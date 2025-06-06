@@ -8,22 +8,12 @@ def main(script_path: Path):
     if not script_path.exists():
         print(f"Script file {script_path} does not exist.")
         return
-    with open(script_path, "r") as f:
+    with open(script_path, "r", encoding="utf-8") as f:
         src_script = json.load(f)
 
-    script_dict = {
-        "7A=AB": "これから始まるシナリオは、スタッフのお遊びですので",
-        "AF=E0": "氣にせず樂しんで下さい。なお、このシナリオに關する",
-        "E4=115": "質問はユ-ザ-サポ-ト係では、受け付けておりません",
-        "8C3=8D0": "おしまいだよ☆",
-    }
+    script_dict = {"0095D=00974": "とっても似合うと思うよ。"}
     # …
-    dialogue_array = [
-        "이제 시작될 시나리오는,스태프의 장난이므로  ",
-        "신경쓰지 말고 즐겨주세요.이 시나리오에 관한 ",
-        "질문은 사용자 지원 부서에서 받지 않습니다. ",
-        "끝이야☆   ",
-    ]
+    dialogue_array = ["정말 잘 어올려 보여."]
 
     console = Console()
 
@@ -56,12 +46,13 @@ def main(script_path: Path):
             src_script[script_range] = dialogue
 
     if confirmed:
-        with open(script_path, "w") as f:
+        console.print("[green] Saved [/green]")
+        with open(script_path, "w", encoding="utf-8") as f:
             json.dump(src_script, f, ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":
 
-    base_dir = Path("c:/work_han/workspace")
-    script_path = base_dir / "SPC4_VIS.BIN_kor.json"
+    base_dir = Path("c:/work_han/workspace/script")
+    script_path = base_dir / "H02_ADV.BIN_kor.json"
     main(script_path)

@@ -18,7 +18,7 @@ def main():
     dst_data_path = config["dst_data_file"]
 
     # read scripts
-    with open(dst_script_path, "r") as f:
+    with open(dst_script_path, "r", encoding="utf-8") as f:
         scripts = json.load(f)
 
     # read a font table

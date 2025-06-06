@@ -10,7 +10,7 @@ def main():
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         if not "_jpn.json" in file.name:
             continue
-        with open(file, "r") as f:
+        with open(file, "r", encoding="utf-8") as f:
             src = json.load(f)
 
         for address, src_sentence in src.items():

@@ -7,9 +7,9 @@ from rich.console import Console
 
 
 def main():
-    script_base_dir = Path("../workspace/m3")
-    src_bin_base_dir = Path("../workspace/Macross3_jpn")
-    dst_bin_base_dir = Path("../workspace/m3_kor")
+    script_base_dir = Path("../workspace/m4")
+    src_bin_base_dir = Path("../workspace/m4_jpn_all")
+    dst_bin_base_dir = Path("../workspace/m4_kor")
     dst_font_table_path = "font_table/font_table-kor-jin.json"
 
     # ===================================================================
@@ -28,22 +28,27 @@ def main():
             continue
 
         # Check src data path
-        src_data_path = src_bin_base_dir / file.name.replace("_kor.json", "")
+        src_data_path = src_bin_base_dir / str(
+            file.relative_to(script_base_dir)
+        ).replace("_kor.json", "")
         if not src_data_path.exists():
             print(f"{src_data_path.name} is not exists.")
             continue
 
-        # Check src data path
-        dst_data_path = dst_bin_base_dir / src_data_path.name
+        # Check dst data path
+        dst_data_path = dst_bin_base_dir / src_data_path.relative_to(src_bin_base_dir)
         if dst_data_path.exists():
             continue
+
+        if not dst_data_path.parent.exists():
+            dst_data_path.parent.mkdir(parents=True, exist_ok=True)
 
         console.print(f"[yellow] Start:{src_data_path}[/yellow]")
 
         # Read scripts
-        with open(src_script_path, "r") as f:
+        with open(src_script_path, "r", encoding="utf-8") as f:
             src_scripts = json.load(f)
-        with open(dst_script_path, "r") as f:
+        with open(dst_script_path, "r", encoding="utf-8") as f:
             dst_scripts = json.load(f)
 
         # read a font table

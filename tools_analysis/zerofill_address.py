@@ -4,16 +4,25 @@ from pathlib import Path
 
 # Dialog dictionary
 def main():
-    base_dir = Path("c:/work_han/workspace")
+    base_dir = Path("c:/work_han/workspace/script")
     script_base_dir = base_dir
+    dst_dir = base_dir
 
     # read a pair of scripts
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
-        if not "_dos.json" in file.name:
+
+        # Check extensions
+        need_continue = True
+        candidates = ["_kor.json", "_jpn.json"]
+        for candidate in candidates:
+            if candidate in file.name:
+                need_continue = False
+                break
+
+        if need_continue:
             continue
 
         print(file)
-
         with open(file, "r") as f:
             scripts = json.load(f)
 
@@ -30,7 +39,8 @@ def main():
             address_new = f"{spos:05X}={epos:05X}"
             scripts_new[address_new] = scripts[address]
 
-        with open(file, "w") as f:
+        dst_path = dst_dir / file.name
+        with open(dst_path, "w", encoding="utf-8") as f:
             json.dump(scripts_new, f, ensure_ascii=False, indent=4)
 
 

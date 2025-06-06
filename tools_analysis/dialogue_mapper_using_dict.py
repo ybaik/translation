@@ -6,27 +6,27 @@ from pathlib import Path
 def main():
     base_dir = Path("c:/work_han/workspace")
 
-    script_base_dir = base_dir
+    script_base_dir = base_dir / "script"
 
-    ref = "m2"
+    ref = "m234"
     # read a dictionary
     dictionary_path = base_dir / f"{ref}_dictionary.json"
     if not dictionary_path.exists():
         return
-    with open(dictionary_path, "r") as f:
+    with open(dictionary_path, "r", encoding="utf-8") as f:
         dictionary = json.load(f)
 
     # read a pair of scripts
-    for file in script_base_dir.glob("*.json"):  # Use rglob to search subdirectories
+    for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         if not "_jpn.json" in file.name:
             continue
         dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")
         if not dst_path.exists():
             continue
 
-        with open(file, "r") as f:
+        with open(file, "r", encoding="utf-8") as f:
             src = json.load(f)
-        with open(dst_path, "r") as f:
+        with open(dst_path, "r", encoding="utf-8") as f:
             dst = json.load(f)
 
         # check address
@@ -64,7 +64,7 @@ def main():
 
         if modified:
             print(dst_path)
-            with open(dst_path, "w") as f:
+            with open(dst_path, "w", encoding="utf-8") as f:
                 json.dump(dst, f, ensure_ascii=False, indent=4)
 
 

@@ -5,9 +5,9 @@ from pathlib import Path
 # Dialog dictionary
 def main():
     base_dir = Path("c:/work_han/workspace")
-    script_base_dir = base_dir / "m2"
-    data_base_dir = base_dir / "m2_kor"
-    data_base_dir = base_dir / "Macross2_jpn"
+    script_base_dir = base_dir / "m4"
+    data_base_dir = base_dir / "m4_kor"
+    data_base_dir = base_dir / "m4_jpn"
 
     find_source = True
 
@@ -26,9 +26,9 @@ def main():
             continue
 
         need_update = False
-        with open(file, "r") as f:
+        with open(file, "r", encoding="utf-8") as f:
             src = json.load(f)
-        with open(dst_path, "r") as f:
+        with open(dst_path, "r", encoding="utf-8") as f:
             dst = json.load(f)
 
         # check address
@@ -129,7 +129,7 @@ def main():
 
             if need_update:
                 sorted_src = {k: src[k] for k in sorted(src)}
-                with open(file, "w") as f:
+                with open(file, "w", encoding="utf-8") as f:
                     json.dump(sorted_src, f, ensure_ascii=False, indent=4)
                 print(1)
 

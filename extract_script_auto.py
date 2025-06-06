@@ -7,13 +7,10 @@ from module.script import extract_scripts
 
 def main():
 
-    bin_path = "../workspace/m2_jpn"
-    font_table_path = "font_table/font_table-jpn.json"
+    bin_path = "../workspace/m4_jpn_s"
+    font_table_path = "font_table/font_table-jpn-40K.json"
     extended_word = "_jpn"
-    bin_path = "../workspace/m2_dos"
-    font_table_path = "../workspace/anex86dos_m2.tbl"
-    extended_word = "_dos"
-    script_path = "../workspace"
+    script_path = "../workspace/m4_jpn_s4"
 
     length_threshold = 2
     restriction = False
@@ -46,7 +43,7 @@ def main():
         script, _ = extract_scripts(data, font_table, length_threshold, restriction)
 
         # save data
-        with open(dst_script_path, "w") as f:
+        with open(dst_script_path, "w", encoding="utf-8") as f:
             json.dump(script, f, ensure_ascii=False, indent=4)
 
 

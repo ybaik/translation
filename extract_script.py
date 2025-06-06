@@ -39,11 +39,11 @@ def main():
     )
 
     # save the extracted scripts
-    with open(src_script_path, "w") as f:
+    with open(src_script_path, "w", encoding="utf-8") as f:
         json.dump(script, f, ensure_ascii=False, indent=4)
 
     # save logs
-    with open("script_log.json", "w") as f:
+    with open("script_log.json", "w", encoding="utf-8") as f:
         json.dump(script_log, f, ensure_ascii=False, indent=4)
 
 

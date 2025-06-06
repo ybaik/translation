@@ -4,10 +4,10 @@ from pathlib import Path
 
 # Dialog dictionary
 def main():
-    base_dir = Path("c:/work_han/workspace")
+    base_dir = Path("c:/work_han/workspace4")
 
-    ref = "m2"
-    src = "m2"
+    ref = "m4"
+    src = "m4"
     script_base_dir = base_dir / src
 
     # read a dictionary
@@ -15,7 +15,7 @@ def main():
     # annoying_path = base_dir / f"{ref}_dictionary.json"
     if not annoying_path:
         return
-    with open(annoying_path, "r") as f:
+    with open(annoying_path, "r", encoding="utf-8") as f:
         annoying = json.load(f)
 
     print(f"Number of annoying scripts = {len(annoying)}")
@@ -24,13 +24,14 @@ def main():
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         if not "_jpn.json" in file.name:
             continue
+        print(file)
         dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")
         if not dst_path.exists():
             continue
 
-        with open(file, "r") as f:
+        with open(file, "r", encoding="utf-8") as f:
             src = json.load(f)
-        with open(dst_path, "r") as f:
+        with open(dst_path, "r", encoding="utf-8") as f:
             dst = json.load(f)
 
         # check address
@@ -69,7 +70,7 @@ def main():
                         modified = True
 
         if modified:
-            with open(dst_path, "w") as f:
+            with open(dst_path, "w", encoding="utf-8") as f:
                 json.dump(dst, f, ensure_ascii=False, indent=4)
 
 

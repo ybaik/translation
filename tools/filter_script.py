@@ -14,7 +14,7 @@ def main():
         if val != "@":
             scripts_new[key] = val
 
-    with open(file_path, "w") as f:
+    with open(file_path, "w", encoding="utf-8") as f:
         json.dump(scripts_new, f, ensure_ascii=False, indent=4)
 
 

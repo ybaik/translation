@@ -15,7 +15,7 @@ def main():
             continue
         # read json script
         print(file)
-        with open(f"{base_path}/{file}", "r") as f:
+        with open(f"{base_path}/{file}", "r", encoding="utf-8") as f:
             scripts = json.load(f)
         for k, v in scripts.items():
             if sentence_to_find in v:

@@ -3,14 +3,15 @@ from pathlib import Path
 
 
 def main():
+    base_ref_dir = Path("c:/work_han/backup")
     base_dir = Path("c:/work_han/workspace")
 
-    ref = "m3"
-    src = "m2"
-    script_base_dir = base_dir / src
+    ref = "m23"
+    src = "m234"
+    script_base_dir = base_dir / "m4"
 
-    reference_dictionary_path = base_dir / ref / f"{ref}_dictionary.json"
-    with open(reference_dictionary_path, "r") as f:
+    reference_dictionary_path = base_ref_dir / f"{ref}_dictionary.json"
+    with open(reference_dictionary_path, "r", encoding="utf-8") as f:
         dictionary = json.load(f)
     # dictionary = dict()
 
@@ -26,9 +27,9 @@ def main():
         if not dst_path.exists():
             continue
 
-        with open(file, "r") as f:
+        with open(file, "r", encoding="utf-8") as f:
             src = json.load(f)
-        with open(dst_path, "r") as f:
+        with open(dst_path, "r", encoding="utf-8") as f:
             dst = json.load(f)
 
         # check address
@@ -54,7 +55,7 @@ def main():
                     dictionary[src_sentence]["translated"].append(dst_sentence)
 
     # save dictionary
-    with open(dictionary_path, "w") as f:
+    with open(dictionary_path, "w", encoding="utf-8") as f:
         json.dump(dictionary, f, ensure_ascii=False, indent=4)
 
     # make annoying dictionary
@@ -67,7 +68,7 @@ def main():
     print("Number of annoying scripts = ", len(annoying))
 
     # save dictionary
-    with open(annoying_path, "w") as f:
+    with open(annoying_path, "w", encoding="utf-8") as f:
         json.dump(annoying, f, ensure_ascii=False, indent=4)
 
 

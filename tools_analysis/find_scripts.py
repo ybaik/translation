@@ -4,14 +4,13 @@ from pathlib import Path
 
 # Dialog dictionary
 def main():
-    base_dir = Path("c:/work_han/workspace")
-    script_base_dir = base_dir / "m2"
+    base_dir = Path("c:/work_han/workspace4")
     script_base_dir = base_dir
-    data_base_dir = base_dir / "m2_kor"
+    data_base_dir = base_dir / "m4_kor"
 
     find_source = True
 
-    sentence = "|"
+    sentence = "VT-102!"
     sentence_kor = "기록참모 엑세돌 "
     sentence_kor = sentence_kor.replace(" ", "_")
 
@@ -23,9 +22,9 @@ def main():
         if not dst_path.exists():
             continue
 
-        with open(file, "r") as f:
+        with open(file, "r", encoding="utf-8") as f:
             src = json.load(f)
-        with open(dst_path, "r") as f:
+        with open(dst_path, "r", encoding="utf-8") as f:
             dst = json.load(f)
 
         # check address
@@ -51,7 +50,7 @@ def main():
                 print("=============================")
         else:
             for address, src_sentence in src.items():
-                if sentence != src_sentence:
+                if sentence not in src_sentence:
                     buf_address = address
                     buf_src_sentence = src_sentence
                     buf_dst_sentence = dst[address]
