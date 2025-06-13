@@ -1,36 +1,41 @@
+import json
+from pathlib import Path
+from rich.console import Console
+
+
 def main():
-    script_range = [
-        "B1D=B2E",
-        "B39=B46",
-        "B5F=B6C",
-        "B85=B8C",
-        "BA5=BB8",
-        "BBC=BCB",
-    ]
-    script = "\
-와…… 대단해……\
-앗,꺄!   \
-민메이씨!  \
-아야!!\
-큰일이네,라이트가 \
-망가져버렸어. \
-"
-    script = script.replace(" ", "_")
-    length = len(script)
-    start = 0
-    for line in script_range:
-        codes = line.split("=")
+
+    script_dict = {
+        "0080B=00826": "そういえば、輝さんに会うの、",
+        "0082A=00839": "あれ以来ですね？",
+    }
+    # …
+    dialogue_array = ["그런데,히카루씨를 만나는건", "그후 처음이죠?"]
+
+    console = Console()
+
+    if len(script_dict.keys()) != len(dialogue_array):
+        print(
+            f"Script range {len(script_dict.keys())} and dialogue array length {len(dialogue_array)} are not matched."
+        )
+        return
+
+    for script_range, dialogue in zip(script_dict.keys(), dialogue_array):
+        dialogue = dialogue.replace(" ", "_")
+        length = len(dialogue)
+        codes = script_range.split("=")
         s_code_int = int(codes[0], 16)
         e_code_int = int(codes[1], 16)
         l_len = (e_code_int - s_code_int + 1) // 2
 
-        if start + l_len <= length:
-            print(l_len, script[start : start + l_len])
-        else:
-            print(l_len, script[start:])
-        start += l_len
+        original_dialogue = script_dict[script_range]
 
-    print(length - start)
+        if l_len != length:
+            console.print(
+                f"[yellow]{l_len} {original_dialogue} {dialogue} {length - l_len}[/yellow]"
+            )
+        else:
+            print(l_len, original_dialogue, dialogue, length - l_len)
 
 
 if __name__ == "__main__":

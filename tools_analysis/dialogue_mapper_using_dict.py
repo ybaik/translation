@@ -1,16 +1,23 @@
 import json
 from pathlib import Path
+from rich.console import Console
 
 
 # Dialog dictionary
 def main():
-    base_dir = Path("c:/work_han/workspace")
+    console = Console()
 
-    script_base_dir = base_dir / "script"
+    base_dir = Path("c:/work_han/workspace")
+    ref_base_dir = Path("c:/work_han/backup")
+
+    # script_base_dir = base_dir / "script"
+    # script_base_dir = base_dir / "m4"
+    script_base_dir = base_dir
+    # script_base_dir = Path("c:/work_han/backup")
 
     ref = "m234"
     # read a dictionary
-    dictionary_path = base_dir / f"{ref}_dictionary.json"
+    dictionary_path = ref_base_dir / f"{ref}_dictionary.json"
     if not dictionary_path.exists():
         return
     with open(dictionary_path, "r", encoding="utf-8") as f:
@@ -23,6 +30,13 @@ def main():
         dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")
         if not dst_path.exists():
             continue
+
+        file_tag = f"{file.parent.name}/{file.name}"
+        color = "green"
+        if "m2" in file_tag:
+            color = "yellow"
+        elif "m3" in file_tag:
+            color = "red"
 
         with open(file, "r", encoding="utf-8") as f:
             src = json.load(f)
@@ -38,7 +52,8 @@ def main():
             if address in dst:
                 dst_sentence = dst[address]
                 if len(src_sentence) != len(dst_sentence):
-                    print(file.name, address)
+                    console.print(f"[{color}]{address},{file_tag}[/{color}]")
+                    print(len(src_sentence), len(dst_sentence))
                     assert (
                         0
                     ), f"Sentence length is not matched. {src_sentence} != {dst_sentence}"
@@ -53,7 +68,8 @@ def main():
                     if dst[address] != translated[0]:
                         dst[address] = translated[0]
                         modified = True
-                        print(file.name, address)
+
+                        console.print(f"[{color}]{address},{file_tag}[/{color}]")
                         print(src_sentence)
                         print(translated[0])
                 # else:

@@ -3,24 +3,39 @@ from pathlib import Path
 
 
 def main():
-    base_ref_dir = Path("c:/work_han/backup")
     base_dir = Path("c:/work_han/workspace")
+    base_ref_dir = Path("c:/work_han/backup")
 
-    ref = "m23"
-    src = "m234"
-    script_base_dir = base_dir / "m4"
+    out = "m234"
 
-    reference_dictionary_path = base_ref_dir / f"{ref}_dictionary.json"
-    with open(reference_dictionary_path, "r", encoding="utf-8") as f:
-        dictionary = json.load(f)
-    # dictionary = dict()
+    if out == "m234":
+        base_script_dir = base_dir
+        ref = "m23"
+        script_dir = base_script_dir / "m4"
+    elif out == "m23":
+        base_script_dir = base_ref_dir
+        ref = "m3"
+        script_dir = base_script_dir / "m2"
+    elif out == "m2":
+        base_script_dir = base_ref_dir
+        script_dir = base_script_dir / "m2"
+    elif out == "m3":
+        base_script_dir = base_ref_dir
+        script_dir = base_script_dir / "m3"
+
+    if out in ["m2", "m3"]:
+        dictionary = dict()
+    else:
+        reference_dictionary_path = base_ref_dir / f"{ref}_dictionary.json"
+        with open(reference_dictionary_path, "r", encoding="utf-8") as f:
+            dictionary = json.load(f)
 
     # read a dictionary
-    dictionary_path = base_dir / f"{src}_dictionary.json"
-    annoying_path = base_dir / f"{src}_annoying.json"
+    dictionary_path = base_ref_dir / f"{out}_dictionary.json"
+    annoying_path = base_ref_dir / f"{out}_annoying.json"
 
     # read a pair of scripts
-    for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
+    for file in script_dir.rglob("*.json"):  # Use rglob to search subdirectories
         if not "_jpn.json" in file.name:
             continue
         dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")

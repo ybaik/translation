@@ -45,13 +45,13 @@ class FontTable:
             if len(k) == 2:  # 1-byte code
                 if self.char2code_1byte.get(v) is None:
                     self.char2code_1byte[v] = k
-                else:
-                    print(f"Invalid 1-byte code: {k}")
+                # else:
+                #     print(f"Invalid 1-byte code: {k}")
             else:
                 if self.char2code.get(v) is None:
                     self.char2code[v] = k
-                else:
-                    print(f"Invalid 2-byte code: {k}")
+                # else:
+                #     print(f"Invalid 2-byte code: {k}")
 
         return True
 
@@ -76,9 +76,9 @@ class FontTable:
             font_table = json.load(f)
 
         codes = list(font_table.keys())
-        for code in codes:
-            if not is_sjis_valid(code):
-                print(f"code {code} is invalid for sjis.")
+        # for code in codes:
+        #     if not is_sjis_valid(code):
+        #         print(f"code {code} is invalid for sjis.")
 
         codes.sort()
         self.code_int_min = int(codes[0], 16)
@@ -99,8 +99,8 @@ class FontTable:
                 character = line[idx + 1 :]
 
                 # check if the code is value based on shift-jis
-                if not is_sjis_valid(code_hex):
-                    print(f"code {code_hex} is invalid for sjis.")
+                # if not is_sjis_valid(code_hex):
+                #     print(f"code {code_hex} is invalid for sjis.")
 
                 if font_table.get(code_hex) is None:
                     font_table[code_hex] = character

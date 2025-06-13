@@ -4,18 +4,24 @@ from pathlib import Path
 
 # Dialog dictionary
 def main():
-    base_dir = Path("c:/work_han/workspace4")
+    base_dir = Path("c:/work_han/workspace")
     script_base_dir = base_dir
-    data_base_dir = base_dir / "m4_kor"
 
-    find_source = True
+    script_base_dir = Path("c:/work_han/workspace/m4")
+    # script_base_dir = Path("c:/work_han/workspace/script")
+    script_base_dir = Path("c:/work_han/backup")
 
-    sentence = "VT-102!"
-    sentence_kor = "기록참모 엑세돌 "
+    find_source = False
+
+    sentence = "あれ以来ですね"
+    sentence_kor = "착륙하는"
     sentence_kor = sentence_kor.replace(" ", "_")
 
     # read a pair of scripts
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
+
+        file_tag = f"{file.parent.name}/{file.name}"
+
         if not "_jpn.json" in file.name:
             continue
         dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")
@@ -44,7 +50,7 @@ def main():
                 print(buf_address)
                 print(buf_src_sentence)
                 print(buf_dst_sentence)
-                print(file.name, address)
+                print(file_tag, address)
                 print(src[address])
                 print(dst_sentence)
                 print("=============================")
@@ -53,6 +59,9 @@ def main():
                 if sentence not in src_sentence:
                     buf_address = address
                     buf_src_sentence = src_sentence
+
+                    if not address in dst:
+                        print(f"Key error: {address} {file_tag}")
                     buf_dst_sentence = dst[address]
                     continue
                 if address in dst:
@@ -68,7 +77,7 @@ def main():
                     print(buf_address)
                     print(buf_src_sentence)
                     print(buf_dst_sentence)
-                    print(file.name, address)
+                    print(file_tag, address)
                     print(src_sentence)
                     print(dst_sentence)
                     print("=============================")

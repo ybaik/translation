@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from module.font_table import FontTable 
+from module.font_table import FontTable
 
 
 # Dialog dictionary
@@ -9,7 +9,7 @@ def main():
     script_dir = base_dir
     data_dir = base_dir / "m4_jpn"
     font_table = FontTable("./font_table/font_table-jpn-40k.json")
-    target_letter = "■"#@"
+    target_letter = "■"  # @"
     # target_letter = "@"
 
     # read a pair of scripts
@@ -43,22 +43,26 @@ def main():
             epos = int(code_hex_end, 16)
 
             letter_pos = src_sentence.find(target_letter)
-            pos = spos + letter_pos*2
+            pos = spos + letter_pos * 2
 
             code_int = (data[pos] << 8) + data[pos + 1]
             code_hex = f"{code_int:X}"
             read_letter = font_table.get_char(code_hex)
 
             if read_letter is None:
-                print(f"Character {code_hex} is none in the font table. {address}, {file}")
+                print(
+                    f"Character {code_hex} is none in the font table. {address}, {file}"
+                )
             elif read_letter not in ["■", "@"]:
                 new_sentence = src_sentence[:letter_pos] + read_letter
                 if len(src_sentence) > letter_pos + 1:
-                    new_sentence += src_sentence[letter_pos+1:]
+                    new_sentence += src_sentence[letter_pos + 1 :]
                 script[address] = new_sentence
                 is_updated = True
             else:
-                print(f"Character {code_hex} is not found in the font table. {address}, {file}")
+                print(
+                    f"Character {code_hex} is not found in the font table. {address}, {file}"
+                )
 
         if is_updated:
             print(file)
