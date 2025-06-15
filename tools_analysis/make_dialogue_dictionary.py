@@ -32,11 +32,11 @@ def main():
         with open(reference_dictionary_path, "r", encoding="utf-8") as f:
             dictionary = json.load(f)
 
-    # read a dictionary
+    # Read an existing dictionary
     dictionary_path = base_ref_dir / f"{out}_dictionary.json"
     annoying_path = base_ref_dir / f"{out}_annoying.json"
 
-    # read a pair of scripts
+    # Read a pair of scripts
     for file in script_dir.rglob("*.json"):  # Use rglob to search subdirectories
         if not "_jpn.json" in file.name:
             continue
@@ -72,11 +72,11 @@ def main():
                     dictionary[src_sentence]["count"] += 1
                     dictionary[src_sentence]["translated"].append(dst_sentence)
 
-    # save dictionary
+    # Save a dictionary
     with open(dictionary_path, "w", encoding="utf-8") as f:
         json.dump(dictionary, f, ensure_ascii=False, indent=4)
 
-    # make annoying dictionary
+    # Make an annoying dictionary - for cases that a source script has multiple destination scripts
     annoying = dict()
     for key, value in dictionary.items():
         if value["count"] > 1:
@@ -85,7 +85,7 @@ def main():
     print("Number of scripts = ", len(dictionary))
     print("Number of annoying scripts = ", len(annoying))
 
-    # save dictionary
+    # Save the annoying dictionary
     with open(annoying_path, "w", encoding="utf-8") as f:
         json.dump(annoying, f, ensure_ascii=False, indent=4)
 

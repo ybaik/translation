@@ -3,7 +3,6 @@ from pathlib import Path
 from rich.console import Console
 
 
-# Dialog dictionary
 def main():
     console = Console()
 
@@ -16,14 +15,14 @@ def main():
     # script_base_dir = Path("c:/work_han/backup")
 
     ref = "m234"
-    # read a dictionary
+    # Read an existing dictionary
     dictionary_path = ref_base_dir / f"{ref}_dictionary.json"
     if not dictionary_path.exists():
         return
     with open(dictionary_path, "r", encoding="utf-8") as f:
         dictionary = json.load(f)
 
-    # read a pair of scripts
+    # Read a pair of scripts
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         if not "_jpn.json" in file.name:
             continue
@@ -43,7 +42,7 @@ def main():
         with open(dst_path, "r", encoding="utf-8") as f:
             dst = json.load(f)
 
-        # check address
+        # Check addresses in the source script
         modified = False
         for address, src_sentence in src.items():
             if not src_sentence in dictionary:
@@ -52,7 +51,7 @@ def main():
             if address in dst:
                 dst_sentence = dst[address]
                 if len(src_sentence) != len(dst_sentence):
-                    console.print(f"[{color}]{address},{file_tag}[/{color}]")
+                    console.print(f"{address},{file_tag}", style=color)
                     print(len(src_sentence), len(dst_sentence))
                     assert (
                         0
@@ -69,7 +68,7 @@ def main():
                         dst[address] = translated[0]
                         modified = True
 
-                        console.print(f"[{color}]{address},{file_tag}[/{color}]")
+                        console.print(f"{address},{file_tag}", style=color)
                         print(src_sentence)
                         print(translated[0])
                 # else:

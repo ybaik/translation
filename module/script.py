@@ -3,7 +3,7 @@ from .font_table import FontTable
 from .sjis_code import is_sjis_valid
 
 
-def extract_scripts(
+def extract_script(
     data: bytearray,
     font_table: FontTable,
     length_threshold: int,
@@ -11,14 +11,14 @@ def extract_scripts(
 ) -> Tuple[Dict, Dict]:
 
     i = 0
-    length = 0  # sentence length
+    length = 0  # Sentence length
     sentence = ""
     sentence_log = ""
     script = dict()
     script_log = dict()
 
     while i < len(data) - 1:
-        # extract a 2byte code
+        # Extract a 2byte code
         code_int = (data[i] << 8) + data[i + 1]
         code_hex = f"{code_int:X}"
 
@@ -32,10 +32,10 @@ def extract_scripts(
                 need_to_stop = False
 
         if not need_to_stop:
-            # find a character in the font table
+            # Find a character in the font table
             character = font_table.get_char(code_hex)
 
-            if character:  # character is in the font table
+            if character:  # Character is in the font table
                 sentence += character
                 if character == "■":
                     sentence_log += f":{code_hex}" if sentence_log else f"{code_hex}"
@@ -47,7 +47,7 @@ def extract_scripts(
                 length += 1
                 i += 1
         else:
-            # check sentence length and save
+            # Check sentence length and save
             if length >= length_threshold:
                 address = f"{i-length*2:05X}={i-1:05X}"
                 script[address] = sentence
@@ -58,7 +58,7 @@ def extract_scripts(
             length = 0
         i += 1
 
-    # check a result of the end of data
+    # Check a result of the end of data
     if length >= length_threshold:
         address = f"{i-length*2:05X}={i-1:05X}"
         script[address] = sentence
@@ -71,16 +71,16 @@ def extract_scripts(
     return script, script_log
 
 
-def write_scripts(data: bytearray, font_table: FontTable, scripts: Dict) -> bytearray:
+def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytearray:
 
-    # write scripts
-    for address, sentence in scripts.items():
+    # Write scripts
+    for address, sentence in script.items():
         [code_hex_start, code_hex_end] = address.split("=")
         spos = int(code_hex_start, 16)
         epos = int(code_hex_end, 16)
         pos = spos
 
-        # write characters in the sentence
+        # Write characters in the sentence
         idx_char = 0
         while idx_char < len(sentence):
             character = sentence[idx_char]
@@ -140,17 +140,17 @@ def write_code(
 
 
 def extract_table(
-    data: bytearray, scripts: Dict, font_table: FontTable = dict()
+    data: bytearray, script: Dict, font_table: FontTable = dict()
 ) -> FontTable:
 
-    # write scripts
-    for range, sentence in scripts.items():
+    # Check a script
+    for range, sentence in script.items():
         [code_hex_start, code_hex_end] = range.split("=")
         spos = int(code_hex_start, 16)
         pos = spos
 
-        # write letters in the sentence
-        for i, letter in enumerate(sentence):
+        # Check letters in the sentence
+        for letter in sentence:
             # extract a 2byte code
             code_int = (data[pos] << 8) + data[pos + 1]
             code_hex = f"{code_int:X}"
@@ -166,7 +166,7 @@ def find_sentence(script: Dict, sentence: str) -> bool:
     """Find a sentence.
 
     Args:
-        script (dict): A dictionary of scripts.
+        script (dict): A dictionary of a script.
         sentence (str): A sentence to find.
 
     Returns:
@@ -185,7 +185,7 @@ def find_sentence_and_update(script: Dict, sentence: str, new_sentence: str) -> 
     """Find a sentence and update it.
 
     Args:
-        script (dict): A dictionary of scripts.
+        script (dict): A dictionary of script.
         sentence (str): A sentence to find.
         new_sentence (str): A new sentence to update. The length should be matched.
 

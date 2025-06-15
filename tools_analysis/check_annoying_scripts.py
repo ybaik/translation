@@ -3,7 +3,6 @@ from pathlib import Path
 from rich.console import Console
 
 
-# Dialog dictionary
 def main():
     console = Console()
 
@@ -15,7 +14,7 @@ def main():
     # script_base_dir = base_dir / "m4"
     # script_base_dir = Path("c:/work_han/backup")
 
-    # read a dictionary
+    # Read an existing dictionary
     annoying_path = ref_base_dir / f"{ref}_annoying.json"
     # annoying_path = base_dir / f"{ref}_dictionary.json"
     if not annoying_path:
@@ -25,7 +24,7 @@ def main():
 
     print(f"Number of annoying scripts = {len(annoying)}")
 
-    # read a pair of scripts
+    # Read a pair of scripts
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         if not "_jpn.json" in file.name:
             continue
@@ -46,7 +45,7 @@ def main():
         with open(dst_path, "r", encoding="utf-8") as f:
             dst = json.load(f)
 
-        # check address
+        # Check addresses in the source script
         modified = False
         for address, src_sentence in src.items():
             if not src_sentence in annoying:
@@ -55,7 +54,7 @@ def main():
             if address in dst:
                 dst_sentence = dst[address]
                 if len(src_sentence) != len(dst_sentence):
-                    console.print(f"[{color}]{address},{file_tag}[/{color}]")
+                    console.print(f"{address},{file_tag}", style=color)
                     assert (
                         0
                     ), f"sentence length is not matched. {src_sentence} != {dst_sentence}"
@@ -77,7 +76,7 @@ def main():
                     new_sentence = annoying[src_sentence]["translated"][idx]
                     if new_sentence != dst_sentence:
                         dst[address] = new_sentence
-                        console.print(f"[{color}]{address},{file_tag}[/{color}]")
+                        console.print(f"{address},{file_tag}", style=color)
                         print(new_sentence)
                         modified = True
 

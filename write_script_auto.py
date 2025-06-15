@@ -7,9 +7,9 @@ from rich.console import Console
 
 
 def main():
-    script_base_dir = Path("../workspace/m4")
-    src_bin_base_dir = Path("../workspace/m4_jpn_all")
-    dst_bin_base_dir = Path("../workspace/m4_kor")
+    script_base_dir = Path("../workspace/m2")
+    src_bin_base_dir = Path("../workspace/m2_jpn_all")
+    dst_bin_base_dir = Path("../workspace/m2_kor")
     dst_font_table_path = "font_table/font_table-kor-jin.json"
 
     # ===================================================================
@@ -27,7 +27,7 @@ def main():
             print(f"{src_script_path.name} is not exists.")
             continue
 
-        # Check src data path
+        # Check a source data path
         src_data_path = src_bin_base_dir / str(
             file.relative_to(script_base_dir)
         ).replace("_kor.json", "")
@@ -35,7 +35,7 @@ def main():
             print(f"{src_data_path.name} is not exists.")
             continue
 
-        # Check dst data path
+        # Check a destination data path
         dst_data_path = dst_bin_base_dir / src_data_path.relative_to(src_bin_base_dir)
         if dst_data_path.exists():
             continue
@@ -45,23 +45,23 @@ def main():
 
         console.print(f"[yellow] Start:{src_data_path}[/yellow]")
 
-        # Read scripts
+        # Read source and destination scripts
         with open(src_script_path, "r", encoding="utf-8") as f:
             src_scripts = json.load(f)
         with open(dst_script_path, "r", encoding="utf-8") as f:
             dst_scripts = json.load(f)
 
-        # read a font table
+        # Read a destinationfont table
         if not check_file(dst_font_table_path):
             return
         font_table = FontTable(dst_font_table_path)
 
-        # check address
+        # Compare addresses in the source and destination scripts
         count_diff = diff_address(src_scripts, dst_scripts)
         if count_diff:
             return
 
-        # check scripts
+        # Compare source and destination scripts
         count_false_length, count_false_letters = check_script(dst_scripts, font_table)
 
         if count_false_length or count_false_letters:
@@ -75,7 +75,7 @@ def main():
         print(f"False length/letter count:{count_false_length},{count_false_letters}")
         console.print(f"[yellow] End:{src_data_path}[/yellow]")
 
-        # read the target (jpn) data
+        # Read the source binary data
         if not check_file(src_data_path):
             return
         with open(src_data_path, "rb") as f:
@@ -83,10 +83,10 @@ def main():
         data = bytearray(data)
         print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
-        # write scripts
+        # Write the destination script to the binary data in memory
         data = write_scripts(data, font_table, dst_scripts)
 
-        # save data
+        # Save the replaced binary data to a file in the destination directory
         with open(dst_data_path, "wb") as f:
             f.write(data)
 

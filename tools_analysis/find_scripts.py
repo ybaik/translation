@@ -14,11 +14,11 @@ def main():
 
     find_source = False
 
-    sentence = "じゃあ、どうするの？"
+    sentence = ""
     sentence_kor = "휘"
     sentence_kor = sentence_kor.replace(" ", "_")
 
-    # read a pair of scripts
+    # Read a pair of scripts
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
 
         file_tag = f"{file.parent.name}/{file.name}"

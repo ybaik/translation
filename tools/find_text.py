@@ -13,7 +13,7 @@ def main():
     for file in path_list:
         if not "_kor.json" in file:
             continue
-        # read json script
+        # Read json script
         print(file)
         with open(f"{base_path}/{file}", "r", encoding="utf-8") as f:
             scripts = json.load(f)

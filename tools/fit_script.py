@@ -38,15 +38,13 @@ def main(script_path: Path):
 
         if l_len != length:
             confirmed = False
-            console.print(
-                f"[yellow]{l_len} {original_dialogue} {dialogue} {length - l_len}[/yellow]"
-            )
+            console.print(f"{l_len} {original_dialogue} {dialogue} {length - l_len}", style="yellow")
         else:
             print(l_len, original_dialogue, dialogue, length - l_len)
             src_script[script_range] = dialogue
 
     if confirmed:
-        console.print("[green] Saved [/green]")
+        console.print("Saved", style="green")
         with open(script_path, "w", encoding="utf-8") as f:
             json.dump(src_script, f, ensure_ascii=False, indent=4)
 

@@ -2,7 +2,7 @@ import os
 import json
 from pathlib import Path
 from module.font_table import check_file, FontTable
-from module.script import extract_scripts
+from module.script import extract_script
 
 
 def main():
@@ -26,12 +26,12 @@ def main():
             continue
 
         print(f"{file} ===========================================")
-        # read a font table
+        # Read a font table
         if not check_file(font_table_path):
             return
         font_table = FontTable(font_table_path)
 
-        # read the target (jpn) data
+        # Read a target binary data
         if not check_file(src_data_path):
             return
         with open(src_data_path, "rb") as f:
@@ -39,10 +39,10 @@ def main():
         data = bytearray(data)
         print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
-        # extract scripts
-        script, _ = extract_scripts(data, font_table, length_threshold, restriction)
+        # Extract a script from the binary data
+        script, _ = extract_script(data, font_table, length_threshold, restriction)
 
-        # save data
+        # Save the extracted script to a file in the script directory
         with open(dst_script_path, "w", encoding="utf-8") as f:
             json.dump(script, f, ensure_ascii=False, indent=4)
 

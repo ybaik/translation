@@ -27,7 +27,7 @@ def main():
         if not os.path.isfile(target_path):
             continue
 
-        # read json script
+        # Read a json script
         print(file)
         with open(f"{base_path}/{file}", "rb") as f:
             data = f.read()
@@ -39,7 +39,7 @@ def main():
             found = True
             for j in range(len(address_to_find_int)):
                 idx = j * 2
-                # extract a 2byte code
+                # Extract a 2byte code
                 code_int = (data[i + idx] << 8) + data[i + idx + 1]
 
                 if address_to_find_int[j] != code_int:

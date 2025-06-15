@@ -1,7 +1,7 @@
 import json
 from module.font_table import check_file, FontTable
-from module.script import write_scripts
-from check_script import check_script
+from module.script import write_script
+from module.check_script import check_script
 
 
 def main():
@@ -17,17 +17,17 @@ def main():
     src_data_path = config["src_data_file"]
     dst_data_path = config["dst_data_file"]
 
-    # read scripts
+    # Read a script
     with open(dst_script_path, "r", encoding="utf-8") as f:
-        scripts = json.load(f)
+        script = json.load(f)
 
-    # read a font table
+    # Read a font table
     if not check_file(dst_font_table_path):
         return
     font_table = FontTable(dst_font_table_path)
 
-    # check scripts
-    count_false_length, count_false_letters = check_script(scripts, font_table)
+    # Check the script
+    count_false_length, count_false_letters = check_script(script, font_table)
     print(
         f"False sentence length and letter count: {count_false_length}, {count_false_letters}"
     )
@@ -36,7 +36,7 @@ def main():
         print("False sentence length or letters should be fixed.")
         return
 
-    # read the target (jpn) data
+    # Read the source binary data
     if not check_file(src_data_path):
         return
     with open(src_data_path, "rb") as f:
@@ -44,10 +44,10 @@ def main():
     data = bytearray(data)
     print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
-    # write script
-    data = write_scripts(data, font_table, scripts)
+    # Write the script to the binary data in memory
+    data = write_script(data, font_table, script)
 
-    # save data
+    # Save the replaced binary data to a file in the destination directory
     with open(dst_data_path, "wb") as f:
         f.write(data)
 
