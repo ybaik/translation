@@ -1,8 +1,10 @@
 import json
 from pathlib import Path
+from rich.console import Console
 
 
 def main():
+    console = Console()
     base_dir = Path("c:/work_han/workspace")
     base_ref_dir = Path("c:/work_han/backup")
 
@@ -14,8 +16,8 @@ def main():
         script_dir = base_script_dir / "m4"
     elif out == "m23":
         base_script_dir = base_ref_dir
-        ref = "m3"
-        script_dir = base_script_dir / "m2"
+        ref = "m2"
+        script_dir = base_script_dir / "m3"
     elif out == "m2":
         base_script_dir = base_ref_dir
         script_dir = base_script_dir / "m2"
@@ -41,6 +43,7 @@ def main():
         dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")
         if not dst_path.exists():
             continue
+        file_tag = f"{file.parent.name}/{file.name}"
 
         with open(file, "r", encoding="utf-8") as f:
             src = json.load(f)
@@ -59,7 +62,7 @@ def main():
             if address in dst:
                 dst_sentence = dst[address]
                 if len(src_sentence) != len(dst_sentence):
-                    print(file.name, address)
+                    console.print(f"{address} {file_tag}", style="red")
                     assert (
                         0
                     ), f"sentence length is not matched. {address}/{len(src_sentence)} != {len(dst_sentence)}"

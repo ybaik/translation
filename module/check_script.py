@@ -23,7 +23,7 @@ def check_script(scripts: Dict, font_table: FontTable) -> Tuple[int, int]:
     count_false_characters = 0
 
     for address, sentence in scripts.items():
-        # Check data length from an address range
+        # Check data length from an address range in bytes
         [code_hex_start, code_hex_end] = address.split("=")
         length_from_address = int(code_hex_end, 16) - int(code_hex_start, 16) + 1
 

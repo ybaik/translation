@@ -1,20 +1,21 @@
 import json
 from pathlib import Path
+from rich.console import Console
 
 
-# Dialog dictionary
 def main():
+    console = Console()
     base_dir = Path("c:/work_han/workspace")
     script_base_dir = base_dir
 
-    script_base_dir = Path("c:/work_han/workspace/m4")
+    script_base_dir = Path("c:/work_han/workspace/m2")
     # script_base_dir = Path("c:/work_han/workspace/script")
-    script_base_dir = Path("c:/work_han/backup")
+    # script_base_dir = Path("c:/work_han/backup")
 
     find_source = False
 
-    sentence = "あれ以来ですね"
-    sentence_kor = "착륙하는"
+    sentence = "じゃあ、どうするの？"
+    sentence_kor = "휘"
     sentence_kor = sentence_kor.replace(" ", "_")
 
     # read a pair of scripts
@@ -41,6 +42,7 @@ def main():
         if not find_source:
             for address, dst_sentence in dst.items():
                 if sentence_kor not in dst_sentence:
+                    # if sentence_kor != dst_sentence:
                     buf_address = address
                     buf_dst_sentence = dst_sentence
                     buf_src_sentence = src[address]
@@ -50,7 +52,7 @@ def main():
                 print(buf_address)
                 print(buf_src_sentence)
                 print(buf_dst_sentence)
-                print(file_tag, address)
+                console.print(f"{address} {file_tag}", style="green")
                 print(src[address])
                 print(dst_sentence)
                 print("=============================")
@@ -77,7 +79,7 @@ def main():
                     print(buf_address)
                     print(buf_src_sentence)
                     print(buf_dst_sentence)
-                    print(file_tag, address)
+                    console.print(f"{address} {file_tag}", style="green")
                     print(src_sentence)
                     print(dst_sentence)
                     print("=============================")
