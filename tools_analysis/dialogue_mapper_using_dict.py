@@ -9,8 +9,8 @@ def main():
     base_dir = Path("c:/work_han/workspace")
     ref_base_dir = Path("c:/work_han/backup")
 
-    # script_base_dir = base_dir / "script"
-    # script_base_dir = base_dir / "m4"
+    script_base_dir = base_dir / "m4_script"
+    script_base_dir = base_dir / "m4"
     script_base_dir = base_dir
     # script_base_dir = Path("c:/work_han/backup")
 
@@ -50,13 +50,17 @@ def main():
 
             if address in dst:
                 dst_sentence = dst[address]
-                if len(src_sentence) != len(dst_sentence):
-                    console.print(f"{address},{file_tag}", style=color)
-                    print(len(src_sentence), len(dst_sentence))
-                    assert (
-                        0
-                    ), f"Sentence length is not matched. {src_sentence} != {dst_sentence}"
-                    continue
+
+                if "|" in dst_sentence:
+                    pass
+                else:
+                    if len(src_sentence) != len(dst_sentence):
+                        console.print(f"{address},{file_tag}", style=color)
+                        print(len(src_sentence), len(dst_sentence))
+                        assert (
+                            0
+                        ), f"Sentence length is not matched. {src_sentence} != {dst_sentence}"
+                        continue
 
                 # print(file.name, address)
                 # print(src_sentence)

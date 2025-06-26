@@ -9,7 +9,6 @@ def main():
     base_ref_dir = Path("c:/work_han/backup")
 
     out = "m234"
-
     if out == "m234":
         base_script_dir = base_dir
         ref = "m23"
@@ -24,8 +23,11 @@ def main():
     elif out == "m3":
         base_script_dir = base_ref_dir
         script_dir = base_script_dir / "m3"
+    elif out == "m4":
+        base_script_dir = base_ref_dir
+        script_dir = base_dir / "m4"
 
-    if out in ["m2", "m3"]:
+    if out in ["m2", "m3", "m4"]:
         dictionary = dict()
     else:
         reference_dictionary_path = base_ref_dir / f"{ref}_dictionary.json"
@@ -61,12 +63,16 @@ def main():
 
             if address in dst:
                 dst_sentence = dst[address]
-                if len(src_sentence) != len(dst_sentence):
-                    console.print(f"{address} {file_tag}", style="red")
-                    assert (
-                        0
-                    ), f"sentence length is not matched. {address}/{len(src_sentence)} != {len(dst_sentence)}"
-                    continue
+
+                if "|" in dst_sentence:
+                    pass
+                else:
+                    if len(src_sentence) != len(dst_sentence):
+                        console.print(f"{address} {file_tag}", style="red")
+                        assert (
+                            0
+                        ), f"sentence length is not matched. {address}/{len(src_sentence)} != {len(dst_sentence)}"
+                        continue
                 dictionary[src_sentence]["reference"] += 1
                 if not dst_sentence in dictionary[src_sentence]["translated"]:
                     dictionary[src_sentence]["count"] += 1

@@ -1,15 +1,15 @@
 import json
 from pathlib import Path
 from module.font_table import check_file, FontTable
-from module.script import write_scripts
+from module.script import write_script
 from module.check_script import check_script, diff_address
 from rich.console import Console
 
 
 def main():
-    script_base_dir = Path("../workspace/m2")
-    src_bin_base_dir = Path("../workspace/m2_jpn_all")
-    dst_bin_base_dir = Path("../workspace/m2_kor")
+    script_base_dir = Path("../workspace/m4")
+    src_bin_base_dir = Path("../workspace/m4_jpn_all")
+    dst_bin_base_dir = Path("../workspace/m4_kor")
     dst_font_table_path = "font_table/font_table-kor-jin.json"
 
     # ===================================================================
@@ -45,11 +45,11 @@ def main():
 
         console.print(f"[yellow] Start:{src_data_path}[/yellow]")
 
-        # Read source and destination scripts
+        # Read source and destination script
         with open(src_script_path, "r", encoding="utf-8") as f:
-            src_scripts = json.load(f)
+            src_script = json.load(f)
         with open(dst_script_path, "r", encoding="utf-8") as f:
-            dst_scripts = json.load(f)
+            dst_script = json.load(f)
 
         # Read a destinationfont table
         if not check_file(dst_font_table_path):
@@ -57,12 +57,12 @@ def main():
         font_table = FontTable(dst_font_table_path)
 
         # Compare addresses in the source and destination scripts
-        count_diff = diff_address(src_scripts, dst_scripts)
+        count_diff = diff_address(src_script, dst_script)
         if count_diff:
             return
 
-        # Compare source and destination scripts
-        count_false_length, count_false_letters = check_script(dst_scripts, font_table)
+        # Check the destination script
+        count_false_length, count_false_letters = check_script(dst_script, font_table)
 
         if count_false_length or count_false_letters:
             console.print(
@@ -84,7 +84,7 @@ def main():
         print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
         # Write the destination script to the binary data in memory
-        data = write_scripts(data, font_table, dst_scripts)
+        data = write_script(data, font_table, dst_script)
 
         # Save the replaced binary data to a file in the destination directory
         with open(dst_data_path, "wb") as f:

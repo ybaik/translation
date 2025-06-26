@@ -38,7 +38,10 @@ def main(script_path: Path):
 
         if l_len != length:
             confirmed = False
-            console.print(f"{l_len} {original_dialogue} {dialogue} {length - l_len}", style="yellow")
+            console.print(
+                f"{l_len} {original_dialogue} {dialogue} {length - l_len}",
+                style="yellow",
+            )
         else:
             print(l_len, original_dialogue, dialogue, length - l_len)
             src_script[script_range] = dialogue
@@ -51,6 +54,6 @@ def main(script_path: Path):
 
 if __name__ == "__main__":
 
-    base_dir = Path("c:/work_han/workspace/script")
-    script_path = base_dir / "H02_ADV.BIN_kor.json"
+    base_dir = Path("c:/work_han/workspace/m4_script")
+    script_path = base_dir / "BODY_MES.BIN_kor.json"
     main(script_path)

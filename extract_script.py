@@ -34,9 +34,7 @@ def main():
     print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
     # Extract a script from the binary data
-    script, script_log = extract_script(
-        data, font_table, length_threshold, restriction
-    )
+    script, script_log = extract_script(data, font_table, length_threshold, restriction)
 
     # Save the extracted script to a file in the script directory
     with open(src_script_path, "w", encoding="utf-8") as f:

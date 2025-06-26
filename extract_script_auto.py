@@ -7,13 +7,13 @@ from module.script import extract_script
 
 def main():
 
-    bin_path = "../workspace/m4_jpn_s"
-    font_table_path = "font_table/font_table-jpn-40K.json"
+    bin_path = "../workspace/m2_jpn_all"
+    font_table_path = "font_table/font_table-jpn-full.json"
     extended_word = "_jpn"
-    script_path = "../workspace/m4_jpn_s4"
+    script_path = "../workspace/script"
 
-    length_threshold = 2
-    restriction = False
+    length_threshold = 1
+    restriction = True
     # =================================================================
 
     files = os.listdir(bin_path)
