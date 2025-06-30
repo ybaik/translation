@@ -1,7 +1,7 @@
 import os
 import json
 from typing import List
-from .sjis_code import is_sjis_valid
+from ascii import ascii_table
 
 
 def check_file(path: str) -> bool:
@@ -19,8 +19,9 @@ class FontTable:
         self.code_int_min = 0xFFFF
         self.code_int_max = 0
 
-        # For 1-byte characters
-        self.char2code_1byte = dict()
+        # For ascii (1-byte) characters
+        self.code2char_ascii = ascii_table
+        self.char2code_ascii = {v: k for k, v in ascii_table.items()}
 
         # Read font table
         self.read_font_table(file_path)
@@ -39,14 +40,11 @@ class FontTable:
             print("f{ext} is not a supported format.")
             return False
 
-        # make char2code table
+        # Make char2code table
         self.char2code = dict()
         for k, v in self.code2char.items():
             if len(k) == 2:  # 1-byte code
-                if self.char2code_1byte.get(v) is None:
-                    self.char2code_1byte[v] = k
-                # else:
-                #     print(f"Invalid 1-byte code: {k}")
+                continue
             else:
                 if self.char2code.get(v) is None:
                     self.char2code[v] = k
@@ -76,10 +74,6 @@ class FontTable:
             font_table = json.load(f)
 
         codes = list(font_table.keys())
-        # for code in codes:
-        #     if not is_sjis_valid(code):
-        #         print(f"code {code} is invalid for sjis.")
-
         codes.sort()
         self.code_int_min = int(codes[0], 16)
         self.code_int_max = int(codes[-1], 16)
@@ -89,7 +83,7 @@ class FontTable:
 
         font_table = dict()
 
-        # read font table
+        # Read font table
         with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
             for line in lines:
@@ -97,10 +91,6 @@ class FontTable:
                 idx = line.find("=")
                 code_hex = line[:idx].upper()
                 character = line[idx + 1 :]
-
-                # check if the code is value based on shift-jis
-                # if not is_sjis_valid(code_hex):
-                #     print(f"code {code_hex} is invalid for sjis.")
 
                 if font_table.get(code_hex) is None:
                     font_table[code_hex] = character
@@ -146,8 +136,8 @@ class FontTable:
     def get_code(self, character: str) -> str:
         return self.char2code.get(character)
 
-    def get_code_1byte(self, character: str) -> str:
-        return self.char2code_1byte.get(character)
+    def get_code_ascii(self, character: str) -> str:
+        return self.char2code_ascii.get(character)
 
     def get_codes(self, sentence: str) -> List[str]:
         codes_hex = []

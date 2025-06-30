@@ -68,6 +68,12 @@ def main():
                 translated = dictionary[src_sentence]["translated"]
 
                 if len(translated) == 1:
+                    if len(dst[address]) != len(translated[0]):
+                        console.print(
+                            f"Length mismatch: {address},{file_tag}", style="red"
+                        )
+                        continue
+
                     if dst[address] != translated[0]:
                         dst[address] = translated[0]
                         modified = True
