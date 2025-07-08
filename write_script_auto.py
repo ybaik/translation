@@ -7,9 +7,9 @@ from rich.console import Console
 
 
 def main():
-    script_base_dir = Path("../workspace/m4")
-    src_bin_base_dir = Path("../workspace/m4_jpn_all")
-    dst_bin_base_dir = Path("../workspace/m4_kor")
+    script_base_dir = Path("../workspace/script")
+    src_bin_base_dir = Path("../workspace/rb1-PC98-JPN")
+    dst_bin_base_dir = Path("../workspace/rb1-PC98-KOR")
     dst_font_table_path = "font_table/font_table-kor-jin.json"
 
     # ===================================================================
@@ -64,14 +64,19 @@ def main():
         # Check the destination script
         count_false_length, count_false_letters = check_script(dst_script, font_table)
 
-        if count_false_length or count_false_letters:
+        if count_false_length:
             console.print(
                 f"[yellow] False length/letter count:{count_false_length},{count_false_letters}[/yellow]"
             )
+        if count_false_letters:
             console.print(
-                f"[yellow]The error should be fixed for[/yellow] [green]{src_data_path}[/green]"
+                f"[yellow] False length/letter count:{count_false_length},{count_false_letters}[/yellow]"
             )
             return
+        console.print(
+            f"[yellow]The error should be fixed for[/yellow] [green]{src_data_path}[/green]"
+        )
+
         print(f"False length/letter count:{count_false_length},{count_false_letters}")
         console.print(f"[yellow] End:{src_data_path}[/yellow]")
 
@@ -81,10 +86,13 @@ def main():
         with open(src_data_path, "rb") as f:
             data = f.read()
         data = bytearray(data)
-        print(f"Data size: {src_data_path}({len(data):,} bytes)")
+        console.print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
         # Write the destination script to the binary data in memory
-        data = write_script(data, font_table, dst_script)
+        data, valid_sentence_count = write_script(data, font_table, dst_script)
+        console.print(
+            f"Valid sentence percentege: {valid_sentence_count/len(dst_script)*100:.2f}%"
+        )
 
         # Save the replaced binary data to a file in the destination directory
         with open(dst_data_path, "wb") as f:

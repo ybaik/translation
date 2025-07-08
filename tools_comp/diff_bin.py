@@ -1,17 +1,16 @@
 import os
 from pathlib import Path
-from shutil import copyfile
 
 
 def main():
-
     base_dir = Path("c:/work_han/workspace")
-    src_dir = base_dir / "jpn_all"
-    dst_dir = base_dir / "kor_all"
+    src_dir = base_dir / "KOUKAI-JPN"
+    dst_dir = base_dir / "KOUKAI-KOR"
 
-    patch_dir = base_dir / "patch"
+    patch_dir = base_dir / "KOUKAI-KOR"
+    dst_dir = patch_dir
+
     patch_list = os.listdir(patch_dir)
-
     file_list = os.listdir(src_dir)
 
     cnt = 0
@@ -29,7 +28,7 @@ def main():
 
         msg = ""
         if len(src_data) != len(dst_data):
-            msg += " diff file size |"
+            msg += f" diff file size ({len(src_data)}, {len(dst_data)}: {len(dst_data)-len(src_data)}) |"
 
         # if len(msg) > 0:
         #     print(f"{file}\t:{msg}")

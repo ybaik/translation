@@ -14,24 +14,13 @@ def check_script(scripts: Dict, font_table: FontTable) -> Tuple[int, int]:
     Returns:
         (int, int): A tuple containing the count of incorrect sentence lengths and incorrect characters.
     """
-
-    # Create a set of available characters
-    available_characters = set(font_table.char2code.keys())
-
     # Check script
     count_false_length = 0
     count_false_characters = 0
 
     for address, sentence in scripts.items():
-        # Check data length from an address range in bytes
-        [code_hex_start, code_hex_end] = address.split("=")
-        length_from_address = int(code_hex_end, 16) - int(code_hex_start, 16) + 1
-
-        # Check data length from a sentence
-        num_one_byte = sentence.count("|")
-        num_two_byte = len(sentence) - num_one_byte * 2
-        length_from_sentence = num_one_byte + num_two_byte * 2
-
+        length_from_address = font_table.check_length_from_address(address)
+        length_from_sentence = font_table.check_length_from_sentence(sentence)
         if length_from_address != length_from_sentence:
             print(
                 f"Wrong sentence length:{address}: {length_from_address}-{length_from_sentence}"
@@ -39,16 +28,7 @@ def check_script(scripts: Dict, font_table: FontTable) -> Tuple[int, int]:
             count_false_length += 1
 
         # Check if there is false characters in a sentence via comparison with the font table
-        count_false_character = 0
-        false_character = ""
-        for character in sentence:
-            if (
-                character == "|"
-            ):  # Ignore the pipe character since it is an indicate of a one byte character
-                continue
-            if character not in available_characters:
-                count_false_character += 1
-                false_character += character
+        count_false_character, false_character = font_table.verify_sentence(sentence)
         if count_false_character:
             print(f"Wrong letters:{address}: {count_false_character}-{false_character}")
             count_false_characters += count_false_character

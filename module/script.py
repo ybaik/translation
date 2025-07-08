@@ -1,17 +1,18 @@
 from typing import Dict, Tuple
-from .font_table import FontTable
-from .sjis_code import is_sjis_valid
+from module.font_table import FontTable
 
 
 def extract_script(
     data: bytearray,
     font_table: FontTable,
     length_threshold: int,
-    restriction: bool = False,
+    check_ascii: bool = False,
+    check_ascii_restriction: bool = False,
+    check_range: bool = False,
 ) -> Tuple[Dict, Dict]:
 
     i = 0
-    length = 0  # Sentence length
+    length = 0  # Sentence length in bytes
     sentence = ""
     sentence_log = ""
     script = dict()
@@ -24,12 +25,12 @@ def extract_script(
 
         need_to_stop = True
 
-        if restriction:
-            if is_sjis_valid(code_hex):
-                need_to_stop = False
-        else:
-            if font_table.range(code_int):
-                need_to_stop = False
+        character = font_table.get_char(code_hex)
+        if character is not None:
+            need_to_stop = False
+
+        if check_range and font_table.range(code_int):
+            need_to_stop = False
 
         if not need_to_stop:
             # Find a character in the font table
@@ -39,24 +40,37 @@ def extract_script(
                 sentence += character
                 if character == "■":
                     sentence_log += f":{code_hex}" if sentence_log else f"{code_hex}"
-                length += 1
-                i += 1
+                length += 2
+                i += 2
             else:
                 sentence += "@"
                 sentence_log += f":@{code_hex}" if sentence_log else f"@{code_hex}"
-                length += 1
-                i += 1
+                length += 2
+                i += 2
         else:
+            if check_ascii:
+                code_int = data[i]
+                code_hex = f"{code_int:X}"
+                character = font_table.get_char_ascii(code_hex)
+
+                if check_ascii_restriction and character != "_" and length == 0:
+                    need_to_stop = True
+                elif character is not None:
+                    sentence += "|" + character
+                    length += 1
+                    need_to_stop = False
+
             # Check sentence length and save
-            if length >= length_threshold:
-                address = f"{i-length*2:05X}={i-1:05X}"
-                script[address] = sentence
-                if sentence_log:
-                    script_log[address] = sentence_log
-            sentence = ""
-            sentence_log = ""
-            length = 0
-        i += 1
+            if need_to_stop:
+                if length >= length_threshold:
+                    address = f"{i-length:05X}={i-1:05X}"
+                    script[address] = sentence
+                    if sentence_log:
+                        script_log[address] = sentence_log
+                sentence = ""
+                sentence_log = ""
+                length = 0
+            i += 1
 
     # Check a result of the end of data
     if length >= length_threshold:
@@ -73,12 +87,35 @@ def extract_script(
 
 def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytearray:
 
+    valid_sentence_count = 0
+
     # Write scripts
     for address, sentence in script.items():
         [code_hex_start, code_hex_end] = address.split("=")
         spos = int(code_hex_start, 16)
         epos = int(code_hex_end, 16)
         pos = spos
+
+        # Check if there is a unsupport letter in the sentence
+        skip_sentence = False
+        skip_character = False
+        for character in sentence:
+            if character == "|":
+                skip_character = True
+                continue
+            if skip_character:
+                skip_character = False
+                continue
+            if not font_table.exists(character):
+                skip_sentence = True
+                break
+
+            if font_table.is_japanese(character):
+                skip_sentence = True
+                break
+        if skip_sentence:
+            continue
+        valid_sentence_count += 1
 
         # Write characters in the sentence
         idx_char = 0
@@ -90,8 +127,8 @@ def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytear
                 idx_char += 1
                 character = sentence[idx_char]
 
-                if font_table.get_code_1byte(character) is not None:
-                    code_hex = font_table.get_code_1byte(character)
+                if font_table.get_code_ascii(character) is not None:
+                    code_hex = font_table.get_code_ascii(character)
                     code_int = int(code_hex, 16)
                     data[pos] = code_int
                 else:
@@ -113,7 +150,7 @@ def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytear
                 pos += 2
             idx_char += 1
 
-    return data
+    return data, valid_sentence_count
 
 
 def write_code(

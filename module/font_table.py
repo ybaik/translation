@@ -1,7 +1,7 @@
 import os
 import json
-from typing import List
-from ascii import ascii_table
+from typing import List, Tuple
+from .ascii import ascii_table
 
 
 def check_file(path: str) -> bool:
@@ -121,8 +121,21 @@ class FontTable:
     def range(self, code_int: int) -> bool:
         return True if self.code_int_min <= code_int <= self.code_int_max else False
 
+    def exists(self, character: str) -> bool:
+        return character in self.char2code.keys()
+
+    def is_japanese(self, character: str) -> bool:
+        code = self.char2code.get(character)
+        code_int = int(code, 16)
+        if code_int >= 0x829F and code_int <= 0x8396:
+            return True
+        return False
+
     def get_char(self, code_hex: str) -> str:
         return self.code2char.get(code_hex)
+
+    def get_char_ascii(self, code_hex: str) -> str:
+        return self.code2char_ascii.get(code_hex)
 
     def get_chars(self, codes_hex) -> str:
         word = ""
@@ -146,3 +159,36 @@ class FontTable:
             codes_hex.append(code_hex)
 
         return codes_hex
+
+    def check_length_from_address(self, address: str) -> int:
+        [code_hex_start, code_hex_end] = address.split("=")
+        length_from_address = int(code_hex_end, 16) - int(code_hex_start, 16) + 1
+        return length_from_address
+
+    def check_length_from_sentence(self, sentence: str) -> int:
+        num_one_byte = sentence.count("|")
+        num_two_byte = len(sentence) - num_one_byte * 2
+        length_from_sentence = num_one_byte + num_two_byte * 2
+        return length_from_sentence
+
+    def verify_sentence(self, sentence: str) -> Tuple[bool, str]:
+        count_false_character = 0
+        false_characters = ""
+        check_ascii = False
+        for character in sentence:
+            if character == "|":
+                check_ascii = True
+                continue
+
+            if check_ascii:
+                if character not in self.char2code_ascii:
+                    count_false_character += 1
+                    false_character += "|" + character
+                check_ascii = False
+                continue
+
+            if character not in self.char2code:
+                count_false_character += 1
+                false_characters += character
+
+        return count_false_character, false_characters

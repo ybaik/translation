@@ -1,20 +1,18 @@
 import json
 from pathlib import Path
 from rich.console import Console
+from module.font_table import FontTable
 
 
 def main():
     console = Console()
 
     base_dir = Path("c:/work_han/workspace")
-    ref_base_dir = Path("c:/work_han/backup")
+    ref_base_dir = base_dir
+    script_base_dir = base_dir / "script"
 
-    script_base_dir = base_dir / "m4_script"
-    script_base_dir = base_dir / "m4"
-    script_base_dir = base_dir
-    # script_base_dir = Path("c:/work_han/backup")
+    ref = "rb"
 
-    ref = "m234"
     # Read an existing dictionary
     dictionary_path = ref_base_dir / f"{ref}_dictionary.json"
     if not dictionary_path.exists():
@@ -32,60 +30,58 @@ def main():
 
         file_tag = f"{file.parent.name}/{file.name}"
         color = "green"
-        if "m2" in file_tag:
-            color = "yellow"
-        elif "m3" in file_tag:
-            color = "red"
-
         with open(file, "r", encoding="utf-8") as f:
             src = json.load(f)
         with open(dst_path, "r", encoding="utf-8") as f:
             dst = json.load(f)
+
+        src_font_table = FontTable("./font_table/font_table-jpn-full.json")
+        dst_font_table = FontTable("./font_table/font_table-kor-jin.json")
 
         # Check addresses in the source script
         modified = False
         for address, src_sentence in src.items():
             if not src_sentence in dictionary:
                 continue
+            if address not in dst:
+                continue
 
-            if address in dst:
-                dst_sentence = dst[address]
+            dst_sentence = dst[address]
+            # length = src_font_table.check_length_from_address(address)
+            len_src_sentence = src_font_table.check_length_from_sentence(src_sentence)
+            len_dst_sentence = dst_font_table.check_length_from_sentence(dst_sentence)
+            if len_src_sentence != len_dst_sentence:
+                console.print(f"{address},{file_tag}", style=color)
+                print(len(src_sentence), len(dst_sentence))
+                assert (
+                    0
+                ), f"Sentence length is not matched. {src_sentence} != {dst_sentence}"
+                continue
 
-                if "|" in dst_sentence:
-                    pass
-                else:
-                    if len(src_sentence) != len(dst_sentence):
-                        console.print(f"{address},{file_tag}", style=color)
-                        print(len(src_sentence), len(dst_sentence))
-                        assert (
-                            0
-                        ), f"Sentence length is not matched. {src_sentence} != {dst_sentence}"
-                        continue
+            # print(file.name, address)
+            # print(src_sentence)
+            # print(dst_sentence)
+            translated = dictionary[src_sentence]["translated"]
+            if len(translated) == 1:
+                len_translated = dst_font_table.check_length_from_sentence(
+                    translated[0]
+                )
+                if len_dst_sentence != len_translated:
+                    console.print(f"Length mismatch: {address},{file_tag}", style="red")
+                    continue
 
-                # print(file.name, address)
-                # print(src_sentence)
-                # print(dst_sentence)
-                translated = dictionary[src_sentence]["translated"]
+                if dst[address] != translated[0]:
+                    dst[address] = translated[0]
+                    modified = True
 
-                if len(translated) == 1:
-                    if len(dst[address]) != len(translated[0]):
-                        console.print(
-                            f"Length mismatch: {address},{file_tag}", style="red"
-                        )
-                        continue
-
-                    if dst[address] != translated[0]:
-                        dst[address] = translated[0]
-                        modified = True
-
-                        console.print(f"{address},{file_tag}", style=color)
-                        print(src_sentence)
-                        print(translated[0])
-                # else:
-                #     print(len(translated))
-                #     print(file.name, address)
-                #     print(src_sentence)
-                #     print(dst_sentence)
+                    console.print(f"{address},{file_tag}", style=color)
+                    print(src_sentence)
+                    print(translated[0])
+            # else:
+            #     print(len(translated))
+            #     print(file.name, address)
+            #     print(src_sentence)
+            #     print(dst_sentence)
 
         if modified:
             print(dst_path)

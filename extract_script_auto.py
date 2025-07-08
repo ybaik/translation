@@ -7,16 +7,24 @@ from module.script import extract_script
 
 def main():
 
-    bin_path = "../workspace/m2_jpn_all"
+    bin_path = "../workspace/rb1-PC98-JPN"
     font_table_path = "font_table/font_table-jpn-full.json"
     extended_word = "_jpn"
-    script_path = "../workspace/script"
+    script_path = "../workspace/script_init"
 
-    length_threshold = 1
-    restriction = True
+    # bin_path = "../workspace/KOUKAI-KOR-HDD"
+    # font_table_path = "font_table/font_table-kor-jin.json"
+    # extended_word = "_kor"
+
+    # ref_dir = Path("../workspace/KOR-patch")
+
+    length_threshold_in_bytes = 2
+    check_ascii = True
+    check_ascii_restriction = True  # If True, the first ASCII code need to be x20
     # =================================================================
 
     files = os.listdir(bin_path)
+    # files = os.listdir(ref_dir)
 
     for file in files:
         src_data_path = f"{bin_path}/{file}"
@@ -40,7 +48,13 @@ def main():
         print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
         # Extract a script from the binary data
-        script, _ = extract_script(data, font_table, length_threshold, restriction)
+        script, _ = extract_script(
+            data,
+            font_table,
+            length_threshold_in_bytes,
+            check_ascii,
+            check_ascii_restriction,
+        )
 
         # Save the extracted script to a file in the script directory
         with open(dst_script_path, "w", encoding="utf-8") as f:

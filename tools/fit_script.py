@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from rich.console import Console
+from module.font_table import FontTable
 
 
 def main(script_path: Path):
@@ -11,10 +12,13 @@ def main(script_path: Path):
     with open(script_path, "r", encoding="utf-8") as f:
         src_script = json.load(f)
 
-    script_dict = {"0095D=00974": "とっても似合うと思うよ。"}
-    # …
-    dialogue_array = ["정말 잘 어올려 보여."]
+    dst_font_table = FontTable("./font_table/font_table-kor-jin.json")
 
+    script_dict = {
+        "2D35A=2D365": "傭兵の人数は",
+    }
+    # …
+    dialogue_array = ["용병 인원은"]
     console = Console()
 
     confirmed = False
@@ -28,22 +32,18 @@ def main(script_path: Path):
 
     for script_range, dialogue in zip(script_dict.keys(), dialogue_array):
         dialogue = dialogue.replace(" ", "_")
-        length = len(dialogue)
-        codes = script_range.split("=")
-        s_code_int = int(codes[0], 16)
-        e_code_int = int(codes[1], 16)
-        l_len = (e_code_int - s_code_int + 1) // 2
-
+        length = dst_font_table.check_length_from_address(script_range)
+        length_from_dialogue = dst_font_table.check_length_from_sentence(dialogue)
         original_dialogue = script_dict[script_range]
 
-        if l_len != length:
+        if length != length_from_dialogue:
             confirmed = False
             console.print(
-                f"{l_len} {original_dialogue} {dialogue} {length - l_len}",
+                f"{length} {original_dialogue} {dialogue} {length_from_dialogue-length}",
                 style="yellow",
             )
         else:
-            print(l_len, original_dialogue, dialogue, length - l_len)
+            print(length, original_dialogue, dialogue, length_from_dialogue - length)
             src_script[script_range] = dialogue
 
     if confirmed:
@@ -54,6 +54,6 @@ def main(script_path: Path):
 
 if __name__ == "__main__":
 
-    base_dir = Path("c:/work_han/workspace/m4_script")
-    script_path = base_dir / "BODY_MES.BIN_kor.json"
+    base_dir = Path("c:/work_han/workspace/script")
+    script_path = base_dir / "MAIN.EXE_kor.json"
     main(script_path)
