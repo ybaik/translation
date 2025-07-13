@@ -103,6 +103,26 @@ class FontTable:
         self.code_int_max = int(codes[-1], 16)
         self.code2char = font_table
 
+    def _read_tbl_1byte(self, file_path: str) -> None:
+        with open(file_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+            # Reset 1-byte table
+            self.code2char_ascii = dict()
+            self.char2code_ascii = dict()
+
+            for line in lines:
+                line = line.rstrip()
+                idx = line.find("=")
+                code_hex = line[:idx].upper()
+                character = line[idx + 1 :]
+
+                if self.code2char.get(code_hex) is None:
+                    self.code2char_ascii[code_hex] = character
+                    self.char2code_ascii[character] = code_hex
+                else:
+                    print(f"duplicated: {code_hex}")
+
     def _write_json(self, file_path: str) -> None:
 
         font_table = dict(sorted(self.code2char.items()))

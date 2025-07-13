@@ -176,6 +176,26 @@ def write_code(
     return data
 
 
+def write_code_1byte(
+    data: bytearray, hex_start: str, hex_end: str, code_hex: str, count: int
+) -> bytearray:
+
+    spos = int(hex_start, 16)
+    epos = int(hex_end, 16)
+    pos = spos
+
+    for i in range(count):
+        if pos >= epos:
+            break
+
+        code_int = int(code_hex, 16)
+        code_int += i
+        data[pos] = code_int
+        pos += 1
+
+    return data
+
+
 def extract_table(
     data: bytearray, script: Dict, font_table: FontTable = dict()
 ) -> FontTable:
