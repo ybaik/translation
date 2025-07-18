@@ -2,6 +2,7 @@ import os
 import json
 from typing import List, Tuple
 from .ascii import ascii_table
+from .jisx0201 import jisx0201_table
 
 
 def check_file(path: str) -> bool:
@@ -44,7 +45,8 @@ class FontTable:
         self.char2code = dict()
         for k, v in self.code2char.items():
             if len(k) == 2:  # 1-byte code
-                continue
+                if self.char2code.get(v) is None:
+                    self.char2code[v] = k
             else:
                 if self.char2code.get(v) is None:
                     self.char2code[v] = k
@@ -191,6 +193,13 @@ class FontTable:
         length_from_sentence = num_one_byte + num_two_byte * 2
         return length_from_sentence
 
+    def check_length_from_table(self, sentence: str) -> int:
+        length = 0
+        for letter in sentence:
+            code = self.get_code(letter)
+            length += len(code) // 2
+        return length
+
     def verify_sentence(self, sentence: str) -> Tuple[bool, str]:
         count_false_character = 0
         false_characters = ""
@@ -203,7 +212,7 @@ class FontTable:
             if check_ascii:
                 if character not in self.char2code_ascii:
                     count_false_character += 1
-                    false_character += "|" + character
+                    false_characters += "|" + character
                 check_ascii = False
                 continue
 

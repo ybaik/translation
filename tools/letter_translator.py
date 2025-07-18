@@ -11,8 +11,9 @@ def main():
     font_table_jpn = FontTable("font_table/font_table-jpn-full.json")
 
     # Get a code or codes from a letter or letters
-    script = "쇠씹"
+    script = "깹"
     codes_hex = font_table_kor.get_codes(script)
+    print(codes_hex)
     jpn_script = font_table_jpn.get_chars(codes_hex)
     print(jpn_script)
 

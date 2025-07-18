@@ -1,23 +1,32 @@
 import json
 from pathlib import Path
 from module.font_table import check_file, FontTable
-from module.script import write_script
-from module.check_script import check_script, diff_address
+from module.script import write_script, write_script_multibyte
+from module.check_script import check_script, check_script_multibyte, diff_address
 from rich.console import Console
 
 
 def main():
-    script_base_dir = Path("../workspace/script")
+    script_base_dir = Path("../workspace/script_1byte")
     src_bin_base_dir = Path("../workspace/rb1-PC98-JPN")
     dst_bin_base_dir = Path("../workspace/rb1-PC98-KOR")
-    dst_font_table_path = "font_table/font_table-kor-jin.json"
 
+    src_bin_base_dir = Path("../workspace/rb1-PC98-KOR_1st")
+    dst_bin_base_dir = Path("../workspace/rb1-PC98-KOR")
+
+    dst_font_table_path = "font_table/font_table-kor-jin.json"
+    dst_font_table_path = "../workspace/font_table-kor-rb1-multibyte.json"
+
+    consider_multibyte = True
     # ===================================================================
     # For debugging prints
     console = Console()
 
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         if not "_kor.json" in file.name:
+            continue
+
+        if "MAIN" not in file.name:
             continue
 
         # Check paths
@@ -37,8 +46,8 @@ def main():
 
         # Check a destination data path
         dst_data_path = dst_bin_base_dir / src_data_path.relative_to(src_bin_base_dir)
-        if dst_data_path.exists():
-            continue
+        # if dst_data_path.exists():
+        #     continue
 
         if not dst_data_path.parent.exists():
             dst_data_path.parent.mkdir(parents=True, exist_ok=True)
@@ -62,7 +71,14 @@ def main():
             return
 
         # Check the destination script
-        count_false_length, count_false_letters = check_script(dst_script, font_table)
+        if not consider_multibyte:
+            count_false_length, count_false_letters = check_script(
+                dst_script, font_table
+            )
+        else:
+            count_false_length, count_false_letters = check_script_multibyte(
+                dst_script, font_table
+            )
 
         if count_false_length:
             console.print(
@@ -89,7 +105,12 @@ def main():
         console.print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
         # Write the destination script to the binary data in memory
-        data, valid_sentence_count = write_script(data, font_table, dst_script)
+        if not consider_multibyte:
+            data, valid_sentence_count = write_script(data, font_table, dst_script)
+        else:
+            data, valid_sentence_count = write_script_multibyte(
+                data, font_table, dst_script
+            )
         console.print(
             f"Valid sentence percentege: {valid_sentence_count/len(dst_script)*100:.2f}%"
         )

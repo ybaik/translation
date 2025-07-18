@@ -153,6 +153,59 @@ def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytear
     return data, valid_sentence_count
 
 
+def write_script_multibyte(
+    data: bytearray, font_table: FontTable, script: Dict
+) -> bytearray:
+
+    valid_sentence_count = 0
+
+    # Write scripts
+    for address, sentence in script.items():
+        [code_hex_start, code_hex_end] = address.split("=")
+        spos = int(code_hex_start, 16)
+        epos = int(code_hex_end, 16)
+        pos = spos
+
+        # Check if there is a unsupport letter in the sentence
+        skip_sentence = False
+        for character in sentence:
+            if not font_table.exists(character):
+                skip_sentence = True
+                break
+
+            if font_table.is_japanese(character):
+                skip_sentence = True
+                break
+        if skip_sentence:
+            continue
+        valid_sentence_count += 1
+
+        # Write characters in the sentence
+        idx_char = 0
+        while idx_char < len(sentence):
+            character = sentence[idx_char]
+
+            if font_table.get_code(character) is None:
+                assert 0, f"{character} is not in the font table."
+
+            code_hex = font_table.get_code(character)
+            code_int = int(code_hex, 16)
+
+            # Check if the letter is a one byte character
+            if len(code_hex) == 2:
+                data[pos] = code_int
+                pos += 1
+            else:  # Input two bytes character
+                code1 = (code_int & 0xFF00) >> 8
+                code2 = code_int & 0x00FF
+                data[pos] = code1
+                data[pos + 1] = code2
+                pos += 2
+            idx_char += 1
+
+    return data, valid_sentence_count
+
+
 def write_code(
     data: bytearray, hex_start: str, hex_end: str, code_hex: str, count: int
 ) -> bytearray:

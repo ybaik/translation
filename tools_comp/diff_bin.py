@@ -4,10 +4,11 @@ from pathlib import Path
 
 def main():
     base_dir = Path("c:/work_han/workspace")
-    src_dir = base_dir / "KOUKAI-JPN"
-    dst_dir = base_dir / "KOUKAI-KOR"
+    src_dir = base_dir / "sangoku2-PC98-JPN"
+    dst_dir = base_dir / "sangoku2-DOS-KOR"
 
-    patch_dir = base_dir / "KOUKAI-KOR"
+    # patch_dir = base_dir / "KOUKAI-KOR"
+    patch_dir = dst_dir
     dst_dir = patch_dir
 
     patch_list = os.listdir(patch_dir)

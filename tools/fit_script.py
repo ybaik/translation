@@ -15,10 +15,16 @@ def main(script_path: Path):
     dst_font_table = FontTable("./font_table/font_table-kor-jin.json")
 
     script_dict = {
-        "2D35A=2D365": "傭兵の人数は",
+        "2BBFA=2BC0F": "特殊な力を持つ人たちが",
+        "2BC11=2BC24": "味方になってくれれば",
+        "2BC26=2BC35": "とても心強いわね",
     }
     # …
-    dialogue_array = ["용병 인원은"]
+    dialogue_array = [
+        "특별한| 힘을| 가진| 자가|_",
+        "아군이| 되어만| 준다면",
+        "정말| 든든할텐데|.",
+    ]
     console = Console()
 
     confirmed = False
