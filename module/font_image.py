@@ -43,3 +43,29 @@ def return_img_roi(code_hex: str, debug=False) -> Tuple[int, int, int, int]:
     ypos = row * 16
     xpos = col * 16
     return [ypos, ypos + 16, xpos, xpos + 16]
+
+
+def return_img_roi_1byte(code_hex: str, debug=False) -> Tuple[int, int, int, int]:
+    """
+    Return the pixel ROI (row pixel start, row pixel end, column pixel start, column pixel end) based on the input font code
+
+    Args:
+    code_hex (str): A hexadecimal code as a string, e.g., "8140".
+
+    Returns:
+    Tuple[int, int, int, int]: Y start, Y end, X start, X end.
+    """
+    code = int(code_hex, 16)
+    if code > 0xFF or code < 0:
+        assert 0, f"{code_hex} is not a supproted range."
+
+    col = code
+    row = 0
+    
+
+    # Set a patch ROI
+    if debug:
+        print(row, col)
+    ypos = row * 16
+    xpos = col * 8
+    return [ypos, ypos + 16, xpos, xpos + 8]

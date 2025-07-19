@@ -7,17 +7,17 @@ from rich.console import Console
 
 
 def main():
-    script_base_dir = Path("../workspace/script_1byte")
+    script_base_dir = Path("../workspace/script")
     src_bin_base_dir = Path("../workspace/rb1-PC98-JPN")
     dst_bin_base_dir = Path("../workspace/rb1-PC98-KOR")
 
-    src_bin_base_dir = Path("../workspace/rb1-PC98-KOR_1st")
+    src_bin_base_dir = Path("../workspace/rb1-PC98-KOR_2nd")
     dst_bin_base_dir = Path("../workspace/rb1-PC98-KOR")
 
     dst_font_table_path = "font_table/font_table-kor-jin.json"
-    dst_font_table_path = "../workspace/font_table-kor-rb1-multibyte.json"
+    dst_font_table_path = "../workspace/font_table-kor-rb1-1st.json"
 
-    consider_multibyte = True
+    consider_multibyte = False
     # ===================================================================
     # For debugging prints
     console = Console()
