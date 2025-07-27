@@ -7,27 +7,27 @@ from rich.console import Console
 
 
 def main():
-    script_base_dir = Path("../workspace/script")
-    src_bin_base_dir = Path("../workspace/rb1-PC98-JPN")
-    dst_bin_base_dir = Path("../workspace/rb1-PC98-KOR")
+    script_base_dir = Path("../workspace2/script")
+    src_bin_base_dir = Path("../workspace2/JPN")
+    dst_bin_base_dir = Path("../workspace2/KOR")
 
-    src_bin_base_dir = Path("../workspace/rb1-PC98-KOR_2nd")
-    dst_bin_base_dir = Path("../workspace/rb1-PC98-KOR")
+    # src_bin_base_dir = Path("../workspace/rb1-PC98-KOR-backup")
+    # dst_bin_base_dir = Path("../workspace/rb1-PC98-KOR")
 
     dst_font_table_path = "font_table/font_table-kor-jin.json"
-    dst_font_table_path = "../workspace/font_table-kor-rb1-1st.json"
+    # dst_font_table_path = "../workspace/font_table-kor-rb1-1st.json"
 
-    consider_multibyte = False
+    consider_multibyte = False  # This is not for the ordinary case, e.g. royal blood
     # ===================================================================
     # For debugging prints
     console = Console()
 
-    for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
+    for file in script_base_dir.glob("*.json"):  # Use rglob to search subdirectories
         if not "_kor.json" in file.name:
             continue
 
-        if "MAIN" not in file.name:
-            continue
+        # if "MAIN" not in file.name:
+        #     continue
 
         # Check paths
         dst_script_path = file

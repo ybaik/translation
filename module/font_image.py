@@ -61,7 +61,6 @@ def return_img_roi_1byte(code_hex: str, debug=False) -> Tuple[int, int, int, int
 
     col = code
     row = 0
-    
 
     # Set a patch ROI
     if debug:

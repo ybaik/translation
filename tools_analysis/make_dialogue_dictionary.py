@@ -6,7 +6,7 @@ from module.font_table import FontTable
 
 def main():
     console = Console()
-    base_dir = Path("c:/work_han/workspace")
+    base_dir = Path("c:/work_han/workspace2")
     script_dir = base_dir / "script"
 
     dictionary = dict()
@@ -23,7 +23,7 @@ def main():
         if not dst_path.exists():
             continue
         file_tag = f"{file.parent.name}/{file.name}"
-
+        console.print(file_tag)
         with open(file, "r", encoding="utf-8") as f:
             src = json.load(f)
         with open(dst_path, "r", encoding="utf-8") as f:
@@ -34,6 +34,9 @@ def main():
 
         # check address
         for address, src_sentence in src.items():
+
+            if "=" not in address:
+                continue
 
             # Check if the address is in the destination script
             if address not in dst:
@@ -49,7 +52,7 @@ def main():
                 console.print(f"{address} {file_tag}", style="red")
                 assert (
                     0
-                ), f"sentence length is not matched. {length} != {length_from_src_sentence}"
+                ), f"sentence length is not matched. {address}:{length} != {length_from_dst_sentence}"
                 continue
 
             # Check if the src and dst sentences are valid
@@ -61,15 +64,15 @@ def main():
                 console.print(f"{address} {file_tag}", style="red")
                 assert (
                     0
-                ), f"sentence length is not matched. {length} != {length_from_dst_sentence}"
+                ), f"sentence length is not matched. {address}:{length} != {length_from_dst_sentence}"
                 continue
 
             count_false_character, false_character = dst_font_table.verify_sentence(
                 dst_sentence
             )
-            if count_false_character:
-                console.print(f"{address} {file_tag}", style="red")
-                continue
+            # if count_false_character:
+            #     console.print(f"{address} {file_tag}", style="red")
+            #     continue
 
             # Add the sentence to the dictionary
             if not src_sentence in dictionary:

@@ -10,6 +10,7 @@ def crop_paste(img_src, img_dst, roi_src, roi_dst):
     ]
     return img_dst
 
+
 MOD_TABLE = {
     "824F": "간",
     "8250": "갈",
@@ -224,8 +225,9 @@ MOD_TABLE = {
     "957A": "w",
     "957B": "x",
     "957C": "y",
-    "957D": "z"
+    "957D": "z",
 }
+
 
 def main():
     DEBUG = False

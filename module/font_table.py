@@ -21,7 +21,8 @@ class FontTable:
         self.code_int_max = 0
 
         # For ascii (1-byte) characters
-        self.code2char_ascii = ascii_table
+        # self.code2char_ascii = ascii_table
+        self.code2char_ascii = jisx0201_table
         self.char2code_ascii = {v: k for k, v in ascii_table.items()}
 
         # Read font table
@@ -145,6 +146,9 @@ class FontTable:
 
     def exists(self, character: str) -> bool:
         return character in self.char2code.keys()
+
+    def exists_1byte(self, character: str) -> bool:
+        return character in self.char2code_ascii.keys()
 
     def is_japanese(self, character: str) -> bool:
         code = self.char2code.get(character)

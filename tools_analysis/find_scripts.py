@@ -8,13 +8,13 @@ def main():
     base_dir = Path("c:/work_han/workspace")
     script_base_dir = base_dir
 
-    script_base_dir = Path("c:/work_han/workspace/script")
+    script_base_dir = Path("c:/work_han/workspace2/script_init")
     # script_base_dir = Path("c:/work_han/backup")
 
-    find_source = False
+    find_source = True
 
-    sentence = "エラン"
-    sentence_kor = "아날로그"
+    sentence = "暗闇"
+    sentence_kor = "조건"
     sentence_kor = sentence_kor.replace(" ", "_")
 
     # Read a pair of scripts
@@ -22,16 +22,20 @@ def main():
 
         file_tag = f"{file.parent.name}/{file.name}"
 
-        if not "_jpn.json" in file.name:
-            continue
-        dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")
-        if not dst_path.exists():
-            continue
+        if find_source:
 
-        with open(file, "r", encoding="utf-8") as f:
-            src = json.load(f)
-        with open(dst_path, "r", encoding="utf-8") as f:
-            dst = json.load(f)
+            if not "_jpn.json" in file.name:
+                continue
+            with open(file, "r", encoding="utf-8") as f:
+                src = json.load(f)
+        else:
+            dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")
+            if not dst_path.exists():
+                continue
+            with open(dst_path, "r", encoding="utf-8") as f:
+                dst = json.load(f)
+
+        console.print(file.name)
 
         # check address
         buf_address = ""

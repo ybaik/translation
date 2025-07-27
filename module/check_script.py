@@ -19,6 +19,8 @@ def check_script(scripts: Dict, font_table: FontTable) -> Tuple[int, int]:
     count_false_characters = 0
 
     for address, sentence in scripts.items():
+        if "=" not in address:
+            continue
         length_from_address = font_table.check_length_from_address(address)
         length_from_sentence = font_table.check_length_from_sentence(sentence)
         if length_from_address != length_from_sentence:

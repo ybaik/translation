@@ -1,5 +1,6 @@
 from typing import Dict, Tuple
 from module.font_table import FontTable
+from module.decoding import decode, encode
 
 
 def extract_script(
@@ -89,6 +90,11 @@ def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytear
 
     valid_sentence_count = 0
 
+    # Check if decoding is needed
+    encoding = script.pop("encoding", None)
+    if encoding is not None:
+        data = decode(data, encoding)
+
     # Write scripts
     for address, sentence in script.items():
         [code_hex_start, code_hex_end] = address.split("=")
@@ -98,13 +104,16 @@ def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytear
 
         # Check if there is a unsupport letter in the sentence
         skip_sentence = False
-        skip_character = False
+        check_1byte = False
         for character in sentence:
             if character == "|":
-                skip_character = True
+                check_1byte = True
                 continue
-            if skip_character:
-                skip_character = False
+            if check_1byte:
+                if not font_table.exists_1byte(character):
+                    skip_sentence = True
+                    break
+                check_1byte = False
                 continue
             if not font_table.exists(character):
                 skip_sentence = True
@@ -132,7 +141,9 @@ def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytear
                     code_int = int(code_hex, 16)
                     data[pos] = code_int
                 else:
-                    assert 0, f"{character} is not in the 1-byte font table."
+                    assert (
+                        0
+                    ), f"{code_hex_start}:{character} is not in the 1-byte font table."
                 pos += 1
             else:  # Input two bytes character
                 if character in ["■", "@"]:
@@ -149,6 +160,10 @@ def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytear
                     assert 0, f"{character} is not in the 2-byte font table."
                 pos += 2
             idx_char += 1
+
+    # Check if encoding is needed
+    if encoding is not None:
+        data = encode(data, encoding)
 
     return data, valid_sentence_count
 
