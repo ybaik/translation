@@ -5,7 +5,7 @@ from pathlib import Path
 # Dialog dictionary
 def main():
     base_dir = Path("c:/work_han/workspace")
-    script_base_dir = base_dir / "m2"
+    script_base_dir = base_dir / "script-dos"
 
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         if not "_jpn.json" in file.name:

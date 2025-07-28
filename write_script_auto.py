@@ -7,9 +7,11 @@ from rich.console import Console
 
 
 def main():
-    script_base_dir = Path("../workspace2/script")
-    src_bin_base_dir = Path("../workspace2/JPN")
-    dst_bin_base_dir = Path("../workspace2/KOR")
+    platform = "dos"
+
+    script_base_dir = Path(f"../workspace/script-{platform}")
+    src_bin_base_dir = Path(f"../workspace/jpn-{platform}")
+    dst_bin_base_dir = Path(f"../workspace/kor-{platform}")
 
     # src_bin_base_dir = Path("../workspace/rb1-PC98-KOR-backup")
     # dst_bin_base_dir = Path("../workspace/rb1-PC98-KOR")

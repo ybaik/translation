@@ -9,7 +9,7 @@ def main():
 
     base_dir = Path("c:/work_han/workspace")
     ref_base_dir = base_dir
-    script_base_dir = base_dir / "script"
+    script_base_dir = base_dir / "script-pc98"
 
     ref = "rb"
 
@@ -22,6 +22,7 @@ def main():
 
     # Read a pair of scripts
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
+        console.print(file.name)
         if not "_jpn.json" in file.name:
             continue
         dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")

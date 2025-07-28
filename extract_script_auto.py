@@ -3,14 +3,20 @@ import json
 from pathlib import Path
 from module.font_table import check_file, FontTable
 from module.script import extract_script
+from module.decoding import decode
 
 
 def main():
-
-    bin_path = "../workspace/rb1-PC98-JPN"
+    platform = "dos"
+    bin_path = f"../workspace/jpn-decoded-{platform}"
     font_table_path = "font_table/font_table-jpn-full.json"
     extended_word = "_jpn"
-    script_path = "../workspace/script_init"
+    script_path = f"../workspace/script_init-{platform}"
+
+    # bin_path = "../workspace/m3-dos"
+    # font_table_path = "../workspace/font_table-dos-macross3.json"
+    # extended_word = "_dos"
+    # script_path = "../workspace/m3-script"
 
     # bin_path = "../workspace/KOUKAI-KOR-HDD"
     # font_table_path = "font_table/font_table-kor-jin.json"
@@ -20,7 +26,10 @@ def main():
 
     length_threshold_in_bytes = 2
     check_ascii = True
-    check_ascii_restriction = True  # If True, the first ASCII code need to be x20
+    check_ascii_restriction = False  # If True, the first ASCII code need to be x20
+
+    decoding_info = "xor:0x77"
+    decoding_base_path = f"../workspace/jpn-decoded-{platform}"
     # =================================================================
 
     files = os.listdir(bin_path)
@@ -29,6 +38,9 @@ def main():
     for file in files:
         src_data_path = f"{bin_path}/{file}"
         dst_script_path = f"{script_path}/{file}{extended_word}.json"
+
+        if "EVENT.XOR" not in file:
+            continue
 
         if not os.path.isfile(src_data_path):
             continue
@@ -45,15 +57,22 @@ def main():
         with open(src_data_path, "rb") as f:
             data = f.read()
         data = bytearray(data)
+
+        # Decoding
+        # data = decode(data, decoding_info)
+        # decoding_path = f"{decoding_base_path}/{file}"
+        # with open(decoding_path, "wb") as f:
+        #     f.write(data)
+
         print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
         # Extract a script from the binary data
         script, _ = extract_script(
-            data,
-            font_table,
-            length_threshold_in_bytes,
-            check_ascii,
-            check_ascii_restriction,
+            data=data,
+            font_table=font_table,
+            length_threshold=length_threshold_in_bytes,
+            check_ascii=check_ascii,
+            check_ascii_restriction=check_ascii_restriction,
         )
 
         # Save the extracted script to a file in the script directory

@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import List, Dict, Tuple
 from module.font_table import FontTable
 from module.decoding import decode, encode
 
@@ -64,10 +64,11 @@ def extract_script(
             # Check sentence length and save
             if need_to_stop:
                 if length >= length_threshold:
-                    address = f"{i-length:05X}={i-1:05X}"
-                    script[address] = sentence
-                    if sentence_log:
-                        script_log[address] = sentence_log
+                    if "�" not in sentence:  # Need to check this later
+                        address = f"{i-length:05X}={i-1:05X}"
+                        script[address] = sentence
+                        if sentence_log:
+                            script_log[address] = sentence_log
                 sentence = ""
                 sentence_log = ""
                 length = 0
@@ -330,3 +331,69 @@ def find_sentence_and_update(script: Dict, sentence: str, new_sentence: str) -> 
             is_updated = True
 
     return is_updated
+
+
+def split_sentence(script: Dict, font_table: FontTable, control_code: str):
+    pop_list = []
+    new_dict = dict()
+    for address, sentence in script.items():
+        if control_code not in sentence:
+            continue
+        pop_list.append(address)
+
+        hex_start, hex_end = address.split("=")
+        spos = int(hex_start, 16)
+        epos = int(hex_end, 16)
+
+        # Check previous sentence
+        pos = sentence.find(control_code)
+        code_length = len(control_code)
+
+        sentence_prev_full = sentence[: pos + code_length]
+        sentence_prev = sentence[:pos]
+        length_prev_full = font_table.check_length_from_sentence(sentence_prev_full)
+        length = font_table.check_length_from_sentence(sentence_prev)
+        spos_prev = spos
+        epos_prev = spos + length - 1
+
+        # Check post sentence
+        sentence_post = sentence[pos + code_length :]
+        spos_post = spos + length_prev_full
+        epos_post = epos
+
+        if len(sentence_post):
+            new_dict[f"{spos_post:05X}={epos_post:05X}"] = sentence_post
+
+            # Recursive function
+            if control_code in sentence_post:
+                split_sentence(new_dict, font_table, control_code)
+
+        new_dict[f"{spos_prev:05X}={epos_prev:05X}"] = sentence_prev
+
+    for key in pop_list:
+        del script[key]
+
+    script.update(new_dict)
+
+
+def split_sentences(
+    script: Dict, font_table: FontTable, control_codes: List[str] = []
+) -> Dict:
+    for control_code in control_codes:
+        pop_list = []
+        update_dict = dict()
+        for addresses, sentence in script.items():
+            if control_code not in sentence:
+                continue
+            pop_list.append(addresses)
+
+            new_dict = {addresses: sentence}
+            split_sentence(new_dict, font_table, control_code)
+            update_dict.update(new_dict)
+
+        # Remove original sentences when they are split
+        for adresses in pop_list:
+            del script[adresses]
+        script.update(update_dict)
+
+    return script
