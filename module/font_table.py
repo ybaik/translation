@@ -1,6 +1,6 @@
 import os
 import json
-from typing import List, Tuple
+from typing import List, Dict, Tuple
 from .ascii import ascii_table
 from .jisx0201 import jisx0201_table
 
@@ -21,12 +21,16 @@ class FontTable:
         self.code_int_max = 0
 
         # For ascii (1-byte) characters
-        # self.code2char_ascii = ascii_table
-        self.code2char_ascii = jisx0201_table
-        self.char2code_ascii = {v: k for k, v in ascii_table.items()}
+        self.set_custom_code_1byte()
 
         # Read font table
         self.read_font_table(file_path)
+
+    def set_custom_code_1byte(self, custom_codes: Dict = {}) -> None:
+        # self.code2char_ascii = ascii_table
+        self.code2char_ascii = jisx0201_table
+        self.code2char_ascii.update(custom_codes)
+        self.char2code_ascii = {v: k for k, v in self.code2char_ascii.items()}
 
     def read_font_table(self, file_path: str) -> bool:
 

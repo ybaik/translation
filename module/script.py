@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from typing import List, Dict, Tuple
 from module.font_table import FontTable
 from module.decoding import decode, encode
@@ -51,7 +53,7 @@ def extract_script(
         else:
             if check_ascii:
                 code_int = data[i]
-                code_hex = f"{code_int:X}"
+                code_hex = f"{code_int:02X}"
                 character = font_table.get_char_ascii(code_hex)
 
                 if check_ascii_restriction and character != "_" and length == 0:
@@ -95,6 +97,11 @@ def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytear
     encoding = script.pop("encoding", None)
     if encoding is not None:
         data = decode(data, encoding)
+
+    # Check if custom codes exist
+    custom_codes = script.pop("custom_codes", None)
+    if custom_codes is not None:
+        font_table.set_custom_code_1byte(custom_codes)
 
     # Write scripts
     for address, sentence in script.items():
@@ -397,3 +404,321 @@ def split_sentences(
         script.update(update_dict)
 
     return script
+
+
+class Script:
+    def __init__(self, file_path: str) -> None:
+        self.script = None
+        self.encoding = None
+        self.custom_codes = None
+        self.custom_input = None
+
+        # Read a script
+        if not Path(file_path).exists():
+            print(f"{file_path} does not exist.")
+            return None
+
+        with open(file_path, "r", encoding="utf-8") as f:
+            self.script = json.load(f)
+
+        # Get encoding
+        if "encoding" in self.script.keys():
+            self.encoding = self.script.pop("encoding")
+
+        # Get custom codes
+        if "custom_codes" in self.script.keys():
+            self.custom_codes = self.script.pop("custom_codes")
+
+        # Get custom input
+        if "custom_input" in self.script.keys():
+            self.custom_input = self.script.pop("custom_input")
+
+    def set_custom_codes(self, custom_codes: Dict) -> None:
+        self.custom_codes = custom_codes
+
+    def save(self, file_path: str) -> None:
+
+        save_dict = dict()
+
+        # Set encoding
+        if self.encoding is not None:
+            save_dict["encoding"] = self.encoding
+
+        # Set custom codes
+        if self.custom_codes is not None:
+            save_dict["custom_codes"] = self.custom_codes
+
+        # Set custom input
+        if self.custom_input is not None:
+            save_dict["custom_input"] = self.custom_input
+
+        save_dict.update(self.script)
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(save_dict, f, ensure_ascii=False, indent=4)
+
+    def validate(self, font_table: FontTable) -> bool:
+        # Check script
+        count_false_length = 0
+        count_false_characters = 0
+
+        for address, sentence in self.script.items():
+            if "=" not in address:
+                continue
+            length_from_address = font_table.check_length_from_address(address)
+            length_from_sentence = font_table.check_length_from_sentence(sentence)
+            if length_from_address != length_from_sentence:
+                print(
+                    f"Wrong sentence length:{address}: {length_from_address}-{length_from_sentence}"
+                )
+                count_false_length += 1
+
+            # Check if there is false characters in a sentence via comparison with the font table
+            count_false_character, false_character = font_table.verify_sentence(
+                sentence
+            )
+            if count_false_character:
+                # print(f"Wrong letters:{address}: {count_false_character}-{false_character}")
+                count_false_characters += count_false_character
+                # Debug
+                count_false_characters = 0
+
+        return count_false_length, count_false_characters
+
+    def split_sentences(self, font_table: FontTable, split_code: str) -> bool:
+
+        # Initialize remove_key_list, modified_script
+        remove_key_list = []
+        modified_script = dict()
+        # Connect sentences
+        for address, sentence in self.script.items():
+
+            # Check if the address is alreeady checked
+            if address in remove_key_list:
+                continue
+
+            # Check there is a split code in the sentence
+            split_index = sentence.find(split_code)
+
+            if split_index == -1 or split_index + 1 == len(sentence):
+                continue
+
+            # Set a merged sentencee
+            remove_key_list.append(address)
+
+            [code_hex_start, code_hex_end] = address.split("=")
+            spos = int(code_hex_start, 16)
+            epos = int(code_hex_end, 16)
+
+            sentence_prev = sentence[: split_index + 1]
+            sentence_next = sentence[split_index + 1 :]
+
+            length_prev = font_table.check_length_from_sentence(sentence_prev)
+
+            epos_prev = spos + length_prev - 1
+            spos_next = epos_prev + 1
+
+            address_prev = f"{spos:05X}={epos_prev:05X}"
+            address_next = f"{spos_next:05X}={epos:05X}"
+
+            modified_script[address_prev] = sentence_prev
+            modified_script[address_next] = sentence_next
+
+        if len(remove_key_list) == 0:
+            print("No sentences are split.")
+            return False
+
+        # Remove old sentences
+        for key in remove_key_list:
+            del self.script[key]
+
+        # Update script
+        self.script.update(modified_script)
+        self.script = dict(sorted(self.script.items()))
+
+        return True
+
+    def merge_sentences(self) -> bool:
+
+        # Initialize remove_key_list, modified_script
+        remove_key_list = []
+        modified_script = dict()
+
+        # Set a temporal start_pos_table
+        start_pos_table = dict()
+        for address in self.script.keys():
+            [code_hex_start, code_hex_end] = address.split("=")
+            spos = int(code_hex_start, 16)
+            epos = int(code_hex_end, 16)
+            start_pos_table[spos] = address
+
+        # Connect sentences
+        for address, sentence in self.script.items():
+
+            # Check if the address is alreeady checked
+            if address in remove_key_list:
+                continue
+
+            [code_hex_start, code_hex_end] = address.split("=")
+            spos = int(code_hex_start, 16)
+            epos = int(code_hex_end, 16)
+
+            # Check if the next sentence exists
+            if start_pos_table.get(epos + 1) is None:
+                continue
+
+            # Set a merged sentencee
+            address_next = start_pos_table[epos + 1]
+            remove_key_list.append(address)
+            remove_key_list.append(address_next)
+
+            epos_next = int(address_next.split("=")[-1], 16)
+
+            address_new = f"{spos:05X}={epos_next:05X}"
+            sentence_new = sentence + self.script[address_next]
+            modified_script[address_new] = sentence_new
+
+        if len(remove_key_list) == 0:
+            print("No sentences are merged.")
+            return False
+
+        # Remove old sentences
+        for key in remove_key_list:
+            del self.script[key]
+
+        # Update script
+        self.script.update(modified_script)
+        self.script = dict(sorted(self.script.items()))
+
+        return True
+
+    def attach_control_codes(self, binay_path: str, control_codes: Dict = {}) -> bool:
+
+        # Check control codes
+        if len(control_codes.keys()) == 0:
+            print("No control codes are specified.")
+            return
+
+        # Read a binary data
+        if not Path(binay_path).exists():
+            print(f"{binay_path} does not exist.")
+            return
+
+        with open(binay_path, "rb") as f:
+            binary_data = f.read()
+        binary_data = bytearray(binary_data)
+
+        # Decoding bianry data
+        if self.encoding is not None:
+            binary_data = decode(binary_data, self.encoding)
+
+        # Initialize remove_key_list, modified_script
+        remove_key_list = []
+        modified_script = dict()
+
+        # Set a temporal start_pos_table
+        start_pos_table = dict()
+        for address in self.script.keys():
+            [code_hex_start, code_hex_end] = address.split("=")
+            spos = int(code_hex_start, 16)
+            epos = int(code_hex_end, 16)
+            start_pos_table[spos] = address
+
+        # Connect sentences
+        for address, sentence in self.script.items():
+
+            # Check if the address is alreeady checked
+            if address in remove_key_list:
+                continue
+
+            [code_hex_start, code_hex_end] = address.split("=")
+            spos = int(code_hex_start, 16)
+            epos = int(code_hex_end, 16)
+            if epos + 1 >= len(binary_data):
+                continue
+
+            # Check if the next character is a control code
+            char_code_hex = f"{binary_data[epos + 1]:02X}"
+            if char_code_hex not in control_codes.keys():
+                continue
+
+            # Set a merged sentencee
+            remove_key_list.append(address)
+            epos_next = epos + 1
+
+            address_new = f"{spos:05X}={epos_next:05X}"
+            sentence_new = sentence + "|" + control_codes[char_code_hex]
+            modified_script[address_new] = sentence_new
+
+        if len(remove_key_list) == 0:
+            print("No sentences are connected.")
+            return False
+
+        # Remove old sentences
+        for key in remove_key_list:
+            del self.script[key]
+
+        # Update script
+        self.script.update(modified_script)
+        self.script = dict(sorted(self.script.items()))
+
+        return True
+
+    def filter_sentences(self) -> bool:
+        """
+        To get rid of 1-byte noisy characters
+        """
+
+        remove_key_list = []
+        modified_script = dict()
+
+        for address, sentence in self.script.items():
+            if "=" not in address:
+                continue
+            if "|" not in sentence:
+                continue
+
+            start, end = address.split("=")
+            start = int(start, 16)  # Convert to integer
+            end = int(end, 16)  # Convert to integer
+
+            is_1byte = False
+            remove = ""
+            add_byte = 0
+            for character in sentence:
+                if character == "|":
+                    is_1byte = True
+                    continue
+
+                if is_1byte:
+                    if character == "C":
+                        is_1byte = False
+                        break
+                    else:
+                        remove += f"|{character}"
+                        add_byte += 1
+                        is_1byte = False
+                else:
+                    break
+
+            if add_byte > 0:
+                remove_key_list.append(address)
+                start_new = start + add_byte
+                if start_new >= end:
+                    continue
+                address_new = f"{start_new:05X}={end:05X}"
+                sentence_new = sentence[add_byte * 2 :]
+                modified_script[address_new] = sentence_new
+
+        if len(remove_key_list) == 0:
+            print("No sentences are connected.")
+            return False
+
+        # Remove old sentences
+        for key in remove_key_list:
+            del self.script[key]
+
+        # Update script
+        self.script.update(modified_script)
+        self.script = dict(sorted(self.script.items()))
+
+        return True

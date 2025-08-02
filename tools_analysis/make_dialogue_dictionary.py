@@ -6,7 +6,7 @@ from module.font_table import FontTable
 
 def main():
     console = Console()
-    base_dir = Path("c:/work_han/workspace")
+    base_dir = Path("c:/work_han/workspace0")
     script_dir = base_dir / "script-dos"
 
     dictionary = dict()
@@ -16,7 +16,7 @@ def main():
     annoying_path = base_dir / f"rb_annoying.json"
 
     # Read a pair of scripts
-    for file in script_dir.rglob("*.json"):  # Use rglob to search subdirectories
+    for file in script_dir.glob("*.json"):  # Use rglob to search subdirectories
         if not "_jpn.json" in file.name:
             continue
         dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")

@@ -7,9 +7,9 @@ from module.font_table import FontTable
 def main():
     console = Console()
 
-    base_dir = Path("c:/work_han/workspace2")
+    base_dir = Path("c:/work_han/workspace0")
     ref = "rb"
-    script_base_dir = base_dir / "script"
+    script_base_dir = base_dir / "script-pc98"
 
     # Read an existing dictionary
     annoying_path = base_dir / f"{ref}_annoying.json"
@@ -29,6 +29,7 @@ def main():
         if not "_jpn.json" in file.name:
             continue
 
+        console.print(file.name)
         file_tag = f"{file.parent.name}/{file.name}"
         color = "green"
         dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")

@@ -7,11 +7,11 @@ from rich.console import Console
 
 
 def main():
-    platform = "dos"
+    platform = "pc98"
 
-    script_base_dir = Path(f"../workspace/script-{platform}")
-    src_bin_base_dir = Path(f"../workspace/jpn-{platform}")
-    dst_bin_base_dir = Path(f"../workspace/kor-{platform}")
+    script_base_dir = Path(f"../workspace0/script-{platform}")
+    src_bin_base_dir = Path(f"../workspace0/jpn-{platform}")
+    dst_bin_base_dir = Path(f"../workspace0/kor-{platform}")
 
     # src_bin_base_dir = Path("../workspace/rb1-PC98-KOR-backup")
     # dst_bin_base_dir = Path("../workspace/rb1-PC98-KOR")
@@ -28,7 +28,7 @@ def main():
         if not "_kor.json" in file.name:
             continue
 
-        # if "MAIN" not in file.name:
+        # if "OPEN" not in file.name:
         #     continue
 
         # Check paths
@@ -114,7 +114,7 @@ def main():
                 data, font_table, dst_script
             )
         console.print(
-            f"Valid sentence percentege: {valid_sentence_count/len(dst_script)*100:.2f}%"
+            f"Valid sentence percentege (done/total): {valid_sentence_count/len(dst_script)*100:.2f}% ({valid_sentence_count}/{len(dst_script)})"
         )
 
         # Save the replaced binary data to a file in the destination directory

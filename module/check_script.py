@@ -32,7 +32,7 @@ def check_script(scripts: Dict, font_table: FontTable) -> Tuple[int, int]:
         # Check if there is false characters in a sentence via comparison with the font table
         count_false_character, false_character = font_table.verify_sentence(sentence)
         if count_false_character:
-            print(f"Wrong letters:{address}: {count_false_character}-{false_character}")
+            # print(f"Wrong letters:{address}: {count_false_character}-{false_character}")
             count_false_characters += count_false_character
             # Debug
             count_false_characters = 0

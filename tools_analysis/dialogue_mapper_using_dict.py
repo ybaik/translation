@@ -7,9 +7,12 @@ from module.font_table import FontTable
 def main():
     console = Console()
 
-    base_dir = Path("c:/work_han/workspace")
+    platform = "dos"
+    platform = "pc98"
+
+    base_dir = Path("c:/work_han/workspace0")
     ref_base_dir = base_dir
-    script_base_dir = base_dir / "script-pc98"
+    script_base_dir = base_dir / f"script-{platform}"
 
     ref = "rb"
 

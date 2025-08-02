@@ -8,13 +8,13 @@ def main():
     base_dir = Path("c:/work_han/workspace")
     script_base_dir = base_dir
 
-    script_base_dir = Path("c:/work_han/workspace2/script_init")
+    script_base_dir = Path("c:/work_han/workspace/script-dos")
     # script_base_dir = Path("c:/work_han/backup")
 
     find_source = True
 
-    sentence = "暗闇"
-    sentence_kor = "조건"
+    sentence = "|_|_ディスクエラー|_|:|_回復できません"
+    sentence_kor = "괜찮으"
     sentence_kor = sentence_kor.replace(" ", "_")
 
     # Read a pair of scripts
@@ -23,7 +23,6 @@ def main():
         file_tag = f"{file.parent.name}/{file.name}"
 
         if find_source:
-
             if not "_jpn.json" in file.name:
                 continue
             with open(file, "r", encoding="utf-8") as f:
@@ -34,6 +33,8 @@ def main():
                 continue
             with open(dst_path, "r", encoding="utf-8") as f:
                 dst = json.load(f)
+            with open(file, "r", encoding="utf-8") as f:
+                src = json.load(f)
 
         console.print(file.name)
 
