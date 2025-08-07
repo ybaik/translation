@@ -1,4 +1,5 @@
 import json
+import copy
 from typing import Dict, Tuple
 from module.font_table import check_file, FontTable
 
@@ -89,12 +90,19 @@ def diff_address(src_script: Dict, dst_script: Dict) -> int:
 
     reversed = False
     if len(src_script.keys()) >= len(dst_script):
-        scripts_1 = src_script
-        scripts_2 = dst_script
+        scripts_1 = copy.deepcopy(src_script)
+        scripts_2 = copy.deepcopy(dst_script)
     else:
-        scripts_1 = dst_script
-        scripts_2 = src_script
+        scripts_1 = copy.deepcopy(dst_script)
+        scripts_2 = copy.deepcopy(src_script)
         reversed = True
+
+    # Remove custom keys
+    scripts_1.pop("custom_codes", None)
+    scripts_1.pop("custom_input", None)
+
+    scripts_2.pop("custom_codes", None)
+    scripts_2.pop("custom_input", None)
 
     count_diff = 0
     for key, _ in scripts_1.items():

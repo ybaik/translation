@@ -15,31 +15,27 @@ def main(script_path: Path):
     dst_font_table = FontTable("./font_table/font_table-kor-jin.json")
 
     script_dict = {
-        "1B589=1B5CD": "저승계|_세|_곳으로|_이루어져|_있다|.|G|X|W나는|_신들을|_모아|_지상을|_비췄고|_|C|0|0|9",
-        "1B5CF=1B614": "사람들은|_평화롭게|_살고|_있었다|.|G|N그리고|_평화로운|_시간이|_흘러,지상계|C|0|1|0",
-        "1B616=1B65B": "의|_사람들이|_늘어나고|_문화가|_싹트기|_시작했다.|G|X하지만|_이로|_인해|_사|C|0|1|1",
-        "1B65D=1B6A2": "람들은|_지금까지보다|_더욱|_강한|_욕망을|_품게|_되었다|.|G|X지금,인간계에C|0|1|2",
+        "454B0=454C9": "勝負は痛み分けに終りました",
+        "454E9=4551B": "殿から降伏の使者が|␂参っております。降伏なさいますか",
     }
     # …
-    dialogue_array = [
-        "저승계|_세|_곳으로|_이루어져|_있다|.|G|X|W나는|_신들을|_모아|_지상을|_비췄고|_|C|0|0|9",
-        "사람들은|_평화롭게|_살고|_있었다|.|G|N그| 후|_평화로운|_시간이|_흘러,지상계|C|0|1|0",
-        "의|_사람들이|_늘어나고|_문화가|_싹트기|_시작했다.|G|X하지만|_이로|_인해|_사|C|0|1|1",
-        "람들은|_지금까지보다|_더욱|_강한|_욕망을|_품게|_되었다|.|G|X지금,인간계에C|0|1|2",
-    ]
+    dialogue_array = {
+        "454B0=454C9": "승부는 무승부로 끝났습니다.",
+        "454E9=4551B": "殿から降伏の使者が|␂参っております。降伏なさいますか",
+    }
     console = Console()
 
     confirmed = False
     confirmed = True
 
-    if len(script_dict.keys()) != len(dialogue_array):
+    if len(script_dict.keys()) != len(dialogue_array.values()):
         print(
-            f"Script range {len(script_dict.keys())} and dialogue array length {len(dialogue_array)} are not matched."
+            f"Script range {len(script_dict.keys())} and dialogue array length {len(dialogue_array.values())} are not matched."
         )
         return
 
-    for script_range, dialogue in zip(script_dict.keys(), dialogue_array):
-        dialogue = dialogue.replace(" ", "_")
+    for script_range, dialogue in zip(script_dict.keys(), dialogue_array.values()):
+        dialogue = dialogue.replace(" ", "|_")
         length = dst_font_table.check_length_from_address(script_range)
         length_from_dialogue = dst_font_table.check_length_from_sentence(dialogue)
         original_dialogue = script_dict[script_range]
@@ -62,6 +58,6 @@ def main(script_path: Path):
 
 if __name__ == "__main__":
 
-    base_dir = Path("c:/work_han/workspace/script-dos")
-    script_path = base_dir / "EVENT.DAT_kor.json"
+    base_dir = Path("c:/work_han/workspace0/script-dos")
+    script_path = base_dir / "MAIN.EXE_kor.json"
     main(script_path)

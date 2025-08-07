@@ -103,8 +103,32 @@ def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytear
     if custom_codes is not None:
         font_table.set_custom_code_1byte(custom_codes)
 
+    # Check if custom inputs exist
+    custom_input = script.pop("custom_input", None)
+    if custom_input is not None:
+        for address, codes in custom_input.items():
+            [code_hex_start, code_hex_end] = address.split("=")
+            spos = int(code_hex_start, 16)
+            epos = int(code_hex_end, 16)
+
+            # Check if the format is right
+            num_codes = epos - spos + 1
+            if len(codes) != num_codes * 2:
+                assert (
+                    0
+                ), f"The length of custom input is not matched. {len(codes)} != {num_codes}"
+
+            for i in range(num_codes):
+                code_int = int(codes[i * 2 : i * 2 + 2], 16)
+                data[spos + i] = code_int
+
     # Write scripts
     for address, sentence in script.items():
+
+        # Check if there is a unsupproted address format
+        if "=" not in address:
+            assert 0, f"{address} is not in the correct format."
+
         [code_hex_start, code_hex_end] = address.split("=")
         spos = int(code_hex_start, 16)
         epos = int(code_hex_end, 16)

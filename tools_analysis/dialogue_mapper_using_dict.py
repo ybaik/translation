@@ -45,6 +45,9 @@ def main():
         # Check addresses in the source script
         modified = False
         for address, src_sentence in src.items():
+            if "=" not in address:
+                continue
+
             if not src_sentence in dictionary:
                 continue
             if address not in dst:
