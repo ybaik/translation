@@ -15,15 +15,15 @@ def main():
     font_table_path = "font_table/font_table-jpn-full.json"
     font_table = FontTable(font_table_path)
 
-    # sentence_to_find = "픗"
-    # address_to_find_hex = font_table.get_codes(sentence_to_find)
+    sentence_to_find = "済"
+    address_to_find_hex = font_table.get_codes(sentence_to_find)
 
-    # code_string_hex = ""
-    # for code_hex in address_to_find_hex:
-    #     code_hex = code_hex.replace("0x", "")
-    #     code_string_hex += code_hex
+    code_string_hex = ""
+    for code_hex in address_to_find_hex:
+        code_hex = code_hex.replace("0x", "")
+        code_string_hex += code_hex
 
-    code_string_hex = "CAB5B3"
+    # code_string_hex = "CAB5B3"
     size_byte = len(code_string_hex) // 2
     code_array_int = []
     for i in range(size_byte):

@@ -7,7 +7,8 @@ from rich.console import Console
 
 
 def main():
-    platform = "pc98"
+    platform = "dos"
+    # platform = "pc98"
 
     script_base_dir = Path(f"../workspace0/script-{platform}")
     src_bin_base_dir = Path(f"../workspace0/jpn-{platform}")

@@ -319,131 +319,17 @@ def extract_table(
     return font_table
 
 
-def find_sentence(script: Dict, sentence: str) -> bool:
-    """Find a sentence.
-
-    Args:
-        script (dict): A dictionary of a script.
-        sentence (str): A sentence to find.
-
-    Returns:
-        bool: True if the sentence is found.
-    """
-
-    found = False
-    for key, value in script.items():
-        if value == sentence:
-            found = True
-
-    return found
-
-
-def find_sentence_and_update(script: Dict, sentence: str, new_sentence: str) -> bool:
-    """Find a sentence and update it.
-
-    Args:
-        script (dict): A dictionary of script.
-        sentence (str): A sentence to find.
-        new_sentence (str): A new sentence to update. The length should be matched.
-
-    Returns:
-        bool: True if the sentence is found and updated.
-    """
-
-    dlength = len(sentence)
-    nlength = len(new_sentence)
-    if dlength != nlength:
-        assert 0, f"sentence length is not matched. {dlength} != {nlength}"
-
-    is_updated = False
-    for key, value in script.items():
-        if value == sentence:
-            script[key] = new_sentence
-            is_updated = True
-
-    return is_updated
-
-
-def split_sentence(script: Dict, font_table: FontTable, control_code: str):
-    pop_list = []
-    new_dict = dict()
-    for address, sentence in script.items():
-        if control_code not in sentence:
-            continue
-        pop_list.append(address)
-
-        hex_start, hex_end = address.split("=")
-        spos = int(hex_start, 16)
-        epos = int(hex_end, 16)
-
-        # Check previous sentence
-        pos = sentence.find(control_code)
-        code_length = len(control_code)
-
-        sentence_prev_full = sentence[: pos + code_length]
-        sentence_prev = sentence[:pos]
-        length_prev_full = font_table.check_length_from_sentence(sentence_prev_full)
-        length = font_table.check_length_from_sentence(sentence_prev)
-        spos_prev = spos
-        epos_prev = spos + length - 1
-
-        # Check post sentence
-        sentence_post = sentence[pos + code_length :]
-        spos_post = spos + length_prev_full
-        epos_post = epos
-
-        if len(sentence_post):
-            new_dict[f"{spos_post:05X}={epos_post:05X}"] = sentence_post
-
-            # Recursive function
-            if control_code in sentence_post:
-                split_sentence(new_dict, font_table, control_code)
-
-        new_dict[f"{spos_prev:05X}={epos_prev:05X}"] = sentence_prev
-
-    for key in pop_list:
-        del script[key]
-
-    script.update(new_dict)
-
-
-def split_sentences(
-    script: Dict, font_table: FontTable, control_codes: List[str] = []
-) -> Dict:
-    for control_code in control_codes:
-        pop_list = []
-        update_dict = dict()
-        for addresses, sentence in script.items():
-            if control_code not in sentence:
-                continue
-            pop_list.append(addresses)
-
-            new_dict = {addresses: sentence}
-            split_sentence(new_dict, font_table, control_code)
-            update_dict.update(new_dict)
-
-        # Remove original sentences when they are split
-        for adresses in pop_list:
-            del script[adresses]
-        script.update(update_dict)
-
-    return script
-
-
 class Script:
-    def __init__(self, file_path: str) -> None:
-        self.script = None
+    def __init__(self, file_path: str = "") -> None:
+        self.script = dict()
         self.encoding = None
         self.custom_codes = None
         self.custom_input = None
 
         # Read a script
-        if not Path(file_path).exists():
-            print(f"{file_path} does not exist.")
-            return None
-
-        with open(file_path, "r", encoding="utf-8") as f:
-            self.script = json.load(f)
+        if not len(file_path) and not Path(file_path).exists():
+            with open(file_path, "r", encoding="utf-8") as f:
+                self.script = json.load(f)
 
         # Get encoding
         if "encoding" in self.script.keys():
@@ -458,10 +344,17 @@ class Script:
             self.custom_input = self.script.pop("custom_input")
 
     def set_custom_codes(self, custom_codes: Dict) -> None:
+        """Set custom codes
+        Args:
+            custom_codes (Dict): A dictionary of custom codes.
+        """
         self.custom_codes = custom_codes
 
     def save(self, file_path: str) -> None:
-
+        """Save the script to a file
+        Args:
+            file_path (str): A path to a file.
+        """
         save_dict = dict()
 
         # Set encoding
@@ -481,6 +374,12 @@ class Script:
             json.dump(save_dict, f, ensure_ascii=False, indent=4)
 
     def validate(self, font_table: FontTable) -> bool:
+        """Check the script
+        Args:
+            font_table (FontTable): A font table.
+        Returns:
+            bool: True if the script is valid.
+        """
         # Check script
         count_false_length = 0
         count_false_characters = 0
@@ -509,7 +408,13 @@ class Script:
         return count_false_length, count_false_characters
 
     def split_sentences(self, font_table: FontTable, split_code: str) -> bool:
-
+        """Split sentences by a split code
+        Args:
+            font_table (FontTable): A font table.
+            split_code (str): A split code.
+        Returns:
+            bool: True if the sentences are split.
+        """
         # Initialize remove_key_list, modified_script
         remove_key_list = []
         modified_script = dict()
@@ -562,7 +467,10 @@ class Script:
         return True
 
     def merge_sentences(self) -> bool:
-
+        """Merge sentences if addresses of two sentences are consecutive without duplication
+        Returns:
+            bool: True if the sentences are merged.
+        """
         # Initialize remove_key_list, modified_script
         remove_key_list = []
         modified_script = dict()
@@ -746,3 +654,100 @@ class Script:
         self.script = dict(sorted(self.script.items()))
 
         return True
+
+    def extract_script(
+        self,
+        data: bytearray,
+        font_table: FontTable,
+        length_threshold: int,
+        check_ascii: bool = False,
+        check_ascii_restriction: bool = False,
+        check_range: bool = False,
+    ) -> Dict:
+        """Extract a script from a binary data
+        Args:
+            data (bytearray): A binary data.
+            font_table (FontTable): A font table.
+            length_threshold (int): A threshold of the length of a sentence.
+            check_ascii (bool): If True, check if the sentence contains only ASCII characters.
+            check_ascii_restriction (bool): If True, check if the sentence contains only ASCII characters and the first character is not '_'.
+            check_range (bool): If True, check if the sentence contains only characters in the font table.
+        Returns:
+            Dict: A dictionary of a script log.
+        """
+
+        i = 0
+        length = 0  # Sentence length in bytes
+        sentence = ""
+        sentence_log = ""
+        self.script = dict()
+        script_log = dict()
+
+        while i < len(data) - 1:
+            # Extract a 2byte code
+            code_int = (data[i] << 8) + data[i + 1]
+            code_hex = f"{code_int:X}"
+
+            need_to_stop = True
+
+            character = font_table.get_char(code_hex)
+            if character is not None:
+                need_to_stop = False
+
+            if check_range and font_table.range(code_int):
+                need_to_stop = False
+
+            if not need_to_stop:
+                # Find a character in the font table
+                character = font_table.get_char(code_hex)
+
+                if character:  # Character is in the font table
+                    sentence += character
+                    if character == "■":
+                        sentence_log += (
+                            f":{code_hex}" if sentence_log else f"{code_hex}"
+                        )
+                    length += 2
+                    i += 2
+                else:
+                    sentence += "@"
+                    sentence_log += f":@{code_hex}" if sentence_log else f"@{code_hex}"
+                    length += 2
+                    i += 2
+            else:
+                if check_ascii:
+                    code_int = data[i]
+                    code_hex = f"{code_int:02X}"
+                    character = font_table.get_char_ascii(code_hex)
+
+                    if check_ascii_restriction and character != "_" and length == 0:
+                        need_to_stop = True
+                    elif character is not None:
+                        sentence += "|" + character
+                        length += 1
+                        need_to_stop = False
+
+                # Check sentence length and save
+                if need_to_stop:
+                    if length >= length_threshold:
+                        if "�" not in sentence:  # Need to check this later
+                            address = f"{i-length:05X}={i-1:05X}"
+                            self.script[address] = sentence
+                            if sentence_log:
+                                script_log[address] = sentence_log
+                    sentence = ""
+                    sentence_log = ""
+                    length = 0
+                i += 1
+
+        # Check a result of the end of data
+        if length >= length_threshold:
+            address = f"{i-length*2:05X}={i-1:05X}"
+            self.script[address] = sentence
+            if sentence_log:
+                script_log[address] = sentence_log
+            sentence = ""
+            sentence_log = ""
+            length = 0
+
+        return script_log

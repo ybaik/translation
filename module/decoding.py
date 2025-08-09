@@ -12,3 +12,21 @@ def encode(data, encoding_info):
         encoding_key = int(encoding_key, 16)
         data = bytearray([b ^ encoding_key for b in data])
     return data
+
+
+def convert_3to4bpp(in_path, out_path):
+    with open(in_path, "rb") as f_in, open(out_path, "wb") as f_out:
+        while chunk := f_in.read(3):
+            f_out.write(chunk)
+            if len(chunk) == 3:
+                f_out.write(b"\x00")
+
+
+def convert_4to3bpp(in_path, out_path):
+    with open(in_path, "rb") as f_in, open(out_path, "wb") as f_out:
+        while True:
+            chunk = f_in.read(4)
+            if len(chunk) < 4:
+                f_out.write(chunk[:3])
+                break
+            f_out.write(chunk[:3])

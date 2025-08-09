@@ -52,7 +52,7 @@ def main():
                 console.print(f"{address} {file_tag}", style="red")
                 assert (
                     0
-                ), f"sentence length is not matched. {address}:{length} != {length_from_dst_sentence}"
+                ), f"Jpn sentence length is not matched. {address}:{length} != {length_from_dst_sentence}"
                 continue
 
             # Check if the src and dst sentences are valid
@@ -64,7 +64,7 @@ def main():
                 console.print(f"{address} {file_tag}", style="red")
                 assert (
                     0
-                ), f"sentence length is not matched. {address}:{length} != {length_from_dst_sentence}"
+                ), f"Kor sentence length is not matched. {address}:{length} != {length_from_dst_sentence}"
                 continue
 
             count_false_character, false_character = dst_font_table.verify_sentence(
