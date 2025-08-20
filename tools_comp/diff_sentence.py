@@ -25,7 +25,7 @@ def check_diff_and_save(script, shared_set, save_path):
 
 
 def main():
-    base_dir = Path("c:/work_han/workspace0")
+    base_dir = Path("c:/work_han/workspace")
     src_dir = base_dir / "script-dos"
     dst_dir = base_dir / "script-pc98"
 

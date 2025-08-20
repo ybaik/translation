@@ -6,8 +6,8 @@ from module.font_table import FontTable
 
 def main():
     console = Console()
-    base_dir = Path("c:/work_han/workspace3")
-    script_dir = base_dir / "script-pc98"
+    base_dir = Path("c:/work_han/workspace0")
+    script_dir = base_dir / "script-dos"
 
     dictionary = dict()
 
@@ -19,9 +19,6 @@ def main():
     for file in script_dir.glob("*.json"):  # Use rglob to search subdirectories
         if not "_jpn.json" in file.name:
             continue
-
-        # if "MAIN" not in file.name:
-        #     continue
         dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")
         if not dst_path.exists():
             continue
@@ -34,11 +31,6 @@ def main():
 
         src_font_table = FontTable("./font_table/font_table-jpn-full.json")
         dst_font_table = FontTable("./font_table/font_table-kor-jin.json")
-
-        # Check if custom codes exist
-        custom_codes = dst.pop("custom_codes", None)
-        if custom_codes is not None:
-            dst_font_table.set_custom_code_1byte(custom_codes)
 
         # check address
         for address, src_sentence in src.items():

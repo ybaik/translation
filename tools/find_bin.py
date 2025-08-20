@@ -4,18 +4,19 @@ import sys
 
 sys.path.append("./")
 from module.font_table import FontTable
+from module.decoding import decode
 
 
 def main():
 
-    base_path = "../workspace0/jpn-dos"
+    base_path = "../workspace/jpn-dos"
     path_list = os.listdir(base_path)
 
     # font_table_path = "font_table/font_table-kor-jin.json"
     font_table_path = "font_table/font_table-jpn-full.json"
     font_table = FontTable(font_table_path)
 
-    sentence_to_find = "済"
+    sentence_to_find = "達"
     address_to_find_hex = font_table.get_codes(sentence_to_find)
 
     code_string_hex = ""
@@ -35,13 +36,16 @@ def main():
         if not os.path.isfile(target_path):
             continue
 
-        # if "MAIN" not in file:
-        #     continue
+        if "MAIN" not in file:
+            continue
 
         # Read a json script
         # print(file)
         with open(f"{base_path}/{file}", "rb") as f:
             data = f.read()
+
+        # decoding_info = "xor:0x77"
+        # data = decode(data, decoding_info)
 
         i = 0
         count = 0

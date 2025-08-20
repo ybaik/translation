@@ -111,12 +111,15 @@ def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytear
             spos = int(code_hex_start, 16)
             epos = int(code_hex_end, 16)
 
+            # Need to isolate descriptions
+            codes = codes.split("#")[0]
+
             # Check if the format is right
             num_codes = epos - spos + 1
             if len(codes) != num_codes * 2:
                 assert (
                     0
-                ), f"The length of custom input is not matched. {len(codes)} != {num_codes}"
+                ), f"The length of custom input is not matched. {address}:{len(codes)} != {num_codes}"
 
             for i in range(num_codes):
                 code_int = int(codes[i * 2 : i * 2 + 2], 16)
@@ -327,7 +330,7 @@ class Script:
         self.custom_input = None
 
         # Read a script
-        if not len(file_path) and not Path(file_path).exists():
+        if len(file_path) and Path(file_path).exists():
             with open(file_path, "r", encoding="utf-8") as f:
                 self.script = json.load(f)
 
@@ -350,7 +353,32 @@ class Script:
         """
         self.custom_codes = custom_codes
 
-    def save(self, file_path: str) -> None:
+    def set_address_padding(self, address_padding: int = 5) -> None:
+        """Set address padding
+        Args:
+            address_padding (int): A padding length of address.
+        """
+        annoying = []
+        for address in self.script.keys():
+            start, end = address.split("=")
+            if len(start) != address_padding:
+                annoying.append(address)
+                continue
+            if len(end) != address_padding:
+                annoying.append(address)
+                continue
+
+        for address in annoying:
+            sentence = self.script.pop(address)
+            start, end = address.split("=")
+            start_int = int(start, 16)
+            end_int = int(end, 16)
+            new_address = (
+                f"{start_int:0{address_padding}X}={end_int:0{address_padding}X}"
+            )
+            self.script[new_address] = sentence
+
+    def save(self, file_path: str, address_padding: int = 5) -> None:
         """Save the script to a file
         Args:
             file_path (str): A path to a file.
@@ -369,9 +397,22 @@ class Script:
         if self.custom_input is not None:
             save_dict["custom_input"] = self.custom_input
 
+        # Set address padding
+        self.set_address_padding(address_padding)
+
+        # Sort by keys (address) for the main script
+        self.script = dict(sorted(self.script.items()))
+
         save_dict.update(self.script)
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(save_dict, f, ensure_ascii=False, indent=4)
+
+    def add_script(self, script: Dict) -> None:
+        """Add a script to the main script
+        Args:
+            script (Dict): A script.
+        """
+        self.script.update(script)
 
     def validate(self, font_table: FontTable) -> bool:
         """Check the script
@@ -406,6 +447,72 @@ class Script:
                 count_false_characters = 0
 
         return count_false_length, count_false_characters
+
+    def validate_with_binary(self, font_table: FontTable, binary_path: Path) -> bool:
+        """Check the script with a binary data
+        Args:
+            binary_path (Path): A binary data path.
+        Returns:
+            bool: True if the script is valid.
+        """
+        # Read a binary data
+        if not Path(binary_path).exists():
+            print(f"{binary_path} does not exist.")
+            return
+
+        with open(binary_path, "rb") as f:
+            binary_data = f.read()
+        binary_data = bytearray(binary_data)
+
+        # Decoding bianry data
+        if self.encoding is not None:
+            binary_data = decode(binary_data, self.encoding)
+
+        # Font table update
+        if self.custom_codes is not None:
+            font_table.set_custom_code_1byte(self.custom_codes)
+
+        for address, sentence in self.script.items():
+            if "=" not in address:
+                continue
+            spos = int(address.split("=")[0], 16)
+
+            is_diff = False
+
+            # Need to add a routine to check if the sentence is hex-only or not
+            if "0x:" == sentence[:4]:
+                print("hex-only script")
+                is_diff = True
+            else:
+                idx = 0
+                is_1byte = False
+                for letter in sentence:
+                    if letter == "|":
+                        is_1byte = True
+                        continue
+                    if is_1byte:
+                        code = font_table.get_code_ascii(letter)
+                        code_int = int(code, 16)
+                        if code_int != binary_data[spos + idx]:
+                            is_diff = True
+                            break
+                        else:
+                            idx += 1
+                            is_1byte = False
+                    else:
+                        code = font_table.get_code(letter)
+                        code_int = (binary_data[spos + idx] << 8) + binary_data[
+                            spos + idx + 1
+                        ]
+                        code_hex = f"{code_int:X}"
+                        if code != code_hex:
+                            is_diff = True
+                            break
+                        else:
+                            idx += 2
+            if is_diff:
+                print(f"{address}:{sentence}")
+        return is_diff
 
     def split_sentences(self, font_table: FontTable, split_code: str) -> bool:
         """Split sentences by a split code
@@ -523,7 +630,7 @@ class Script:
 
         return True
 
-    def attach_control_codes(self, binay_path: str, control_codes: Dict = {}) -> bool:
+    def attach_control_codes(self, binary_path: str, control_codes: Dict = {}) -> bool:
 
         # Check control codes
         if len(control_codes.keys()) == 0:
@@ -531,11 +638,11 @@ class Script:
             return
 
         # Read a binary data
-        if not Path(binay_path).exists():
-            print(f"{binay_path} does not exist.")
+        if not Path(binary_path).exists():
+            print(f"{binary_path} does not exist.")
             return
 
-        with open(binay_path, "rb") as f:
+        with open(binary_path, "rb") as f:
             binary_data = f.read()
         binary_data = bytearray(binary_data)
 
@@ -751,3 +858,131 @@ class Script:
             length = 0
 
         return script_log
+
+    def write_script(self, data: bytearray, font_table: FontTable) -> bytearray:
+        valid_sentence_count = 0
+
+        # Check if decoding is needed
+        if self.encoding is not None:
+            data = decode(data, self.encoding)
+
+        # Check if custom codes exist
+        if self.custom_codes is not None:
+            font_table.set_custom_code_1byte(self.custom_codes)
+
+        # Check if custom inputs exist
+        if self.custom_input is not None:
+            for address, codes in self.custom_input.items():
+                [code_hex_start, code_hex_end] = address.split("=")
+                spos = int(code_hex_start, 16)
+                epos = int(code_hex_end, 16)
+
+                # Need to isolate descriptions
+                codes = codes.split("#")[0]
+
+                # Check if the format is right
+                num_codes = epos - spos + 1
+                if len(codes) != num_codes * 2:
+                    assert (
+                        0
+                    ), f"The length of custom input is not matched. {address}:{len(codes)} != {num_codes}"
+
+                for i in range(num_codes):
+                    code_int = int(codes[i * 2 : i * 2 + 2], 16)
+                    data[spos + i] = code_int
+
+        # Write scripts
+        for address, sentence in self.script.items():
+
+            # Check if there is a unsupproted address format
+            if "=" not in address:
+                assert 0, f"{address} is not in the correct format."
+
+            [code_hex_start, code_hex_end] = address.split("=")
+            spos = int(code_hex_start, 16)
+            epos = int(code_hex_end, 16)
+            pos = spos
+
+            # Check if the setence is hex-only
+            if "0x:" == sentence[:3]:
+                # Need to isolate descriptions
+                codes = sentence[3:].split("#")[0]
+
+                # Check if the format is right
+                num_codes = epos - spos + 1
+                if len(codes) != num_codes * 2:
+                    assert (
+                        0
+                    ), f"The length of custom input is not matched. {address}:{len(codes)} != {num_codes}"
+
+                for i in range(num_codes):
+                    code_int = int(codes[i * 2 : i * 2 + 2], 16)
+                    data[spos + i] = code_int
+
+                valid_sentence_count += 1
+                continue
+
+            # Check if there is a unsupport letter in the sentence
+            skip_sentence = False
+            check_1byte = False
+            for character in sentence:
+                if character == "|":
+                    check_1byte = True
+                    continue
+                if check_1byte:
+                    if not font_table.exists_1byte(character):
+                        skip_sentence = True
+                        break
+                    check_1byte = False
+                    continue
+                if not font_table.exists(character):
+                    skip_sentence = True
+                    break
+
+                if font_table.is_japanese(character):
+                    skip_sentence = True
+                    break
+            if skip_sentence:
+                continue
+            valid_sentence_count += 1
+
+            # Write characters in the sentence
+            idx_char = 0
+            while idx_char < len(sentence):
+                character = sentence[idx_char]
+
+                # Check if the letter is a one byte character
+                if character == "|":
+                    idx_char += 1
+                    character = sentence[idx_char]
+
+                    if font_table.get_code_ascii(character) is not None:
+                        code_hex = font_table.get_code_ascii(character)
+                        code_int = int(code_hex, 16)
+                        data[pos] = code_int
+                    else:
+                        assert (
+                            0
+                        ), f"{code_hex_start}:{character} is not in the 1-byte font table."
+                    pos += 1
+                else:  # Input two bytes character
+                    if character in ["■", "@"]:
+                        pass
+                    if font_table.get_code(character) is not None:
+                        code_hex = font_table.get_code(character)
+                        code_int = int(code_hex, 16)
+
+                        code1 = (code_int & 0xFF00) >> 8
+                        code2 = code_int & 0x00FF
+                        data[pos] = code1
+                        data[pos + 1] = code2
+                    else:
+                        assert 0, f"{character} is not in the 2-byte font table."
+                    pos += 2
+                idx_char += 1
+
+        # Check if encoding is needed
+        if self.encoding is not None:
+            data = encode(data, self.encoding)
+
+        return data, valid_sentence_count

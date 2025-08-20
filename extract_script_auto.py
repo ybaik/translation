@@ -7,11 +7,12 @@ from module.decoding import decode
 
 
 def main():
-    platform = "dos"
-    bin_path = f"../workspace/jpn-decoded-{platform}"
+    platform = "pc98"
+    bin_path = f"../workspace3/kor-{platform}"
     font_table_path = "font_table/font_table-jpn-full.json"
-    extended_word = "_jpn"
-    script_path = f"../workspace/script_init-{platform}"
+    font_table_path = "font_table/font_table-kor-jin.json"
+    extended_word = "_kor"
+    script_path = f"../workspace3/script_init-{platform}-kor"
 
     # bin_path = "../workspace/m3-dos"
     # font_table_path = "../workspace/font_table-dos-macross3.json"
@@ -24,12 +25,12 @@ def main():
 
     # ref_dir = Path("../workspace/KOR-patch")
 
-    length_threshold_in_bytes = 2
+    length_threshold_in_bytes = 1
     check_ascii = True
     check_ascii_restriction = False  # If True, the first ASCII code need to be x20
 
-    decoding_info = "xor:0x77"
-    decoding_base_path = f"../workspace/jpn-decoded-{platform}"
+    decoding_info = "xor:0x96"
+    decoding_base_path = f"../workspace0/jpn-decoded-{platform}"
     # =================================================================
 
     files = os.listdir(bin_path)
@@ -39,8 +40,8 @@ def main():
         src_data_path = f"{bin_path}/{file}"
         dst_script_path = f"{script_path}/{file}{extended_word}.json"
 
-        if "EVENT.XOR" not in file:
-            continue
+        # if "MAIN.EXE" not in file:
+        #     continue
 
         if not os.path.isfile(src_data_path):
             continue

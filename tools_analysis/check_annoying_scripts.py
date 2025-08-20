@@ -7,7 +7,7 @@ from module.font_table import FontTable
 def main():
     console = Console()
 
-    base_dir = Path("c:/work_han/workspace0")
+    base_dir = Path("c:/work_han/workspace3")
     ref = "rb"
     script_base_dir = base_dir / "script-pc98"
 

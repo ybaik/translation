@@ -1,22 +1,22 @@
-import json
 from pathlib import Path
-from module.font_table import check_file, FontTable
-from module.script import write_script, write_script_multibyte
-from module.check_script import check_script, check_script_multibyte, diff_address
 from rich.console import Console
+from module.font_table import check_file, FontTable
+from module.script import write_script, Script
+from module.check_script import diff_address
 
 
 def main():
-    platform = "dos"
-    # platform = "pc98"
+    # platform = "dos"
+    platform = "pc98"
 
-    script_base_dir = Path(f"../workspace0/script-{platform}")
-    src_bin_base_dir = Path(f"../workspace0/jpn-{platform}")
-    dst_bin_base_dir = Path(f"../workspace0/kor-{platform}")
+    script_base_dir = Path(f"../workspace3/script-{platform}")
+    src_bin_base_dir = Path(f"../workspace3/jpn-{platform}")
+    dst_bin_base_dir = Path(f"../workspace3/kor-{platform}")
 
     # src_bin_base_dir = Path("../workspace/rb1-PC98-KOR-backup")
     # dst_bin_base_dir = Path("../workspace/rb1-PC98-KOR")
 
+    src_font_table_path = "font_table/font_table-jpn-full.json"
     dst_font_table_path = "font_table/font_table-kor-jin.json"
     # dst_font_table_path = "../workspace/font_table-kor-rb1-1st.json"
 
@@ -29,7 +29,7 @@ def main():
         if not "_kor.json" in file.name:
             continue
 
-        # if "OPEN" not in file.name:
+        # if "MAIN.EXE" not in file.name:
         #     continue
 
         # Check paths
@@ -57,31 +57,30 @@ def main():
 
         console.print(f"[yellow] Start:{src_data_path}[/yellow]")
 
-        # Read source and destination script
-        with open(src_script_path, "r", encoding="utf-8") as f:
-            src_script = json.load(f)
-        with open(dst_script_path, "r", encoding="utf-8") as f:
-            dst_script = json.load(f)
-
-        # Read a destinationfont table
+        # Read source and destination font tables
+        if not check_file(src_font_table_path):
+            return
+        src_font_table = FontTable(src_font_table_path)
         if not check_file(dst_font_table_path):
             return
-        font_table = FontTable(dst_font_table_path)
+        dst_font_table = FontTable(dst_font_table_path)
+
+        # Read source and destination script
+        if not check_file(src_script_path):
+            return
+        src_script = Script(str(src_script_path))
+
+        if not check_file(dst_script_path):
+            return
+        dst_script = Script(str(dst_script_path))
 
         # Compare addresses in the source and destination scripts
-        count_diff = diff_address(src_script, dst_script)
+        count_diff = diff_address(src_script.script, dst_script.script)
         if count_diff:
             return
 
         # Check the destination script
-        if not consider_multibyte:
-            count_false_length, count_false_letters = check_script(
-                dst_script, font_table
-            )
-        else:
-            count_false_length, count_false_letters = check_script_multibyte(
-                dst_script, font_table
-            )
+        count_false_length, count_false_letters = dst_script.validate(dst_font_table)
 
         if count_false_length:
             console.print(
@@ -92,12 +91,16 @@ def main():
                 f"[yellow] False length/letter count:{count_false_length},{count_false_letters}[/yellow]"
             )
             return
-        console.print(
-            f"[yellow]The error should be fixed for[/yellow] [green]{src_data_path}[/green]"
-        )
 
         print(f"False length/letter count:{count_false_length},{count_false_letters}")
         console.print(f"[yellow] End:{src_data_path}[/yellow]")
+
+        # Check source script with binary data
+        is_diff = src_script.validate_with_binary(src_font_table, src_data_path)
+        if is_diff:
+            console.print(
+                f"[yellow] json and data doesn't match.[/yellow] [green]{src_data_path}[/green]"
+            )
 
         # Read the source binary data
         if not check_file(src_data_path):
@@ -108,15 +111,11 @@ def main():
         console.print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
         # Write the destination script to the binary data in memory
-        if not consider_multibyte:
-            data, valid_sentence_count = write_script(data, font_table, dst_script)
-        else:
-            data, valid_sentence_count = write_script_multibyte(
-                data, font_table, dst_script
+        data, valid_sentence_count = dst_script.write_script(data, dst_font_table)
+        if len(dst_script.script):
+            console.print(
+                f"Valid sentence percentege (done/total): {valid_sentence_count/len(dst_script.script)*100:.2f}% ({valid_sentence_count}/{len(dst_script.script)})"
             )
-        console.print(
-            f"Valid sentence percentege (done/total): {valid_sentence_count/len(dst_script)*100:.2f}% ({valid_sentence_count}/{len(dst_script)})"
-        )
 
         # Save the replaced binary data to a file in the destination directory
         with open(dst_data_path, "wb") as f:

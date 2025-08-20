@@ -10,7 +10,7 @@ def main():
     platform = "dos"
     platform = "pc98"
 
-    base_dir = Path("c:/work_han/workspace0")
+    base_dir = Path("c:/work_han/workspace")
     ref_base_dir = base_dir
     script_base_dir = base_dir / f"script-{platform}"
 

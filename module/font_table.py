@@ -196,6 +196,14 @@ class FontTable:
         return length_from_address
 
     def check_length_from_sentence(self, sentence: str) -> int:
+
+        # Check if the sentence is hex-only
+        if "0x:" == sentence[:3]:
+            sentence = sentence[3:].split("#")[
+                0
+            ]  # Remove the hex-only code and the comment
+            return len(sentence) // 2
+
         num_one_byte = sentence.count("|")
         num_two_byte = len(sentence) - num_one_byte * 2
         length_from_sentence = num_one_byte + num_two_byte * 2
