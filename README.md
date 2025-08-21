@@ -20,12 +20,18 @@ cd translation
 
 ### Usage
 1. Extract scripts from game data:
-```python extract_script_auto.py # after modifying the inputs in the script```
+```bash
+python extract_script_auto.py # after modifying the inputs in the script
+```
 
 2. Translate scripts:
-```python tools/fit_scripts.py # after modifying the inputs in the script```
+```bash
+python tools/fit_scripts.py # after modifying the inputs in the script
+```
 
 3. Patch game data:
-```python write_script_auto.py # after modifying the inputs in the script```
+```bash
+python write_script_auto.py # after modifying the inputs in the script
+```
 
 Note: Recommended to use conda or virtual environment
