@@ -1,26 +1,31 @@
-# Translation python package
+# Translation
+Python package for game translation
 
-## Overview
+## Installation
 
-Python scripts for data language patching
-
-## Install
-
-It is highly recommended to use conda or virtual env.
-
-## Requirements
-
+### Requirements
 - Python 3.9+
 
-### Cloning repo
-
+### Setup
+1. Clone repository:
 ```bash
 git clone git@github.com:ybaik/translation.git
 cd translation
 ```
 
-### Install dependencies and "translation"
-
+2. Install dependencies and package:
 ```bash
-pip install -e . # install as a developemnt mode
+   pip install -e .
 ```
+
+### Usage
+1. Extract scripts from game data:
+```python extract_script_auto.py # after modifying the inputs in the script```
+
+2. Translate scripts:
+```python tools/fit_scripts.py # after modifying the inputs in the script```
+
+3. Patch game data:
+```python write_script_auto.py # after modifying the inputs in the script```
+
+Note: Recommended to use conda or virtual environment
