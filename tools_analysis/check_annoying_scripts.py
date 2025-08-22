@@ -44,30 +44,23 @@ def main():
         # Check addresses in the source script
         modified = False
         for address, src_sentence in src.items():
-
             if "=" not in address:
                 continue
-            if not src_sentence in annoying:
+            if src_sentence not in annoying:
                 continue
 
             if address not in dst:
                 continue
 
-            length_from_src_sentence = src_font_table.check_length_from_sentence(
-                src_sentence
-            )
+            length_from_src_sentence = src_font_table.check_length_from_sentence(src_sentence)
             # length_from_src_sentence = src_font_table.verify_sentence(src_sentence)
             dst_sentence = dst[address]
-            length_from_dst_sentence = dst_font_table.check_length_from_sentence(
-                dst_sentence
-            )
+            length_from_dst_sentence = dst_font_table.check_length_from_sentence(dst_sentence)
             # length_from_dst_sentence = dst_font_table.verify_sentence(dst_sentence)
 
             if length_from_src_sentence != length_from_dst_sentence:
                 console.print(f"{address},{file_tag}", style=color)
-                assert (
-                    0
-                ), f"Sentence length is not matched. {src_sentence} != {dst_sentence}"
+                assert 0, f"Sentence length is not matched. {src_sentence} != {dst_sentence}"
                 continue
 
             # print(file.name, address)

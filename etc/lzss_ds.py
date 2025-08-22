@@ -20,9 +20,7 @@ class LZSS_DS:  # for dark seraphim (pc98, dos)
         remainder = num_bytes % len(x)
         return x * repetitions + x[:remainder]
 
-    def _find_longest_match(
-        self, data: bytearray, current_position: int
-    ) -> Optional[Tuple[int, int]]:
+    def _find_longest_match(self, data: bytearray, current_position: int) -> Optional[Tuple[int, int]]:
         end_of_buffer = min(current_position + self.window_size, len(data))
         search_start = max(0, current_position - self.max_match_section)
         for target_end in range(end_of_buffer, current_position + self.code_offset, -1):
@@ -31,9 +29,7 @@ class LZSS_DS:  # for dark seraphim (pc98, dos)
             # print(target_length, hex(target[0]), hex(target[-1]))
             # print([hex(t) for t in target])
 
-            for search_position in range(
-                search_start, current_position - target_length + 1
-            ):
+            for search_position in range(search_start, current_position - target_length + 1):
                 candidate = data[search_position : search_position + target_length]
                 # print(len(candidate), hex(candidate[0]), hex(candidate[-1]),search_position, search_position+target_length)
 
@@ -119,7 +115,6 @@ class LZSS_DS:  # for dark seraphim (pc98, dos)
 
         # decompression
         while i < compressed_size:
-
             if compressed_data[i] != compression_code:  # pattern
                 output_buffer.append(compressed_data[i])
                 i += 1
@@ -127,9 +122,7 @@ class LZSS_DS:  # for dark seraphim (pc98, dos)
                 # read compression info.
                 # length: 4 bits, distance: 12 bits
                 length = (compressed_data[i + 2] >> 4) + 4
-                distance = compressed_data[i + 1] + (
-                    (compressed_data[i + 2] & 0xF) << 8
-                )
+                distance = compressed_data[i + 1] + ((compressed_data[i + 2] & 0xF) << 8)
 
                 length_min = min(length_min, length)
                 length_max = max(length_max, length)
@@ -150,7 +143,6 @@ class LZSS_DS:  # for dark seraphim (pc98, dos)
 
 
 def main():
-
     # decompress
     data_path = "D:/work_han/workspace/kor/OPEN_encoded.ASS"
     decoded_path = "D:/work_han/workspace/kor/OPEN_decoded.ASS"
@@ -182,7 +174,7 @@ def main():
     start = time()
     compressed_data_ = lzss_ds.compress(decompressed_data)
     end = time()
-    print(f"{end-start:.5f} sec")
+    print(f"{end - start:.5f} sec")
     with open(save_path, "wb") as f:
         f.write(compressed_data_)
 

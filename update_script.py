@@ -16,7 +16,7 @@ def main():
 
     # read a pair of scripts
     for file in script_dir.glob("*.json"):  # Use rglob to search subdirectories
-        if not "_jpn.json" in file.name:
+        if "_jpn.json" not in file.name:
             continue
 
         # Read a script
@@ -31,7 +31,6 @@ def main():
             data = bytearray(data)
 
         for address, src_sentence in script.items():
-
             # Ignore the case where the character is in the middle of a sentence
             if "|" in src_sentence:
                 continue

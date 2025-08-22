@@ -60,9 +60,7 @@ def main():
             if len_src_sentence != len_dst_sentence:
                 console.print(f"{address},{file_tag}", style=color)
                 print(len(src_sentence), len(dst_sentence))
-                assert (
-                    0
-                ), f"Sentence length is not matched. {src_sentence} != {dst_sentence}"
+                assert 0, f"Sentence length is not matched. {src_sentence} != {dst_sentence}"
                 continue
 
             # print(file.name, address)
@@ -70,9 +68,7 @@ def main():
             # print(dst_sentence)
             translated = dictionary[src_sentence]["translated"]
             if len(translated) == 1:
-                len_translated = dst_font_table.check_length_from_sentence(
-                    translated[0]
-                )
+                len_translated = dst_font_table.check_length_from_sentence(translated[0])
                 if len_dst_sentence != len_translated:
                     console.print(f"Length mismatch: {address},{file_tag}", style="red")
                     continue

@@ -13,7 +13,6 @@ def extract_script(
     check_ascii_restriction: bool = False,
     check_range: bool = False,
 ) -> Tuple[Dict, Dict]:
-
     i = 0
     length = 0  # Sentence length in bytes
     sentence = ""
@@ -67,7 +66,7 @@ def extract_script(
             if need_to_stop:
                 if length >= length_threshold:
                     if "�" not in sentence:  # Need to check this later
-                        address = f"{i-length:05X}={i-1:05X}"
+                        address = f"{i - length:05X}={i - 1:05X}"
                         script[address] = sentence
                         if sentence_log:
                             script_log[address] = sentence_log
@@ -78,7 +77,7 @@ def extract_script(
 
     # Check a result of the end of data
     if length >= length_threshold:
-        address = f"{i-length*2:05X}={i-1:05X}"
+        address = f"{i - length * 2:05X}={i - 1:05X}"
         script[address] = sentence
         if sentence_log:
             script_log[address] = sentence_log
@@ -90,7 +89,6 @@ def extract_script(
 
 
 def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytearray:
-
     valid_sentence_count = 0
 
     # Check if decoding is needed
@@ -117,9 +115,7 @@ def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytear
             # Check if the format is right
             num_codes = epos - spos + 1
             if len(codes) != num_codes * 2:
-                assert (
-                    0
-                ), f"The length of custom input is not matched. {address}:{len(codes)} != {num_codes}"
+                assert 0, f"The length of custom input is not matched. {address}:{len(codes)} != {num_codes}"
 
             for i in range(num_codes):
                 code_int = int(codes[i * 2 : i * 2 + 2], 16)
@@ -127,7 +123,6 @@ def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytear
 
     # Write scripts
     for address, sentence in script.items():
-
         # Check if there is a unsupproted address format
         if "=" not in address:
             assert 0, f"{address} is not in the correct format."
@@ -176,9 +171,7 @@ def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytear
                     code_int = int(code_hex, 16)
                     data[pos] = code_int
                 else:
-                    assert (
-                        0
-                    ), f"{code_hex_start}:{character} is not in the 1-byte font table."
+                    assert 0, f"{code_hex_start}:{character} is not in the 1-byte font table."
                 pos += 1
             else:  # Input two bytes character
                 if character in ["■", "@"]:
@@ -203,10 +196,7 @@ def write_script(data: bytearray, font_table: FontTable, script: Dict) -> bytear
     return data, valid_sentence_count
 
 
-def write_script_multibyte(
-    data: bytearray, font_table: FontTable, script: Dict
-) -> bytearray:
-
+def write_script_multibyte(data: bytearray, font_table: FontTable, script: Dict) -> bytearray:
     valid_sentence_count = 0
 
     # Write scripts
@@ -256,10 +246,7 @@ def write_script_multibyte(
     return data, valid_sentence_count
 
 
-def write_code(
-    data: bytearray, hex_start: str, hex_end: str, code_hex: str, count: int
-) -> bytearray:
-
+def write_code(data: bytearray, hex_start: str, hex_end: str, code_hex: str, count: int) -> bytearray:
     spos = int(hex_start, 16)
     epos = int(hex_end, 16)
     pos = spos
@@ -279,10 +266,7 @@ def write_code(
     return data
 
 
-def write_code_1byte(
-    data: bytearray, hex_start: str, hex_end: str, code_hex: str, count: int
-) -> bytearray:
-
+def write_code_1byte(data: bytearray, hex_start: str, hex_end: str, code_hex: str, count: int) -> bytearray:
     spos = int(hex_start, 16)
     epos = int(hex_end, 16)
     pos = spos
@@ -299,10 +283,7 @@ def write_code_1byte(
     return data
 
 
-def extract_table(
-    data: bytearray, script: Dict, font_table: FontTable = dict()
-) -> FontTable:
-
+def extract_table(data: bytearray, script: Dict, font_table: FontTable = dict()) -> FontTable:
     # Check a script
     for range, sentence in script.items():
         [code_hex_start, code_hex_end] = range.split("=")
@@ -329,10 +310,13 @@ class Script:
         self.custom_codes = None
         self.custom_input = None
 
-        # Read a script
-        if len(file_path) and Path(file_path).exists():
-            with open(file_path, "r", encoding="utf-8") as f:
-                self.script = json.load(f)
+        # Read a script if the file path is specified
+        if len(file_path):
+            if Path(file_path).exists():
+                with open(file_path, "r", encoding="utf-8") as f:
+                    self.script = json.load(f)
+            else:
+                assert 0, f"{file_path} does not exist."
 
         # Get encoding
         if "encoding" in self.script.keys():
@@ -373,9 +357,7 @@ class Script:
             start, end = address.split("=")
             start_int = int(start, 16)
             end_int = int(end, 16)
-            new_address = (
-                f"{start_int:0{address_padding}X}={end_int:0{address_padding}X}"
-            )
+            new_address = f"{start_int:0{address_padding}X}={end_int:0{address_padding}X}"
             self.script[new_address] = sentence
 
     def save(self, file_path: str, address_padding: int = 5) -> None:
@@ -431,15 +413,11 @@ class Script:
             length_from_address = font_table.check_length_from_address(address)
             length_from_sentence = font_table.check_length_from_sentence(sentence)
             if length_from_address != length_from_sentence:
-                print(
-                    f"Wrong sentence length:{address}: {length_from_address}-{length_from_sentence}"
-                )
+                print(f"Wrong sentence length:{address}: {length_from_address}-{length_from_sentence}")
                 count_false_length += 1
 
             # Check if there is false characters in a sentence via comparison with the font table
-            count_false_character, false_character = font_table.verify_sentence(
-                sentence
-            )
+            count_false_character, false_character = font_table.verify_sentence(sentence)
             if count_false_character:
                 # print(f"Wrong letters:{address}: {count_false_character}-{false_character}")
                 count_false_characters += count_false_character
@@ -480,9 +458,14 @@ class Script:
             is_diff = False
 
             # Need to add a routine to check if the sentence is hex-only or not
-            if "0x:" == sentence[:4]:
-                print("hex-only script")
-                is_diff = True
+            if "0x:" == sentence[:3]:
+                codes = sentence[3:].split("#")[0]
+                length = len(codes) // 2
+                for i in range(length):
+                    code_int = int(codes[i * 2 : i * 2 + 2], 16)
+                    if code_int != binary_data[spos + i]:
+                        is_diff = True
+                        break
             else:
                 idx = 0
                 is_1byte = False
@@ -501,9 +484,7 @@ class Script:
                             is_1byte = False
                     else:
                         code = font_table.get_code(letter)
-                        code_int = (binary_data[spos + idx] << 8) + binary_data[
-                            spos + idx + 1
-                        ]
+                        code_int = (binary_data[spos + idx] << 8) + binary_data[spos + idx + 1]
                         code_hex = f"{code_int:X}"
                         if code != code_hex:
                             is_diff = True
@@ -527,7 +508,6 @@ class Script:
         modified_script = dict()
         # Connect sentences
         for address, sentence in self.script.items():
-
             # Check if the address is alreeady checked
             if address in remove_key_list:
                 continue
@@ -592,7 +572,6 @@ class Script:
 
         # Connect sentences
         for address, sentence in self.script.items():
-
             # Check if the address is alreeady checked
             if address in remove_key_list:
                 continue
@@ -631,7 +610,6 @@ class Script:
         return True
 
     def attach_control_codes(self, binary_path: str, control_codes: Dict = {}) -> bool:
-
         # Check control codes
         if len(control_codes.keys()) == 0:
             print("No control codes are specified.")
@@ -664,7 +642,6 @@ class Script:
 
         # Connect sentences
         for address, sentence in self.script.items():
-
             # Check if the address is alreeady checked
             if address in remove_key_list:
                 continue
@@ -811,9 +788,7 @@ class Script:
                 if character:  # Character is in the font table
                     sentence += character
                     if character == "■":
-                        sentence_log += (
-                            f":{code_hex}" if sentence_log else f"{code_hex}"
-                        )
+                        sentence_log += f":{code_hex}" if sentence_log else f"{code_hex}"
                     length += 2
                     i += 2
                 else:
@@ -838,7 +813,7 @@ class Script:
                 if need_to_stop:
                     if length >= length_threshold:
                         if "�" not in sentence:  # Need to check this later
-                            address = f"{i-length:05X}={i-1:05X}"
+                            address = f"{i - length:05X}={i - 1:05X}"
                             self.script[address] = sentence
                             if sentence_log:
                                 script_log[address] = sentence_log
@@ -849,7 +824,7 @@ class Script:
 
         # Check a result of the end of data
         if length >= length_threshold:
-            address = f"{i-length*2:05X}={i-1:05X}"
+            address = f"{i - length * 2:05X}={i - 1:05X}"
             self.script[address] = sentence
             if sentence_log:
                 script_log[address] = sentence_log
@@ -883,9 +858,7 @@ class Script:
                 # Check if the format is right
                 num_codes = epos - spos + 1
                 if len(codes) != num_codes * 2:
-                    assert (
-                        0
-                    ), f"The length of custom input is not matched. {address}:{len(codes)} != {num_codes}"
+                    assert 0, f"The length of custom input is not matched. {address}:{len(codes)} != {num_codes}"
 
                 for i in range(num_codes):
                     code_int = int(codes[i * 2 : i * 2 + 2], 16)
@@ -893,7 +866,6 @@ class Script:
 
         # Write scripts
         for address, sentence in self.script.items():
-
             # Check if there is a unsupproted address format
             if "=" not in address:
                 assert 0, f"{address} is not in the correct format."
@@ -911,9 +883,7 @@ class Script:
                 # Check if the format is right
                 num_codes = epos - spos + 1
                 if len(codes) != num_codes * 2:
-                    assert (
-                        0
-                    ), f"The length of custom input is not matched. {address}:{len(codes)} != {num_codes}"
+                    assert 0, f"The length of custom input is not matched. {address}:{len(codes)} != {num_codes}"
 
                 for i in range(num_codes):
                     code_int = int(codes[i * 2 : i * 2 + 2], 16)
@@ -961,9 +931,7 @@ class Script:
                         code_int = int(code_hex, 16)
                         data[pos] = code_int
                     else:
-                        assert (
-                            0
-                        ), f"{code_hex_start}:{character} is not in the 1-byte font table."
+                        assert 0, f"{code_hex_start}:{character} is not in the 1-byte font table."
                     pos += 1
                 else:  # Input two bytes character
                     if character in ["■", "@"]:

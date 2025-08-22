@@ -1,15 +1,7 @@
 import os
 import json
 from typing import List, Dict, Tuple
-from .ascii import ascii_table
 from .jisx0201 import jisx0201_table
-
-
-def check_file(path: str) -> bool:
-    if os.path.exists(path):
-        return True
-    print(f"{path} does not exist.")
-    return False
 
 
 class FontTable:
@@ -20,6 +12,10 @@ class FontTable:
         self.code_int_min = 0xFFFF
         self.code_int_max = 0
 
+        # Check if the file exists
+        if not os.path.exists(file_path):
+            assert 0, f"{file_path} does not exist."
+
         # For ascii (1-byte) characters
         self.set_custom_code_1byte()
 
@@ -27,13 +23,11 @@ class FontTable:
         self.read_font_table(file_path)
 
     def set_custom_code_1byte(self, custom_codes: Dict = {}) -> None:
-        # self.code2char_ascii = ascii_table
         self.code2char_ascii = jisx0201_table
         self.code2char_ascii.update(custom_codes)
         self.char2code_ascii = {v: k for k, v in self.code2char_ascii.items()}
 
     def read_font_table(self, file_path: str) -> bool:
-
         if not os.path.isfile(file_path):
             print(f"No {file_path} exist.")
             return False
@@ -76,7 +70,6 @@ class FontTable:
         return True
 
     def _read_json(self, file_path: str):
-
         with open(file_path, "r", encoding="utf-8") as f:
             font_table = json.load(f)
 
@@ -87,7 +80,6 @@ class FontTable:
         self.code2char = font_table
 
     def _read_tbl(self, file_path: str) -> None:
-
         font_table = dict()
 
         # Read font table
@@ -131,13 +123,11 @@ class FontTable:
                     print(f"duplicated: {code_hex}")
 
     def _write_json(self, file_path: str) -> None:
-
         font_table = dict(sorted(self.code2char.items()))
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(font_table, f, ensure_ascii=False, indent=2)
 
     def _write_tbl(self, file_path: str) -> None:
-
         table_for_tbl = ""
         for code, letter in sorted(self.code2char.items()):
             table_for_tbl += f"{code}={letter}\n"
@@ -196,12 +186,9 @@ class FontTable:
         return length_from_address
 
     def check_length_from_sentence(self, sentence: str) -> int:
-
         # Check if the sentence is hex-only
         if "0x:" == sentence[:3]:
-            sentence = sentence[3:].split("#")[
-                0
-            ]  # Remove the hex-only code and the comment
+            sentence = sentence[3:].split("#")[0]  # Remove the hex-only code and the comment
             return len(sentence) // 2
 
         num_one_byte = sentence.count("|")

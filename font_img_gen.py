@@ -13,7 +13,6 @@ def save_font_image(
     offset=0,
     draw_vertical=False,
 ):
-
     if font_width == 8:
         bitchk = 7
     elif font_width == 16:

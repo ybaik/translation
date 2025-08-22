@@ -50,9 +50,7 @@ def main():
             read_letter = font_table.get_char(code_hex)
 
             if read_letter is None:
-                print(
-                    f"Character {code_hex} is none in the font table. {address}, {file}"
-                )
+                print(f"Character {code_hex} is none in the font table. {address}, {file}")
             elif read_letter not in ["■", "@"]:
                 new_sentence = src_sentence[:letter_pos] + read_letter
                 if len(src_sentence) > letter_pos + 1:
@@ -60,9 +58,7 @@ def main():
                 script[address] = new_sentence
                 is_updated = True
             else:
-                print(
-                    f"Character {code_hex} is not found in the font table. {address}, {file}"
-                )
+                print(f"Character {code_hex} is not found in the font table. {address}, {file}")
 
         if is_updated:
             print(file)

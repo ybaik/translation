@@ -11,7 +11,6 @@ def mse(img1, img2):
 
 
 def match_patch(patch, img):
-
     cnt = 0
     min_cnt = -1
     min_error = 10000
@@ -31,7 +30,6 @@ def match_patch(patch, img):
 
 
 def main():
-
     # json_font_table_path = "font_table/font_table-kor-jin.json"
     json_font_table_path = "font_table/font_table-kor-jin.json"
     font_bmp_path = "D:/work_han/font-kor-jin.bmp"

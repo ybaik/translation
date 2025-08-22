@@ -29,7 +29,7 @@ def main():
 
         msg = ""
         if len(src_data) != len(dst_data):
-            msg += f" diff file size ({len(src_data)}, {len(dst_data)}: {len(dst_data)-len(src_data)}) |"
+            msg += f" diff file size ({len(src_data)}, {len(dst_data)}: {len(dst_data) - len(src_data)}) |"
 
         # if len(msg) > 0:
         #     print(f"{file}\t:{msg}")

@@ -4,7 +4,6 @@ from module.script import write_code, write_code_1byte
 
 
 def main():
-
     bin_path = "C:/dos/etc/m2/S01_ARMY.BIN"
     # out_path = "C:/work_han/workspace/MAIN.EXE"
     out_path = bin_path

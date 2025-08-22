@@ -11,7 +11,6 @@ def main():
 
     # read a pair of scripts
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
-
         # Check extensions
         need_continue = True
         # candidates = ["_kor.json", "_jpn.json"]

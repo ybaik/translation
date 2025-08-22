@@ -42,7 +42,6 @@ def main():
 
         # check address
         for address, src_sentence in src.items():
-
             if "=" not in address:
                 continue
 
@@ -52,38 +51,28 @@ def main():
 
             # Check if the src and dst sentences are valid
             length = src_font_table.check_length_from_address(address)
-            length_from_src_sentence = src_font_table.check_length_from_sentence(
-                src_sentence
-            )
+            length_from_src_sentence = src_font_table.check_length_from_sentence(src_sentence)
 
             if length != length_from_src_sentence:
                 console.print(f"{address} {file_tag}", style="red")
-                assert (
-                    0
-                ), f"Jpn sentence length is not matched. {address}:{length} != {length_from_dst_sentence}"
+                assert 0, f"Jpn sentence length is not matched. {address}:{length} != {length_from_dst_sentence}"
                 continue
 
             # Check if the src and dst sentences are valid
             dst_sentence = dst[address]
-            length_from_dst_sentence = dst_font_table.check_length_from_sentence(
-                dst_sentence
-            )
+            length_from_dst_sentence = dst_font_table.check_length_from_sentence(dst_sentence)
             if length != length_from_dst_sentence:
                 console.print(f"{address} {file_tag}", style="red")
-                assert (
-                    0
-                ), f"Kor sentence length is not matched. {address}:{length} != {length_from_dst_sentence}"
+                assert 0, f"Kor sentence length is not matched. {address}:{length} != {length_from_dst_sentence}"
                 continue
 
-            count_false_character, false_character = dst_font_table.verify_sentence(
-                dst_sentence
-            )
+            count_false_character, false_character = dst_font_table.verify_sentence(dst_sentence)
             # if count_false_character:
             #     console.print(f"{address} {file_tag}", style="red")
             #     continue
 
             # Add the sentence to the dictionary
-            if not src_sentence in dictionary:
+            if src_sentence not in dictionary:
                 dictionary[src_sentence] = {
                     "count": 0,
                     "reference": 0,
@@ -91,7 +80,7 @@ def main():
                 }
 
             dictionary[src_sentence]["reference"] += 1
-            if not dst_sentence in dictionary[src_sentence]["translated"]:
+            if dst_sentence not in dictionary[src_sentence]["translated"]:
                 dictionary[src_sentence]["count"] += 1
                 dictionary[src_sentence]["translated"].append(dst_sentence)
 

@@ -8,7 +8,6 @@ from module.decoding import decode
 
 
 def main():
-
     base_path = "../workspace/jpn-dos"
     path_list = os.listdir(base_path)
 

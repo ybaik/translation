@@ -6,7 +6,6 @@ from module.font_table import FontTable
 
 
 def main():
-
     # Read a font table
     font_table = FontTable("font_table/font_table-kor-jin.json")
 

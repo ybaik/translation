@@ -53,7 +53,6 @@ def main():
                 print(dst_sentence)
                 print("=============================")
         else:
-
             data_path = data_base_dir / file.name.replace("_jpn.json", "")
             with open(data_path, "rb") as f:
                 data = f.read()
@@ -94,9 +93,7 @@ def main():
 
                 if epos < len(data) + 6:
                     ccc = data[epos + 1 : epos + 3]
-                    if int("39", 16) >= ccc[0] >= int("30", 16) and int(
-                        "39", 16
-                    ) >= ccc[1] >= int("30", 16):
+                    if int("39", 16) >= ccc[0] >= int("30", 16) and int("39", 16) >= ccc[1] >= int("30", 16):
                         string = ""
                         for i in range(5):
                             val = int(data[epos + i + 1]) - 48
@@ -105,7 +102,7 @@ def main():
 
                         if len(string) > 0:
                             additional_byte = len(string) // 2
-                            new_address = f"{spos:05X}={epos+additional_byte:05X}"
+                            new_address = f"{spos:05X}={epos + additional_byte:05X}"
                             new_sentence = src_sentence + string
 
                             addresses.append(address)
@@ -121,9 +118,7 @@ def main():
 
             if len(addresses) > 0:
                 for i in range(len(addresses)):
-                    src[new_addresses[i]] = src.pop(
-                        addresses[i]
-                    )  # To preserve the original order
+                    src[new_addresses[i]] = src.pop(addresses[i])  # To preserve the original order
                     src[new_addresses[i]] = new_sentences[i]
                 need_update = True
 

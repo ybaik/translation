@@ -1,13 +1,13 @@
 import json
-from module.font_table import check_file, FontTable
+from pathlib import Path
+from module.font_table import FontTable
 from module.script import extract_script
 
 
 def main():
-
     # Read a config file
     config_path = "config.json"
-    if not check_file(config_path):
+    if not Path(config_path).exists():
         return
     with open(config_path) as f:
         config = json.load(f)
@@ -22,12 +22,10 @@ def main():
     restriction = config["restriction"]
 
     # Read a font table
-    if not check_file(src_font_table_path):
-        return
     font_table = FontTable(src_font_table_path)
 
     # Read the target bianry data
-    if not check_file(src_data_path):
+    if not Path(src_data_path).exists():
         return
     with open(src_data_path, "rb") as f:
         data = f.read()

@@ -6,12 +6,11 @@ from module.font_table import FontTable
 
 
 def main():
-
     font_table_kor = FontTable("font_table/font_table-kor-jin.json")
     font_table_jpn = FontTable("font_table/font_table-jpn-full.json")
 
     # Get a code or codes from a letter or letters
-    script = "깹"
+    script = "벗"
     codes_hex = font_table_kor.get_codes(script)
     print(codes_hex)
     jpn_script = font_table_jpn.get_chars(codes_hex)

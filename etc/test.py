@@ -95,7 +95,6 @@ def chohap2unicode(cho, jung, jong):
 
 
 def main():
-
     df = pd.read_csv("../table.csv", encoding="utf-8-sig")
     print(df)
 

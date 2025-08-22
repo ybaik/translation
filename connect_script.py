@@ -6,16 +6,12 @@ def main():
     platform = "pc98"
     target_file = "MAIN.EXE"
     locale = "kor"
-    script_path = (
-        f"C:/work_han/workspace0/script-{platform}/{target_file}_{locale}.json"
-    )
+    script_path = f"C:/work_han/workspace0/script-{platform}/{target_file}_{locale}.json"
     binary_path = f"C:/work_han/workspace0/{locale}-{platform}/{target_file}"
     font_table_path = "font_table/font_table-jpn-full.json"
     # font_table_path = "font_table/font_table-jpn-full.json"
 
-    dst_script_path = (
-        f"C:/work_han/workspace0/script-{platform}/{target_file}_{locale}.json"
-    )
+    dst_script_path = f"C:/work_han/workspace0/script-{platform}/{target_file}_{locale}.json"
 
     font_table = FontTable(font_table_path)
     script = Script(script_path)

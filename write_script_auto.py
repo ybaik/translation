@@ -1,7 +1,8 @@
 from pathlib import Path
 from rich.console import Console
-from module.font_table import check_file, FontTable
-from module.script import write_script, Script
+
+from module.script import Script
+from module.font_table import FontTable
 from module.check_script import diff_address
 
 
@@ -20,17 +21,16 @@ def main():
     dst_font_table_path = "font_table/font_table-kor-jin.json"
     # dst_font_table_path = "../workspace/font_table-kor-rb1-1st.json"
 
-    consider_multibyte = False  # This is not for the ordinary case, e.g. royal blood
     # ===================================================================
     # For debugging prints
     console = Console()
 
     for file in script_base_dir.glob("*.json"):  # Use rglob to search subdirectories
-        if not "_kor.json" in file.name:
+        if "_kor.json" not in file.name:
             continue
 
-        # if "MAIN.EXE" not in file.name:
-        #     continue
+        if "MAIN.EXE" not in file.name:
+            continue
 
         # Check paths
         dst_script_path = file
@@ -40,9 +40,7 @@ def main():
             continue
 
         # Check a source data path
-        src_data_path = src_bin_base_dir / str(
-            file.relative_to(script_base_dir)
-        ).replace("_kor.json", "")
+        src_data_path = src_bin_base_dir / str(file.relative_to(script_base_dir)).replace("_kor.json", "")
         if not src_data_path.exists():
             print(f"{src_data_path.name} is not exists.")
             continue
@@ -58,20 +56,11 @@ def main():
         console.print(f"[yellow] Start:{src_data_path}[/yellow]")
 
         # Read source and destination font tables
-        if not check_file(src_font_table_path):
-            return
         src_font_table = FontTable(src_font_table_path)
-        if not check_file(dst_font_table_path):
-            return
         dst_font_table = FontTable(dst_font_table_path)
 
         # Read source and destination script
-        if not check_file(src_script_path):
-            return
         src_script = Script(str(src_script_path))
-
-        if not check_file(dst_script_path):
-            return
         dst_script = Script(str(dst_script_path))
 
         # Compare addresses in the source and destination scripts
@@ -83,13 +72,9 @@ def main():
         count_false_length, count_false_letters = dst_script.validate(dst_font_table)
 
         if count_false_length:
-            console.print(
-                f"[yellow] False length/letter count:{count_false_length},{count_false_letters}[/yellow]"
-            )
+            console.print(f"[yellow] False length/letter count:{count_false_length},{count_false_letters}[/yellow]")
         if count_false_letters:
-            console.print(
-                f"[yellow] False length/letter count:{count_false_length},{count_false_letters}[/yellow]"
-            )
+            console.print(f"[yellow] False length/letter count:{count_false_length},{count_false_letters}[/yellow]")
             return
 
         print(f"False length/letter count:{count_false_length},{count_false_letters}")
@@ -98,12 +83,10 @@ def main():
         # Check source script with binary data
         is_diff = src_script.validate_with_binary(src_font_table, src_data_path)
         if is_diff:
-            console.print(
-                f"[yellow] json and data doesn't match.[/yellow] [green]{src_data_path}[/green]"
-            )
+            console.print(f"[yellow] json and data doesn't match.[/yellow] [green]{src_data_path}[/green]")
 
         # Read the source binary data
-        if not check_file(src_data_path):
+        if not Path(src_data_path).exists():
             return
         with open(src_data_path, "rb") as f:
             data = f.read()
@@ -113,9 +96,10 @@ def main():
         # Write the destination script to the binary data in memory
         data, valid_sentence_count = dst_script.write_script(data, dst_font_table)
         if len(dst_script.script):
-            console.print(
-                f"Valid sentence percentege (done/total): {valid_sentence_count/len(dst_script.script)*100:.2f}% ({valid_sentence_count}/{len(dst_script.script)})"
-            )
+            valid_p = valid_sentence_count / len(dst_script.script) * 100
+            msg = f"Valid sentence percentege (done/total): {valid_p:.2f}%"
+            msg += f" ({valid_sentence_count}/{len(dst_script.script)})"
+            console.print(msg)
 
         # Save the replaced binary data to a file in the destination directory
         with open(dst_data_path, "wb") as f:

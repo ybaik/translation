@@ -10,7 +10,6 @@ def debug_draw(
     font_height=16,
     font_width=16,
 ):
-
     # Initialize the buffer with 255 (white)
     canvas_gray = np.full((font_height, font_width), 255, dtype=np.uint8)
 
@@ -38,9 +37,7 @@ def debug_draw(
     scale_factor = 8
     new_width = font_width * scale_factor
     new_height = font_height * scale_factor
-    resized_img = cv2.resize(
-        canvas_gray, (new_width, new_height), interpolation=cv2.INTER_NEAREST
-    )
+    resized_img = cv2.resize(canvas_gray, (new_width, new_height), interpolation=cv2.INTER_NEAREST)
     # resized_img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_LINEAR)
 
     cv2.imshow("test", resized_img)
