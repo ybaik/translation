@@ -224,20 +224,22 @@ class FontTable:
         count_false_character = 0
         false_characters = ""
         check_ascii = False
-        for character in sentence:
-            if character == "|":
-                check_ascii = True
-                continue
 
-            if check_ascii:
-                if character not in self.char2code_ascii:
+        if "0x:" != sentence[:3]:
+            for character in sentence:
+                if character == "|":
+                    check_ascii = True
+                    continue
+
+                if check_ascii:
+                    if self.char2code_ascii.get(character) is None:
+                        count_false_character += 1
+                        false_characters += "|" + character
+                    check_ascii = False
+                    continue
+
+                if character not in self.char2code:
                     count_false_character += 1
-                    false_characters += "|" + character
-                check_ascii = False
-                continue
-
-            if character not in self.char2code:
-                count_false_character += 1
-                false_characters += character
+                    false_characters += character
 
         return count_false_character, false_characters

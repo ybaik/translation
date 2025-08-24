@@ -407,6 +407,9 @@ class Script:
         count_false_length = 0
         count_false_characters = 0
 
+        if self.custom_codes is not None:
+            font_table.set_custom_code(self.custom_codes)
+
         for address, sentence in self.script.items():
             if "=" not in address:
                 continue
@@ -419,7 +422,7 @@ class Script:
             # Check if there is false characters in a sentence via comparison with the font table
             count_false_character, false_character = font_table.verify_sentence(sentence)
             if count_false_character:
-                # print(f"Wrong letters:{address}: {count_false_character}-{false_character}")
+                print(f"Wrong letters:{address}: {count_false_character}-{false_character}")
                 count_false_characters += count_false_character
                 # Debug
                 count_false_characters = 0
