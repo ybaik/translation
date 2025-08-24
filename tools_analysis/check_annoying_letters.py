@@ -14,7 +14,7 @@ def main():
 
     # read a pair of scripts
     for file in script_dir.rglob("*.json"):  # Use rglob to search subdirectories
-        if not "_jpn.json" in file.name:
+        if "_jpn.json" not in file.name:
             continue
         with open(file, "r", encoding="utf-8") as f:
             script = json.load(f)

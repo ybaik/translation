@@ -16,16 +16,40 @@ class FontTable:
         if not os.path.exists(file_path):
             assert 0, f"{file_path} does not exist."
 
-        # For ascii (1-byte) characters
-        self.set_custom_code_1byte()
+        # Set code 1 byte (jisx0201)
+        self.code2char_ascii = jisx0201_table
+        self.char2code_ascii = {v: k for k, v in self.code2char_ascii.items()}
 
         # Read font table
         self.read_font_table(file_path)
 
-    def set_custom_code_1byte(self, custom_codes: Dict = {}) -> None:
-        self.code2char_ascii = jisx0201_table
-        self.code2char_ascii.update(custom_codes)
-        self.char2code_ascii = {v: k for k, v in self.code2char_ascii.items()}
+    def set_custom_code(self, custom_codes: Dict = {}) -> None:
+        update_1byte = False
+        update_2byte = False
+        for k, v in custom_codes.items():
+            if len(k) == 2:  # 1-byte code
+                old_code = self.char2code_ascii.get(v, None)
+                if old_code is not None:
+                    # To avoid duplicated code and letter
+                    self.code2char_ascii.pop(old_code, None)
+                self.code2char_ascii[k] = v
+                update_1byte = True
+            elif len(k) == 4:  # 2-byte code
+                old_code = self.char2code.get(v, None)  # To avoid duplicated code and letter
+                if old_code is not None:
+                    # To avoid duplicated code and letter
+                    self.code2char.pop(old_code, None)
+                self.code2char[k] = v
+                update_2byte = True
+            else:
+                assert 0, f"Invalid code length: {k} during custom code setting."
+
+        if update_1byte:
+            self.char2code_ascii = {v: k for k, v in self.code2char_ascii.items()}
+        if update_2byte:
+            self.char2code = dict()
+            for k, v in self.code2char.items():
+                self.char2code.setdefault(v, k)
 
     def read_font_table(self, file_path: str) -> bool:
         if not os.path.isfile(file_path):
@@ -43,14 +67,7 @@ class FontTable:
         # Make char2code table
         self.char2code = dict()
         for k, v in self.code2char.items():
-            if len(k) == 2:  # 1-byte code
-                if self.char2code.get(v) is None:
-                    self.char2code[v] = k
-            else:
-                if self.char2code.get(v) is None:
-                    self.char2code[v] = k
-                # else:
-                #     print(f"Invalid 2-byte code: {k}")
+            self.char2code.setdefault(v, k)
 
         return True
 

@@ -448,11 +448,14 @@ class Script:
 
         # Font table update
         if self.custom_codes is not None:
-            font_table.set_custom_code_1byte(self.custom_codes)
+            font_table.set_custom_code(self.custom_codes)
 
+        diff_status = False
+        err_reason = ""
         for address, sentence in self.script.items():
             if "=" not in address:
                 continue
+
             spos = int(address.split("=")[0], 16)
 
             is_diff = False
@@ -474,26 +477,31 @@ class Script:
                         is_1byte = True
                         continue
                     if is_1byte:
-                        code = font_table.get_code_ascii(letter)
-                        code_int = int(code, 16)
-                        if code_int != binary_data[spos + idx]:
+                        code_hex = font_table.get_code_ascii(letter)
+                        code_bin_int = binary_data[spos + idx]
+                        code_bin_hex = f"{code_bin_int:02X}"
+                        if code_hex != code_bin_hex:
                             is_diff = True
+                            err_reason = f"{code_hex}/{code_bin_hex}"
                             break
                         else:
                             idx += 1
                             is_1byte = False
                     else:
-                        code = font_table.get_code(letter)
-                        code_int = (binary_data[spos + idx] << 8) + binary_data[spos + idx + 1]
-                        code_hex = f"{code_int:X}"
-                        if code != code_hex:
+                        code_hex = font_table.get_code(letter)
+                        code_bin_int = (binary_data[spos + idx] << 8) + binary_data[spos + idx + 1]
+                        code_bin_hex = f"{code_bin_int:04X}"
+                        if code_hex != code_bin_hex:
                             is_diff = True
+                            err_reason = f"{code_hex}/{code_bin_hex}"
                             break
                         else:
                             idx += 2
             if is_diff:
-                print(f"{address}:{sentence}")
-        return is_diff
+                print(f"{address}:{sentence} - {err_reason}")
+
+                diff_status = True
+        return diff_status
 
     def split_sentences(self, font_table: FontTable, split_code: str) -> bool:
         """Split sentences by a split code
@@ -843,7 +851,7 @@ class Script:
 
         # Check if custom codes exist
         if self.custom_codes is not None:
-            font_table.set_custom_code_1byte(self.custom_codes)
+            font_table.set_custom_code(self.custom_codes)
 
         # Check if custom inputs exist
         if self.custom_input is not None:

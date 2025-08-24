@@ -8,11 +8,10 @@ def main():
     console = Console()
 
     base_dir = Path("c:/work_han/workspace3")
-    ref = "rb"
     script_base_dir = base_dir / "script-pc98"
 
     # Read an existing dictionary
-    annoying_path = base_dir / f"{ref}_annoying.json"
+    annoying_path = base_dir / "annoying.json"
     # annoying_path = base_dir / f"{ref}_dictionary.json"
     if not annoying_path:
         return
@@ -26,7 +25,7 @@ def main():
 
     # Read a pair of scripts
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
-        if not "_jpn.json" in file.name:
+        if "_jpn.json" not in file.name:
             continue
 
         console.print(file.name)

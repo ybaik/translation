@@ -1,18 +1,17 @@
 import os
 import json
 from pathlib import Path
-from module.font_table import check_file, FontTable
+from module.font_table import FontTable
 from module.script import extract_script
 from module.decoding import decode
 
 
 def main():
     platform = "pc98"
-    bin_path = f"../workspace3/kor-{platform}"
+    bin_path = f"../workspace0/jpn-{platform}"
     font_table_path = "font_table/font_table-jpn-full.json"
-    font_table_path = "font_table/font_table-kor-jin.json"
-    extended_word = "_kor"
-    script_path = f"../workspace3/script_init-{platform}-kor"
+    extended_word = "_jpn"
+    script_path = f"../workspace0/script_init-{platform}-jpn"
 
     # bin_path = "../workspace/m3-dos"
     # font_table_path = "../workspace/font_table-dos-macross3.json"
@@ -40,7 +39,7 @@ def main():
         src_data_path = f"{bin_path}/{file}"
         dst_script_path = f"{script_path}/{file}{extended_word}.json"
 
-        # if "MAIN.EXE" not in file:
+        # if "OPEN.EXE" not in file:
         #     continue
 
         if not os.path.isfile(src_data_path):
@@ -48,13 +47,9 @@ def main():
 
         print(f"{file} ===========================================")
         # Read a font table
-        if not check_file(font_table_path):
-            return
         font_table = FontTable(font_table_path)
 
         # Read a target binary data
-        if not check_file(src_data_path):
-            return
         with open(src_data_path, "rb") as f:
             data = f.read()
         data = bytearray(data)

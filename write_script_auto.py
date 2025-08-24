@@ -7,19 +7,15 @@ from module.check_script import diff_address
 
 
 def main():
-    # platform = "dos"
-    platform = "pc98"
+    platform = "dos"
+    # platform = "pc98"
 
-    script_base_dir = Path(f"../workspace3/script-{platform}")
-    src_bin_base_dir = Path(f"../workspace3/jpn-{platform}")
-    dst_bin_base_dir = Path(f"../workspace3/kor-{platform}")
-
-    # src_bin_base_dir = Path("../workspace/rb1-PC98-KOR-backup")
-    # dst_bin_base_dir = Path("../workspace/rb1-PC98-KOR")
+    script_base_dir = Path(f"../workspace0/script-{platform}")
+    src_bin_base_dir = Path(f"../workspace0/jpn-{platform}")
+    dst_bin_base_dir = Path(f"../workspace0/kor-{platform}")
 
     src_font_table_path = "font_table/font_table-jpn-full.json"
     dst_font_table_path = "font_table/font_table-kor-jin.json"
-    # dst_font_table_path = "../workspace/font_table-kor-rb1-1st.json"
 
     # ===================================================================
     # For debugging prints
@@ -29,8 +25,8 @@ def main():
         if "_kor.json" not in file.name:
             continue
 
-        if "MAIN.EXE" not in file.name:
-            continue
+        # if "OPEN" in file.name:
+        #     continue
 
         # Check paths
         dst_script_path = file

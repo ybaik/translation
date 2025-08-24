@@ -12,12 +12,12 @@ def main():
     dictionary = dict()
 
     # Read an existing dictionary
-    dictionary_path = base_dir / f"rb_dictionary.json"
-    annoying_path = base_dir / f"rb_annoying.json"
+    dictionary_path = base_dir / "dictionary.json"
+    annoying_path = base_dir / "annoying.json"
 
     # Read a pair of scripts
     for file in script_dir.glob("*.json"):  # Use rglob to search subdirectories
-        if not "_jpn.json" in file.name:
+        if "_jpn.json" not in file.name:
             continue
 
         # if "MAIN" not in file.name:
@@ -55,7 +55,7 @@ def main():
 
             if length != length_from_src_sentence:
                 console.print(f"{address} {file_tag}", style="red")
-                assert 0, f"Jpn sentence length is not matched. {address}:{length} != {length_from_dst_sentence}"
+                assert 0, f"Jpn sentence length is not matched. {address}:{length} != {length_from_src_sentence}"
                 continue
 
             # Check if the src and dst sentences are valid
