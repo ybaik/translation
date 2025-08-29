@@ -26,7 +26,7 @@ def main():
     # Read a pair of scripts
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         console.print(file.name)
-        if not "_jpn.json" in file.name:
+        if "_jpn.json" not in file.name:
             continue
         dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")
         if not dst_path.exists():
@@ -48,7 +48,7 @@ def main():
             if "=" not in address:
                 continue
 
-            if not src_sentence in dictionary:
+            if src_sentence not in dictionary:
                 continue
             if address not in dst:
                 continue

@@ -38,7 +38,7 @@ def main():
         # Check if custom codes exist
         custom_codes = dst.pop("custom_codes", None)
         if custom_codes is not None:
-            dst_font_table.set_custom_code_1byte(custom_codes)
+            dst_font_table.set_custom_code(custom_codes)
 
         # check address
         for address, src_sentence in src.items():

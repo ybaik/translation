@@ -1,5 +1,6 @@
 import os
 import json
+from copy import deepcopy
 from typing import List, Dict, Tuple
 from .jisx0201 import jisx0201_table
 
@@ -17,7 +18,7 @@ class FontTable:
             assert 0, f"{file_path} does not exist."
 
         # Set code 1 byte (jisx0201)
-        self.code2char_ascii = jisx0201_table
+        self.code2char_ascii = deepcopy(jisx0201_table)
         self.char2code_ascii = {v: k for k, v in self.code2char_ascii.items()}
 
         # Read font table

@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import Dict, Tuple
 from module.font_table import FontTable
 from module.decoding import decode, encode
 
@@ -424,8 +424,6 @@ class Script:
             if count_false_character:
                 print(f"Wrong letters:{address}: {count_false_character}-{false_character}")
                 count_false_characters += count_false_character
-                # Debug
-                count_false_characters = 0
 
         return count_false_length, count_false_characters
 
@@ -747,6 +745,26 @@ class Script:
         # Update script
         self.script.update(modified_script)
         self.script = dict(sorted(self.script.items()))
+
+        return True
+
+    def filter_given_sentence(self, given_sentence: str) -> bool:
+        """
+        To get rid of a given sentence
+        """
+        remove_key_list = []
+        for address, sentence in self.script.items():
+            if sentence != given_sentence:
+                continue
+            remove_key_list.append(address)
+
+        if len(remove_key_list) == 0:
+            print("No sentences are removed.")
+            return False
+
+        # Remove old sentences
+        for key in remove_key_list:
+            del self.script[key]
 
         return True
 
