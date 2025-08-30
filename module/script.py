@@ -883,6 +883,7 @@ class Script:
 
                 # Need to isolate descriptions
                 codes = codes.split("#")[0]
+                codes = codes.replace("0x:", "")
 
                 # Check if the format is right
                 num_codes = epos - spos + 1
