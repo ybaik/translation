@@ -7,7 +7,7 @@ from module.font_table import FontTable
 def main():
     console = Console()
 
-    base_dir = Path("c:/work_han/workspace3")
+    base_dir = Path("c:/work_han/workspace4")
     script_base_dir = base_dir / "script-pc98"
 
     # Read an existing dictionary
@@ -73,8 +73,8 @@ def main():
             #     dst[address] = new_sentence
             #     modified = True
 
-            if "modify" in annoying[src_sentence]:
-                idx = annoying[src_sentence]["modify"]
+            if "s" in annoying[src_sentence]:
+                idx = annoying[src_sentence]["s"]
                 new_sentence = annoying[src_sentence]["translated"][idx]
                 if new_sentence != dst_sentence:
                     dst[address] = new_sentence

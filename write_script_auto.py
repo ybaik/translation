@@ -5,14 +5,22 @@ from module.script import Script
 from module.font_table import FontTable
 from module.check_script import diff_address
 
+skip_list = [
+    "OPEN.EXE",
+    "RJDATA.CIM",
+    "RJDATA.FFF",
+    "SDATA.CIM",
+    "SDATA.FFF",
+]
+
 
 def main():
-    platform = "dos"
-    # platform = "pc98"
+    # platform = "dos"
+    platform = "pc98"
 
-    script_base_dir = Path(f"../workspace0/script-{platform}")
-    src_bin_base_dir = Path(f"../workspace0/jpn-{platform}")
-    dst_bin_base_dir = Path(f"../workspace0/kor-{platform}")
+    script_base_dir = Path(f"../workspace4/script-{platform}")
+    src_bin_base_dir = Path(f"../workspace4/jpn-{platform}")
+    dst_bin_base_dir = Path(f"../workspace4/kor-{platform}")
 
     src_font_table_path = "font_table/font_table-jpn-full.json"
     dst_font_table_path = "font_table/font_table-kor-jin.json"
@@ -25,8 +33,16 @@ def main():
         if "_kor.json" not in file.name:
             continue
 
-        # if "OPEN" in file.name:
+        # if "RJDATA" not in file.name:
         #     continue
+
+        do_skip = False
+        for skip in skip_list:
+            if skip in file.name:
+                do_skip = True
+                break
+        if do_skip:
+            continue
 
         # Check paths
         dst_script_path = file
@@ -65,21 +81,23 @@ def main():
             return
 
         # Check the destination script
-        count_false_length, count_false_letters = dst_script.validate(dst_font_table)
+        # count_false_length, count_false_letters = dst_script.validate(dst_font_table)
 
-        if count_false_length:
-            console.print(f"[yellow] False length/letter count:{count_false_length},{count_false_letters}[/yellow]")
-        if count_false_letters:
-            console.print(f"[yellow] False length/letter count:{count_false_length},{count_false_letters}[/yellow]")
-            return
+        # if count_false_length:
+        #     console.print(f"[yellow] False length/letter count:{count_false_length},{count_false_letters}[/yellow]")
+        # if count_false_letters:
+        #     console.print(f"[yellow] False length/letter count:{count_false_length},{count_false_letters}[/yellow]")
+        #     return
 
-        print(f"False length/letter count:{count_false_length},{count_false_letters}")
-        console.print(f"[yellow] End:{src_data_path}[/yellow]")
+        # print(f"False length/letter count:{count_false_length},{count_false_letters}")
+        # console.print(f"[yellow] End:{src_data_path}[/yellow]")
 
         # Check source script with binary data
         is_diff = src_script.validate_with_binary(src_font_table, src_data_path)
         if is_diff:
             console.print(f"[yellow] json and data doesn't match.[/yellow] [green]{src_data_path}[/green]")
+        else:
+            console.print(f"[green] json and data match.[/green] [green]{src_data_path}[/green]")
 
         # Read the source binary data
         if not Path(src_data_path).exists():

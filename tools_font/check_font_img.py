@@ -14,10 +14,7 @@ def main():
     font_bmp_path = "c:/work_han/workspace4/inindo-font-kor.bmp"
     img_src = cv2.imread(font_bmp_path, 0)
 
-    code = "0x:9857985898529853985498559856#그림자군 하급닌자"
-    code = "0x:985E985F98609861986298639864#요술사 니콜라이"
-    # code = "0x:985798589859985A985B985C985D#그림자군 중급닌자"
-    # code = "0x:98659866986798689869986A986B#네고로 하급닌자"
+    code = "97B397B4"
     code = code.replace("0x:", "")
     code = code.split("#")[0]
 
@@ -39,7 +36,8 @@ def main():
     nw = w * 8
     resized = cv2.resize(canvas, dsize=(nw, nh), interpolation=cv2.INTER_AREA)
     cv2.imshow("patch", resized)
-    cv2.waitKey(0)
+    cv2.waitKey(1000)
+    cv2.imwrite("debug.jpg", resized)
 
 
 if __name__ == "__main__":
