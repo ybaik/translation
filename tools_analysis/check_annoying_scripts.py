@@ -10,6 +10,8 @@ def main():
     base_dir = Path("c:/work_han/workspace4")
     script_base_dir = base_dir / "script-pc98"
 
+    # ,"s":0
+
     # Read an existing dictionary
     annoying_path = base_dir / "annoying.json"
     # annoying_path = base_dir / f"{ref}_dictionary.json"

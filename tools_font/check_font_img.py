@@ -14,7 +14,13 @@ def main():
     font_bmp_path = "c:/work_han/workspace4/inindo-font-kor.bmp"
     img_src = cv2.imread(font_bmp_path, 0)
 
-    code = "97B397B4"
+    val = 0x9571
+    code = ""
+    for i in range(4):
+        code += f"{val:X}"
+        val += 1
+
+    code = "97C397C4"
     code = code.replace("0x:", "")
     code = code.split("#")[0]
 

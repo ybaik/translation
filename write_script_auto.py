@@ -5,7 +5,12 @@ from module.script import Script
 from module.font_table import FontTable
 from module.check_script import diff_address
 
+
 skip_list = [
+    "END.EXE",
+    "DMSG.DAT",
+    "MSG.DAT",
+    "MSG.FFF",
     "OPEN.EXE",
     "RJDATA.CIM",
     "RJDATA.FFF",
@@ -15,7 +20,7 @@ skip_list = [
 
 
 def main():
-    # platform = "dos"
+    platform = "dos"
     platform = "pc98"
 
     script_base_dir = Path(f"../workspace4/script-{platform}")
@@ -33,7 +38,10 @@ def main():
         if "_kor.json" not in file.name:
             continue
 
-        # if "RJDATA" not in file.name:
+        # if "MAIN.EXE" not in file.name:
+        #     continue
+
+        # if "MSG.FFF" not in file.name:
         #     continue
 
         do_skip = False

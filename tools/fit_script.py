@@ -15,7 +15,8 @@ def main(script_path: Path):
 
     # … ␀
     dialogue_array = {
-        "03D1E=03D5B": "교토에 무슨 일이 있나 본데,긴키 서쪽으로는 통행이 제한됐어|._",
+        "4758E=4759E": "それではお客さん|␂",
+        "475A0=475B5": "がんばっていきましょう",
     }
     console = Console()
 
@@ -45,7 +46,6 @@ def main(script_path: Path):
 
 if __name__ == "__main__":
     base_dir = Path("c:/work_han/workspace4/script-pc98")
-    # script_path = base_dir / "MAIN.EXE_kor.json"
-    script_path = base_dir / "MSG.DAT_kor.json"
+    script_path = base_dir / "MAIN.EXE_kor.json"
     # script_path = base_dir / "SERIFU.DAT_kor.json"
     main(script_path)

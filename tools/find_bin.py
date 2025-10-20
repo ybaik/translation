@@ -7,16 +7,16 @@ from module.decoding import decode
 
 
 def main():
-    base_path = "../workspace/jpn-dos"
+    base_path = "../workspace4/jpn-pc98"
     path_list = os.listdir(base_path)
 
     # font_table_path = "font_table/font_table-kor-jin.json"
     font_table_path = "font_table/font_table-jpn-full.json"
     font_table = FontTable(font_table_path)
 
-    sentence_to_find = "達"
+    sentence_to_find = "選者の間"
     address_to_find_hex = font_table.get_codes(sentence_to_find)
-
+    print(address_to_find_hex)
     code_string_hex = ""
     for code_hex in address_to_find_hex:
         code_hex = code_hex.replace("0x", "")
@@ -34,8 +34,8 @@ def main():
         if not os.path.isfile(target_path):
             continue
 
-        if "MAIN" not in file:
-            continue
+        # if "MAIN" not in file:
+        #     continue
 
         # Read a json script
         # print(file)
