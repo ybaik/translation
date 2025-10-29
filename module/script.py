@@ -128,6 +128,7 @@ def write_code_1byte(data: bytearray, hex_start: str, hex_end: str, code_hex: st
 class Script:
     def __init__(self, file_path: str = "") -> None:
         self.script = dict()
+        self.zero_padding = None
         self.encoding = None
         self.custom_codes = None
         self.custom_input = None
@@ -139,6 +140,9 @@ class Script:
                     self.script = json.load(f)
             else:
                 assert 0, f"{file_path} does not exist."
+        # Get zero padding
+        if "zero_padding" in self.script.keys():
+            self.zero_padding = self.script.pop("zero_padding")
 
         # Get encoding
         if "encoding" in self.script.keys():
@@ -151,6 +155,38 @@ class Script:
         # Get custom input
         if "custom_input" in self.script.keys():
             self.custom_input = self.script.pop("custom_input")
+
+    def apply_zero_padding(self, data: bytearray) -> bytearray:
+        """Apply zero padding to the binary data
+        Args:
+            data (bytearray): A binary data.
+        Returns:
+            bytearray: A binary data with zero padding.
+        """
+        if self.zero_padding is None:
+            return data
+
+        start_address, length = self.zero_padding.split(":")
+        start_address = int(start_address, 16)
+        length = int(length, 16)
+
+        null_bytes_to_insert = bytearray([0] * length)
+        try:
+            data[start_address:start_address] = null_bytes_to_insert
+
+            # 3. 결과 확인
+            print(f"✅ 삽입 성공!")
+            print(f"원본 데이터 길이: {len(data) - length:X}")
+            print(f"삽입 후 데이터 길이: {len(data)}")
+            print(f"널 바이트가 삽입된 범위: {start_address:X}부터 {start_address + length - 1:X}까지")
+
+        except IndexError:
+            print(f"❌ 오류: 시작 주소({start_address:X})가 데이터 범위를 벗어납니다.")
+
+        except Exception as e:
+            print(f"❌ 알 수 없는 오류 발생: {e}")
+
+        return data
 
     def set_custom_codes(self, custom_codes: Dict) -> None:
         """Set custom codes
@@ -188,6 +224,10 @@ class Script:
             file_path (str): A path to a file.
         """
         save_dict = dict()
+
+        # Set zero padding
+        if self.zero_padding is not None:
+            save_dict["zero_padding"] = self.zero_padding
 
         # Set encoding
         if self.encoding is not None:
@@ -249,21 +289,21 @@ class Script:
 
         return count_false_length, count_false_characters
 
-    def validate_with_binary(self, font_table: FontTable, binary_path: Path) -> bool:
+    def validate_with_binary(self, font_table: FontTable, binary_data=None, binary_path: Path = None) -> bool:
         """Check the script with a binary data
         Args:
             binary_path (Path): A binary data path.
         Returns:
             bool: True if the script is valid.
         """
-        # Read a binary data
-        if not Path(binary_path).exists():
-            print(f"{binary_path} does not exist.")
-            return
-
-        with open(binary_path, "rb") as f:
-            binary_data = f.read()
-        binary_data = bytearray(binary_data)
+        if binary_data is None:
+            # Read a binary data
+            if not Path(binary_path).exists():
+                print(f"{binary_path} does not exist.")
+                return
+            with open(binary_path, "rb") as f:
+                binary_data = f.read()
+            binary_data = bytearray(binary_data)
 
         # Decoding bianry data
         if self.encoding is not None:

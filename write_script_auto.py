@@ -7,15 +7,15 @@ from module.check_script import diff_address
 
 
 skip_list = [
-    "END.EXE",
-    "DMSG.DAT",
-    "MSG.DAT",
-    "MSG.FFF",
-    "OPEN.EXE",
-    "RJDATA.CIM",
-    "RJDATA.FFF",
-    "SDATA.CIM",
-    "SDATA.FFF",
+    # "END.EXE",
+    # "DMSG.DAT",
+    # "MSG.DAT",
+    # "MSG.FFF",
+    # "OPEN.EXE",
+    # "RJDATA.CIM",
+    # "RJDATA.FFF",
+    # "SDATA.CIM",
+    # "SDATA.FFF",
 ]
 
 
@@ -38,8 +38,8 @@ def main():
         if "_kor.json" not in file.name:
             continue
 
-        # if "MAIN.EXE" not in file.name:
-        #     continue
+        if "MAIN.EXE" not in file.name:
+            continue
 
         # if "MSG.FFF" not in file.name:
         #     continue
@@ -83,6 +83,19 @@ def main():
         src_script = Script(str(src_script_path))
         dst_script = Script(str(dst_script_path))
 
+        # Read the source binary data
+        if not Path(src_data_path).exists():
+            return
+        with open(src_data_path, "rb") as f:
+            data = f.read()
+        data = bytearray(data)
+        console.print(f"Data size: {src_data_path}({len(data):,} bytes)")
+
+        # Source script의 내용을 기반으로 한 Binary 확장 옵션 확인 및 적용
+        print(f"{len(data):X}")
+        data = src_script.apply_zero_padding(data)
+        print(f"{len(data):X}")
+
         # Compare addresses in the source and destination scripts
         count_diff = diff_address(src_script.script, dst_script.script)
         if count_diff:
@@ -101,19 +114,11 @@ def main():
         # console.print(f"[yellow] End:{src_data_path}[/yellow]")
 
         # Check source script with binary data
-        is_diff = src_script.validate_with_binary(src_font_table, src_data_path)
+        is_diff = src_script.validate_with_binary(font_table=src_font_table, binary_data=data)
         if is_diff:
             console.print(f"[yellow] json and data doesn't match.[/yellow] [green]{src_data_path}[/green]")
         else:
             console.print(f"[green] json and data match.[/green] [green]{src_data_path}[/green]")
-
-        # Read the source binary data
-        if not Path(src_data_path).exists():
-            return
-        with open(src_data_path, "rb") as f:
-            data = f.read()
-        data = bytearray(data)
-        console.print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
         # Write the destination script to the binary data in memory
         data, valid_sentence_count = dst_script.write_script(data, dst_font_table)
