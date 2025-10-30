@@ -15,7 +15,7 @@ class FontTable:
 
         # Check if the file exists
         if not os.path.exists(file_path):
-            assert 0, f"{file_path} does not exist."
+            raise FileNotFoundError(f"{file_path} does not exist.")
 
         # Set code 1 byte (jisx0201)
         self.code2char_ascii = deepcopy(jisx0201_table)
@@ -43,7 +43,7 @@ class FontTable:
                 self.code2char[k] = v
                 update_2byte = True
             else:
-                assert 0, f"Invalid code length: {k} during custom code setting."
+                raise ValueError(f"Invalid code length: {k} during custom code setting.")
 
         if update_1byte:
             self.char2code_ascii = {v: k for k, v in self.code2char_ascii.items()}

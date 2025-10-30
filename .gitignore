@@ -5,3 +5,6 @@ script_log.json
 
 # Distribution / packaging
 *egg-info/
+
+# gemini
+npm-global/

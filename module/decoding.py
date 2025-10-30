@@ -1,17 +1,17 @@
-def decode(data, encoding_info):
+def _xor_process(data, encoding_info):
     if "xor" in encoding_info:
         encoding_key = encoding_info.split(":")[-1]
         encoding_key = int(encoding_key, 16)
         data = bytearray([b ^ encoding_key for b in data])
     return data
+
+
+def decode(data, encoding_info):
+    return _xor_process(data, encoding_info)
 
 
 def encode(data, encoding_info):
-    if "xor" in encoding_info:
-        encoding_key = encoding_info.split(":")[-1]
-        encoding_key = int(encoding_key, 16)
-        data = bytearray([b ^ encoding_key for b in data])
-    return data
+    return _xor_process(data, encoding_info)
 
 
 def convert_3to4bpp(in_path, out_path):

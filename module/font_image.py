@@ -57,7 +57,7 @@ def return_img_roi_1byte(code_hex: str, debug=False) -> Tuple[int, int, int, int
     """
     code = int(code_hex, 16)
     if code > 0xFF or code < 0:
-        assert 0, f"{code_hex} is not a supproted range."
+        raise ValueError(f"{code_hex} is not a supported range.")
 
     col = code
     row = 0

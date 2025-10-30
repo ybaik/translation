@@ -39,39 +39,6 @@ def check_script(scripts: Dict, font_table: FontTable) -> Tuple[int, int]:
     return count_false_length, count_false_characters
 
 
-def check_script_multibyte(scripts: Dict, font_table: FontTable) -> Tuple[int, int]:
-    """
-    Check the script against the font table
-
-    Parameters:
-        scripts (Dict): The script to check.
-        font_table (FontTable): The font table to check against.
-
-    Returns:
-        (int, int): A tuple containing the count of incorrect sentence lengths and incorrect characters.
-    """
-    # Check script
-    count_false_length = 0
-    count_false_characters = 0
-
-    for address, sentence in scripts.items():
-        length_from_address = font_table.check_length_from_address(address)
-        length_from_sentence = font_table.check_length_from_table(sentence)
-        if length_from_address != length_from_sentence:
-            print(f"Wrong sentence length:{address}: {length_from_address}-{length_from_sentence}")
-            count_false_length += 1
-
-        # Check if there is false characters in a sentence via comparison with the font table
-        count_false_character, false_character = font_table.verify_sentence(sentence)
-        if count_false_character:
-            print(f"Wrong letters:{address}: {count_false_character}-{false_character}")
-            count_false_characters += count_false_character
-            # Debug
-            count_false_characters = 0
-
-    return count_false_length, count_false_characters
-
-
 def diff_address(src_script: Dict, dst_script: Dict) -> int:
     """
     Compare the address of two scripts

@@ -139,7 +139,7 @@ class Script:
                 with open(file_path, "r", encoding="utf-8") as f:
                     self.script = json.load(f)
             else:
-                assert 0, f"{file_path} does not exist."
+                raise FileNotFoundError(f"{file_path} does not exist.")
         # Get zero padding
         if "zero_padding" in self.script.keys():
             self.zero_padding = self.script.pop("zero_padding")
@@ -750,7 +750,9 @@ class Script:
                 # Check if the format is right
                 num_codes = epos - spos + 1
                 if len(codes) != num_codes * 2:
-                    assert 0, f"The length of custom input is not matched. {address}:{len(codes)} != {num_codes}"
+                    raise ValueError(
+                        f"The length of custom input is not matched. {address}:{len(codes)} != {num_codes}"
+                    )
 
                 for i in range(num_codes):
                     code_int = int(codes[i * 2 : i * 2 + 2], 16)
