@@ -38,8 +38,8 @@ def main():
         if "_kor.json" not in file.name:
             continue
 
-        if "MAIN.EXE" not in file.name:
-            continue
+        # if "MAIN.EXE" not in file.name:
+        #     continue
 
         # if "MSG.FFF" not in file.name:
         #     continue
@@ -91,10 +91,8 @@ def main():
         data = bytearray(data)
         console.print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
-        # Source script의 내용을 기반으로 한 Binary 확장 옵션 확인 및 적용
-        print(f"{len(data):X}")
+        # Check and apply binary expansion options based on the contents of the source script.
         data = src_script.apply_zero_padding(data)
-        print(f"{len(data):X}")
 
         # Compare addresses in the source and destination scripts
         count_diff = diff_address(src_script.script, dst_script.script)

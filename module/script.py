@@ -21,7 +21,7 @@ def extract_script(
     script_log = dict()
 
     while i < len(data) - 1:
-        # Extract a 2byte code
+        # Extract a 2-byte code
         code_int = (data[i] << 8) + data[i + 1]
         code_hex = f"{code_int:X}"
 
@@ -173,18 +173,16 @@ class Script:
         null_bytes_to_insert = bytearray([0] * length)
         try:
             data[start_address:start_address] = null_bytes_to_insert
-
-            # 3. 결과 확인
-            print(f"✅ 삽입 성공!")
-            print(f"원본 데이터 길이: {len(data) - length:X}")
-            print(f"삽입 후 데이터 길이: {len(data)}")
-            print(f"널 바이트가 삽입된 범위: {start_address:X}부터 {start_address + length - 1:X}까지")
+            print("Insertion successful!")
+            print(f"Original data length: {len(data) - length:X}")
+            print(f"Data length after insertion: {len(data)}")
+            print(f"Null bytes inserted in range: {start_address:X} to {start_address + length - 1:X}")
 
         except IndexError:
-            print(f"❌ 오류: 시작 주소({start_address:X})가 데이터 범위를 벗어납니다.")
+            print(f"Error: Start address({start_address:X}) is out of data range.")
 
         except Exception as e:
-            print(f"❌ 알 수 없는 오류 발생: {e}")
+            print(f"Unknown error occurred: {e}")
 
         return data
 
@@ -258,12 +256,12 @@ class Script:
         """
         self.script.update(script)
 
-    def validate(self, font_table: FontTable) -> bool:
+    def validate(self, font_table: FontTable) -> Tuple[int, int]:
         """Check the script
         Args:
             font_table (FontTable): A font table.
         Returns:
-            bool: True if the script is valid.
+            Tuple[int, int]: count of false length, count of false characters
         """
         # Check script
         count_false_length = 0
@@ -294,7 +292,7 @@ class Script:
         Args:
             binary_path (Path): A binary data path.
         Returns:
-            bool: True if the script is valid.
+            bool: True if the script is not valid.
         """
         if binary_data is None:
             # Read a binary data
@@ -495,7 +493,7 @@ class Script:
             binary_data = f.read()
         binary_data = bytearray(binary_data)
 
-        # Decoding bianry data
+        # Decoding binary data
         if self.encoding is not None:
             binary_data = decode(binary_data, self.encoding)
 
@@ -513,7 +511,7 @@ class Script:
 
         # Connect sentences
         for address, sentence in self.script.items():
-            # Check if the address is alreeady checked
+            # Check if the address is already checked
             if address in remove_key_list:
                 continue
 
@@ -528,7 +526,7 @@ class Script:
             if char_code_hex not in control_codes.keys():
                 continue
 
-            # Set a merged sentencee
+            # Set a merged sentence
             remove_key_list.append(address)
             epos_next = epos + 1
 
@@ -725,7 +723,7 @@ class Script:
 
         return script_log
 
-    def write_script(self, data: bytearray, font_table: FontTable) -> bytearray:
+    def write_script(self, data: bytearray, font_table: FontTable) -> Tuple[bytearray, int]:
         valid_sentence_count = 0
 
         # Check if decoding is needed
@@ -760,7 +758,7 @@ class Script:
 
         # Write scripts
         for address, sentence in self.script.items():
-            # Check if there is a unsupproted address format
+            # Check if there is a unsupported address format
             if "=" not in address:
                 assert 0, f"{address} is not in the correct format."
 
@@ -769,7 +767,7 @@ class Script:
             epos = int(code_hex_end, 16)
             pos = spos
 
-            # Check if the setence is hex-only
+            # Check if the sentence is hex-only
             if "0x:" == sentence[:3]:
                 # Need to isolate descriptions
                 codes = sentence[3:].split("#")[0]
@@ -786,7 +784,7 @@ class Script:
                 valid_sentence_count += 1
                 continue
 
-            # Check if there is a unsupport letter in the sentence
+            # Check if there is a unsupported letter in the sentence
             skip_sentence = False
             check_1byte = False
             for character in sentence:
@@ -815,7 +813,7 @@ class Script:
             while idx_char < len(sentence):
                 character = sentence[idx_char]
 
-                # Check if the letter is a one byte character
+                # Check if the letter is a 1-byte character
                 if character == "|":
                     idx_char += 1
                     character = sentence[idx_char]
@@ -827,7 +825,7 @@ class Script:
                     else:
                         assert 0, f"{code_hex_start}:{character} is not in the 1-byte font table."
                     pos += 1
-                else:  # Input two bytes character
+                else:  # Input 2-bytes character
                     if character in ["■", "@"]:
                         pass
                     if font_table.get_code(character) is not None:

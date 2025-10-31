@@ -27,10 +27,10 @@ def debug_draw(
     for y in range(font_height):
         for x in range(font_width):
             byte_val = target_data[bit_index // 8]
-            bit_in_byte = 7 - (bit_index % 8)  # MSB부터 읽는다고 가정
+            bit_in_byte = 7 - (bit_index % 8)  # Assuming reading from MSB
             pixel_value_1bit = (byte_val >> bit_in_byte) & 1
 
-            # 1비트 값을 0(검정) 또는 255(흰색)으로 매핑
+            # Map 1-bit value to 0 (black) or 255 (white)
             canvas_gray[y, x] = 255 if pixel_value_1bit == 1 else 0
             bit_index += 1
 
@@ -58,9 +58,9 @@ def main():
         font_gen_data = f.read()
     font_gen_data = bytearray(font_gen_data)
 
-    # 2byte form 1 pixel-width.
-    # For 16x16, 1 letter is 2x16 = 32byte.
-    # 32byte is the basic offset for a letter.
+    # 2-byte font 1 pixel-width.
+    # For 16x16, 1 letter is 2x16 = 32 bytes.
+    # 32 bytes is the basic offset for a letter.
     print(len(font_jpn_data))
     offset = (16 * 7 + 1) * 32  # ,
     offset_start = (16 * 95 + 2) * 32  # "889F": "亜", "가"

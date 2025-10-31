@@ -62,7 +62,7 @@ class FontTable:
         elif ext == ".json":
             self._read_json(file_path)
         else:
-            print("f{ext} is not a supported format.")
+            print(f"{ext} is not a supported format.")
             return False
 
         # Make char2code table

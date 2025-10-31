@@ -26,7 +26,7 @@ def main():
 
     length_threshold_in_bytes = 1
     check_ascii = True
-    check_ascii_restriction = False  # If True, the first ASCII code need to be x20
+    check_ascii_restriction = False  # If True, the first ASCII code needs to be x20
 
     decoding_info = "xor:0x96"
     decoding_base_path = f"../workspace0/jpn-decoded-{platform}"

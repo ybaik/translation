@@ -13,10 +13,9 @@ def main(script_path: Path):
 
     dst_font_table = FontTable("./font_table/font_table-kor-jin.json")
 
-    # … ␀
+    # … ␀ ␁
     dialogue_array = {
-        "4758E=4759E": "それではお客さん|␂",
-        "475A0=475B5": "がんばっていきましょう",
+        "45B3A=45B49": "쓰레기 투기 금지",
     }
     console = Console()
 
@@ -48,4 +47,5 @@ if __name__ == "__main__":
     base_dir = Path("c:/work_han/workspace4/script-pc98")
     script_path = base_dir / "MAIN.EXE_kor.json"
     # script_path = base_dir / "SERIFU.DAT_kor.json"
+    # script_path = base_dir / "DANJON.DAT_kor.json"
     main(script_path)
