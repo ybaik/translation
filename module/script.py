@@ -465,7 +465,6 @@ class Script:
             modified_script[address_new] = sentence_new
 
         if len(remove_key_list) == 0:
-            print("No sentences are merged.")
             return False
 
         # Remove old sentences
@@ -797,6 +796,8 @@ class Script:
                         break
                     check_1byte = False
                     continue
+                if character == "@":  # an ignore character
+                    continue
                 if not font_table.exists(character):
                     skip_sentence = True
                     break
@@ -826,9 +827,9 @@ class Script:
                         assert 0, f"{code_hex_start}:{character} is not in the 1-byte font table."
                     pos += 1
                 else:  # Input 2-bytes character
-                    if character in ["■", "@"]:
+                    if character in ["@"]:  # an ignore character
                         pass
-                    if font_table.get_code(character) is not None:
+                    elif font_table.get_code(character) is not None:
                         code_hex = font_table.get_code(character)
                         code_int = int(code_hex, 16)
 

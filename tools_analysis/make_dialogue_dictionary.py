@@ -20,8 +20,9 @@ def main():
         if "_jpn.json" not in file.name:
             continue
 
-        # if "MAIN" not in file.name:
+        # if "MAIN" in file.name:
         #     continue
+
         dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")
         if not dst_path.exists():
             continue
@@ -70,6 +71,10 @@ def main():
             # if count_false_character:
             #     console.print(f"{address} {file_tag}", style="red")
             #     continue
+
+            # Check ignore sentences
+            if len(dst_sentence.replace("@", "")) == 0:
+                continue
 
             # Add the sentence to the dictionary
             if src_sentence not in dictionary:
