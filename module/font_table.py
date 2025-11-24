@@ -239,6 +239,9 @@ class FontTable:
                     check_ascii = False
                     continue
 
+                if character == "@":  # an ignore character
+                    continue
+
                 if character not in self.char2code:
                     count_false_character += 1
                     false_characters += character

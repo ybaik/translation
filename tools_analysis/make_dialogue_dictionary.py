@@ -6,8 +6,11 @@ from module.font_table import FontTable
 
 def main():
     console = Console()
-    base_dir = Path("c:/work_han/workspace4")
-    script_dir = base_dir / "script-pc98"
+    base_dir = Path("c:/work_han/workspace")
+    script_dirs = [
+        base_dir / "script-dos",
+        base_dir / "script-pc98",
+    ]
 
     dictionary = dict()
 
@@ -16,78 +19,79 @@ def main():
     annoying_path = base_dir / "annoying.json"
 
     # Read a pair of scripts
-    for file in script_dir.glob("*.json"):  # Use rglob to search subdirectories
-        if "_jpn.json" not in file.name:
-            continue
-
-        # if "MAIN" in file.name:
-        #     continue
-
-        dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")
-        if not dst_path.exists():
-            continue
-        file_tag = f"{file.parent.name}/{file.name}"
-        console.print(file_tag)
-        with open(file, "r", encoding="utf-8") as f:
-            src = json.load(f)
-        with open(dst_path, "r", encoding="utf-8") as f:
-            dst = json.load(f)
-
-        src_font_table = FontTable("./font_table/font_table-jpn-full.json")
-        dst_font_table = FontTable("./font_table/font_table-kor-jin.json")
-
-        # Check if custom codes exist
-        custom_codes = dst.pop("custom_codes", None)
-        if custom_codes is not None:
-            dst_font_table.set_custom_code(custom_codes)
-
-        # check address
-        for address, src_sentence in src.items():
-            if "=" not in address:
+    for script_dir in script_dirs:
+        for file in script_dir.glob("*.json"):  # Use rglob to search subdirectories
+            if "_jpn.json" not in file.name:
                 continue
 
-            # Check if the address is in the destination script
-            if address not in dst:
-                continue
-
-            # Check if the src and dst sentences are valid
-            length = src_font_table.check_length_from_address(address)
-            length_from_src_sentence = src_font_table.check_length_from_sentence(src_sentence)
-
-            if length != length_from_src_sentence:
-                console.print(f"{address} {file_tag}", style="red")
-                assert 0, f"Jpn sentence length is not matched. {address}:{length} != {length_from_src_sentence}"
-                continue
-
-            # Check if the src and dst sentences are valid
-            dst_sentence = dst[address]
-            length_from_dst_sentence = dst_font_table.check_length_from_sentence(dst_sentence)
-            if length != length_from_dst_sentence:
-                console.print(f"{address} {file_tag}", style="red")
-                assert 0, f"Kor sentence length is not matched. {address}:{length} != {length_from_dst_sentence}"
-                continue
-
-            count_false_character, false_character = dst_font_table.verify_sentence(dst_sentence)
-            # if count_false_character:
-            #     console.print(f"{address} {file_tag}", style="red")
+            # if "MAIN" in file.name:
             #     continue
 
-            # Check ignore sentences
-            if len(dst_sentence.replace("@", "")) == 0:
+            dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")
+            if not dst_path.exists():
                 continue
+            file_tag = f"{file.parent.name}/{file.name}"
+            console.print(file_tag)
+            with open(file, "r", encoding="utf-8") as f:
+                src = json.load(f)
+            with open(dst_path, "r", encoding="utf-8") as f:
+                dst = json.load(f)
 
-            # Add the sentence to the dictionary
-            if src_sentence not in dictionary:
-                dictionary[src_sentence] = {
-                    "count": 0,
-                    "reference": 0,
-                    "translated": [],
-                }
+            src_font_table = FontTable("./font_table/font_table-jpn-full.json")
+            dst_font_table = FontTable("./font_table/font_table-kor-jin.json")
 
-            dictionary[src_sentence]["reference"] += 1
-            if dst_sentence not in dictionary[src_sentence]["translated"]:
-                dictionary[src_sentence]["count"] += 1
-                dictionary[src_sentence]["translated"].append(dst_sentence)
+            # Check if custom codes exist
+            custom_codes = dst.pop("custom_codes", None)
+            if custom_codes is not None:
+                dst_font_table.set_custom_code(custom_codes)
+
+            # check address
+            for address, src_sentence in src.items():
+                if "=" not in address:
+                    continue
+
+                # Check if the address is in the destination script
+                if address not in dst:
+                    continue
+
+                # Check if the src and dst sentences are valid
+                length = src_font_table.check_length_from_address(address)
+                length_from_src_sentence = src_font_table.check_length_from_sentence(src_sentence)
+
+                if length != length_from_src_sentence:
+                    console.print(f"{address} {file_tag}", style="red")
+                    assert 0, f"Jpn sentence length is not matched. {address}:{length} != {length_from_src_sentence}"
+                    continue
+
+                # Check if the src and dst sentences are valid
+                dst_sentence = dst[address]
+                length_from_dst_sentence = dst_font_table.check_length_from_sentence(dst_sentence)
+                if length != length_from_dst_sentence:
+                    console.print(f"{address} {file_tag}", style="red")
+                    assert 0, f"Kor sentence length is not matched. {address}:{length} != {length_from_dst_sentence}"
+                    continue
+
+                count_false_character, false_character = dst_font_table.verify_sentence(dst_sentence)
+                # if count_false_character:
+                #     console.print(f"{address} {file_tag}", style="red")
+                #     continue
+
+                # Check ignore sentences
+                if len(dst_sentence.replace("@", "")) == 0:
+                    continue
+
+                # Add the sentence to the dictionary
+                if src_sentence not in dictionary:
+                    dictionary[src_sentence] = {
+                        "count": 0,
+                        "reference": 0,
+                        "translated": [],
+                    }
+
+                dictionary[src_sentence]["reference"] += 1
+                if dst_sentence not in dictionary[src_sentence]["translated"]:
+                    dictionary[src_sentence]["count"] += 1
+                    dictionary[src_sentence]["translated"].append(dst_sentence)
 
     # Save a dictionary
     with open(dictionary_path, "w", encoding="utf-8") as f:
