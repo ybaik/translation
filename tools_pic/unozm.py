@@ -7,12 +7,12 @@ m4_list = []
 
 
 def main():
-    base_dir = Path("C:/work_han/ozm")
-    out_base_dir = Path("C:/work_han/ozm")
+    base_dir = Path("../workspace1/m1")
+    out_base_dir = Path("../workspace1/check")
 
     osm = OZM()
-    for file in base_dir.glob("*.OZM"):
-        out_name = file.name.replace(".OZM", ".png")
+    for file in base_dir.rglob("*.IMG"):
+        out_name = file.name.replace(".IMG", ".png")
         out_path = out_base_dir / out_name
 
         if out_path.exists():
@@ -23,7 +23,8 @@ def main():
         print(file.name)
         # file = Path("BAT_MENU.OZM")
 
-        osm.read_ozm(file)
+        if not osm.read_ozm(file):
+            continue
         osm.decompress()
         # with open("BAT_MENU.raw", "wb") as f:
         #     f.write(osm.data_8bpp)

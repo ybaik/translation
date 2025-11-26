@@ -106,16 +106,18 @@ class OZM:
             if self.start_ofs == 0x3A:
                 temp = f.read(1)
                 if temp[0] != self.palette_type:
-                    raise ValueError(
-                        "Invalid OZM file: Expected palette type 0x{:02X}, got 0x{:02X}".format(
-                            self.palette_type, temp[0]
-                        )
-                    )
+                    pass
+                    # raise ValueError(
+                    #     "Invalid OZM file: Expected palette type 0x{:02X}, got 0x{:02X}".format(
+                    #         self.palette_type, temp[0]
+                    #     )
+                    # )
             print(
                 f"  Version: {self.ver:04X}, Size: {self.pixel_width}x{self.height}, Data offset: {self.start_ofs:04X}"
             )
             if self.ver not in [0x200, 0x300, 0x301]:
                 print(f"  Warning: Unexpected version {self.ver:04X}", file=sys.stderr)
+                return False
 
             if self.start_ofs in [0x39, 0x3A]:
                 self.raw_palette = f.read(48)
@@ -123,6 +125,7 @@ class OZM:
 
             f.seek(self.start_ofs)
             self.compressed_data = f.read()
+        return True
 
     def decompress(self):
         if len(self.compressed_data) == 0:
