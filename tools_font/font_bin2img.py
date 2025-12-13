@@ -59,9 +59,12 @@ def load_to_dictionary(file_path):
 def main():
     DEBUG = False
 
-    base_dir = Path("c:/work_han/translation")
-    font_dict = load_to_dictionary(base_dir / "Mulmaru_cp949_full.tbl")
-    font_bin_path = base_dir / "Mulmaru_cp949_full.bin"
+    font_name = "ThinDungGeunMo_cp949_full"
+    base_dir = Path("c:/work_han/font_")
+
+    font_dict = load_to_dictionary(base_dir / f"{font_name}.tbl")
+    font_bin_path = base_dir / f"{font_name}.bin"
+    save_path = base_dir / f"{font_name}.bmp"
     with open(font_bin_path, "rb") as f:
         bin_data = bytearray(f.read())
 
@@ -110,7 +113,7 @@ def main():
             roi_dst = return_img_roi(dst_code, DEBUG)
             img_dst[roi_dst[0] : roi_dst[1], roi_dst[2] : roi_dst[3]] = img
         img_pil = Image.fromarray(img_dst).convert("1")
-        img_pil.save("물마루.bmp")
+        img_pil.save(save_path)
 
 
 if __name__ == "__main__":

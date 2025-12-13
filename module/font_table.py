@@ -192,8 +192,16 @@ class FontTable:
 
     def get_codes(self, sentence: str) -> List[str]:
         codes_hex = []
+        check_ascii = False
         for character in sentence:
-            code_hex = self.char2code.get(character)
+            if character == "|":
+                check_ascii = True
+                continue
+            if check_ascii:
+                code_hex = self.char2code_ascii.get(character)
+                check_ascii = False
+            else:
+                code_hex = self.char2code.get(character)
             codes_hex.append(code_hex)
 
         return codes_hex

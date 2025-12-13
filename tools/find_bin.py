@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 
 sys.path.append("./")
 from module.font_table import FontTable
@@ -7,14 +8,13 @@ from module.decoding import decode
 
 
 def main():
-    base_path = "../workspace4/jpn-pc98"
-    path_list = os.listdir(base_path)
+    base_path = Path("../workspace1/jpn-pc98")
 
     # font_table_path = "font_table/font_table-kor-jin.json"
     font_table_path = "font_table/font_table-jpn-full.json"
     font_table = FontTable(font_table_path)
 
-    sentence_to_find = "選者の間"
+    sentence_to_find = "|ｾ|ｲ|ﾚ|ｰ|ﾝ"
     address_to_find_hex = font_table.get_codes(sentence_to_find)
     print(address_to_find_hex)
     code_string_hex = ""
@@ -29,9 +29,8 @@ def main():
         code_int = int(code_string_hex[i * 2 : i * 2 + 2], 16)
         code_array_int.append(code_int)
 
-    for file in path_list:
-        target_path = f"{base_path}/{file}"
-        if not os.path.isfile(target_path):
+    for file in base_path.rglob("*.*"):  # Use rglob to search subdirectories
+        if not file.is_file():
             continue
 
         # if "MAIN" not in file:
@@ -39,7 +38,7 @@ def main():
 
         # Read a json script
         # print(file)
-        with open(f"{base_path}/{file}", "rb") as f:
+        with open(file, "rb") as f:
             data = f.read()
 
         # decoding_info = "xor:0x77"
