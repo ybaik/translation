@@ -66,7 +66,14 @@ def main():
                 print("=============================")
         else:
             for address, src_sentence in src_script.script.items():
-                if sentence not in src_sentence:
+                found = False
+                if restriction:
+                    if sentence == src_sentence:
+                        found = True
+                else:
+                    if sentence in src_sentence:
+                        found = True
+                if not found:
                     buf_address = address
                     buf_src_sentence = src_sentence
                     continue
@@ -85,12 +92,12 @@ def main():
                 #         continue
 
                 print("=============================")
-                print(buf_address)
-                print(buf_src_sentence)
+                # print(buf_address)
+                # print(buf_src_sentence)
                 # print(buf_dst_sentence)
                 console.print(f"{address} {file_tag}", style="green")
                 print(src_sentence)
-                # print(dst_sentence)
+                print(dst_script.script[address])
                 print("=============================")
 
 
