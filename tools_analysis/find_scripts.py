@@ -1,41 +1,39 @@
 import json
 from pathlib import Path
 from rich.console import Console
+from module.script import Script
 
 
 def main():
     console = Console()
-    base_dir = Path("c:/work_han/workspace")
+    base_dir = Path("c:/work_han/workspace2")
     script_base_dir = base_dir
 
-    script_base_dir = Path("c:/work_han/workspace/script-dos")
+    script_base_dir = Path("c:/work_han/workspace2/script-pc98")
     # script_base_dir = Path("c:/work_han/backup")
 
-    find_source = True
+    find_source = False
+    restriction = False
+    print_correspond_sentence = False
 
-    sentence = "|_|_ディスクエラー|_|:|_回復できません"
-    sentence_kor = "괜찮으"
+    sentence = ""
+    sentence_kor = "정말이지,"
     sentence_kor = sentence_kor.replace(" ", "_")
 
     # Read a pair of scripts
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         file_tag = f"{file.parent.name}/{file.name}"
 
-        if find_source:
-            if "_jpn.json" not in file.name:
-                continue
-            with open(file, "r", encoding="utf-8") as f:
-                src = json.load(f)
-        else:
-            dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")
-            if not dst_path.exists():
-                continue
-            with open(dst_path, "r", encoding="utf-8") as f:
-                dst = json.load(f)
-            with open(file, "r", encoding="utf-8") as f:
-                src = json.load(f)
+        if "_jpn.json" not in file.name:
+            continue
 
-        console.print(file.name)
+        dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")
+        if not dst_path.exists():
+            continue
+
+        src_script = Script(str(file))
+        dst_script = Script(str(dst_path))
+        # console.print(file.name)
 
         # check address
         buf_address = ""
@@ -43,24 +41,31 @@ def main():
         buf_dst_sentence = ""
 
         if not find_source:
-            for address, dst_sentence in dst.items():
-                if sentence_kor not in dst_sentence:
+            for address, dst_sentence in dst_script.script.items():
+                found = False
+                if restriction:
+                    if sentence_kor == dst_sentence:
+                        found = True
+                else:
+                    if sentence_kor in dst_sentence:
+                        found = True
+                if not found:
                     # if sentence_kor != dst_sentence:
                     buf_address = address
                     buf_dst_sentence = dst_sentence
-                    buf_src_sentence = src[address]
+                    buf_src_sentence = src_script.script[address]
                     continue
 
                 print("=============================")
-                print(buf_address)
-                print(buf_src_sentence)
-                print(buf_dst_sentence)
+                # print(buf_address)
+                # print(buf_src_sentence)
+                # print(buf_dst_sentence)
                 console.print(f"{address} {file_tag}", style="green")
-                print(src[address])
+                print(src_script.script[address])
                 print(dst_sentence)
                 print("=============================")
         else:
-            for address, src_sentence in src.items():
+            for address, src_sentence in src_script.script.items():
                 if sentence not in src_sentence:
                     buf_address = address
                     buf_src_sentence = src_sentence

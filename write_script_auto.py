@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from rich.console import Console
 
@@ -8,14 +9,9 @@ from module.check_script import diff_address
 
 skip_list = [
     # "END.EXE",
-    # "DMSG.DAT",
-    # "MSG.DAT",
-    # "MSG.FFF",
     # "OPEN.EXE",
-    # "RJDATA.CIM",
-    # "RJDATA.FFF",
+    # "RPDATA.CIM",
     # "SDATA.CIM",
-    # "SDATA.FFF",
 ]
 
 
@@ -23,25 +19,37 @@ def main():
     platform = "dos"
     platform = "pc98"
 
-    script_base_dir = Path(f"../workspace4/script-{platform}")
-    src_bin_base_dir = Path(f"../workspace4/jpn-{platform}")
-    dst_bin_base_dir = Path(f"../workspace4/kor-{platform}")
+    base_dir = Path("c:/work_han/workspace")
+
+    script_base_dir = base_dir / f"script-{platform}"
+    src_bin_base_dir = base_dir / f"jpn-{platform}"
+    dst_bin_base_dir = base_dir / f"kor-{platform}"
 
     src_font_table_path = "font_table/font_table-jpn-full.json"
     dst_font_table_path = "font_table/font_table-kor-jin.json"
 
     # ===================================================================
-    # For debugging prints
+    # For debugging printsE
     console = Console()
+    total_valid = 0
+    total_count = 0
+    total_valid_file = 0
+    total_count_file = 0
 
-    for file in script_base_dir.glob("*.json"):  # Use rglob to search subdirectories
+    completed_list = []
+
+    # if (base_dir / "complete_list.txt").exists():
+    #     with open(base_dir / "complete_list.txt", "r") as f:
+    #         skip_list = f.read().splitlines()
+
+    for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         if "_kor.json" not in file.name:
             continue
 
-        # if "MAIN.EXE" not in file.name:
+        # if "MAC.EXE" not in file.name:
         #     continue
 
-        # if "MSG.FFF" not in file.name:
+        # if "SERIFU.DAT" not in file.name:
         #     continue
 
         do_skip = False
@@ -126,9 +134,42 @@ def main():
             msg += f" ({valid_sentence_count}/{len(dst_script.script)})"
             console.print(msg)
 
+            total_valid += valid_sentence_count
+            total_count += len(dst_script.script)
+            total_count_file += 1
+
+            completed_list.append((src_data_path, valid_p))
+            if valid_p == 100:
+                total_valid_file += 1
+
         # Save the replaced binary data to a file in the destination directory
         with open(dst_data_path, "wb") as f:
             f.write(data)
+
+    if "workspace\\" in str(script_base_dir):
+        cmd = f"copy ..\\workspace\\kor-{platform}\\*.* ..\\workspace\\kor-{platform}-dosbox-x\\KAMI\\"
+        os.system(cmd)
+
+    # if "workspace1\\" in str(script_base_dir):
+    #     cmd = f"xcopy /E /I /Y ..\\workspace1\\kor-{platform}\\. ..\\workspace1\\kor-p98-hdd\\"
+    #     os.system(cmd)
+
+    if total_count:
+        # Print remaining sentences among not completed files
+        percentage = total_valid / total_count * 100
+        console.print(f"Total valid sentences: {total_valid}/{total_count} ({percentage:.2f}))%")
+
+        # Print the status of total files
+        total_valid_file += len(skip_list)
+        total_count_file += len(skip_list)
+        percentage = total_valid_file / total_count_file * 100
+        console.print(f"Total files: {total_valid_file}/{total_count_file} ({percentage:.2f}))%")
+
+        for i, (file, percent) in enumerate(completed_list):
+            if percent == 100:
+                console.print(f"[green]{i + 1}[/green] {file.name}, {percent:.2f}")
+            else:
+                console.print(f"[yellow]{i + 1}[/yellow] {file.name}, {percent:.2f}")
 
 
 if __name__ == "__main__":

@@ -20,7 +20,7 @@ def main():
 
     # Read a pair of scripts
     for script_dir in script_dirs:
-        for file in script_dir.glob("*.json"):  # Use rglob to search subdirectories
+        for file in script_dir.rglob("*.json"):  # Use rglob to search subdirectories
             if "_jpn.json" not in file.name:
                 continue
 
