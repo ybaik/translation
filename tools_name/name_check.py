@@ -9,40 +9,102 @@ def main():
     game = "노부나가의 야망 4"
     # print(len(name_db.full_name_db.keys()))
     base_dir = "c:/work_han/workspace3/script-pc98"
-    script = Script(f"{base_dir}/SNDATA1.CIM_jpn.json")
+    script_jpn = Script(f"{base_dir}/SNDATA1T.CIM_jpn.json")
+    script_kor = Script(f"{base_dir}/SNDATA1T.CIM_kor.json")
 
-    print(name_db.check_number())
-    query = {"game": "노부나가의 야망 4"}
-    print(name_db.check_number(query))
+    # query = {"game": game}
+    # print(f"노부나가의 야망 4: {name_db.check_number(query)}")
+    # query = {"game": "태합입지전 2"}
+    # print(f"태합입지전 2: {name_db.check_number(query)}")
+    # print(f"Total: {name_db.check_number()}")
+    # name_db.print_duplicate()
+    # return
 
-    name_db.print_duplicate()
+    family_name_jpn = ""
+    family_name_kor = ""
+    given_name_jpn = ""
+    given_name_kor = ""
+    prev_address = ""
 
-    return
+    mod_list = []
 
-    family_name = ""
-    given_name = ""
-    for address, sentence in script.script.items():
+    for address, sentence in script_jpn.script.items():
         start, end = address.split("=")
         start = int(start, 16)
         end = int(end, 16)
-        if start < 0x1192:
+        # if start < 0x3F964:
+        #     continue
+        # if start > 0x41984:
+        #     continue
+
+        if len(family_name_jpn) == 0:
+            family_name_jpn = sentence
+            family_name_kor = script_kor.script[address]
+            prev_address = address
             continue
 
-        if len(family_name) == 0:
-            family_name = sentence
+        if len(given_name_jpn) == 0:
+            given_name_jpn = sentence
+            given_name_kor = script_kor.script[address]
+
+        family_name_jpn = family_name_jpn.replace("␀", "")
+        given_name_jpn = given_name_jpn.replace("␀", "")
+
+        full_name_jpn_clean = f"{family_name_jpn} {given_name_jpn}"
+
+        if not name_db.check_full_name_exist(full_name_jpn_clean):
+            fn_kor = name_db.family_name_db.get(family_name_jpn, "?")
+            gn_kor = name_db.given_name_db.get(given_name_jpn, "?")
+
+            print(f"{full_name_jpn_clean} - {fn_kor} {gn_kor} - is not in the name database.")
+
+            family_name_jpn = ""
+            given_name_jpn = ""
             continue
+        else:
+            if game not in name_db.full_name_db[full_name_jpn_clean]["game"]:
+                print(full_name_jpn_clean)
+                name_db.full_name_db[full_name_jpn_clean]["game"].append(game)
 
-        if len(given_name) == 0:
-            given_name = sentence
+        # Check
+        if given_name_jpn == given_name_kor:
+            name_full_kor = name_db.full_name_db[full_name_jpn_clean]["kor"]
+            name_kor = name_full_kor.split(" ")[-1]
+            if len(name_kor) < 4:
+                info_str = f"{address},{given_name_jpn},{name_kor}"
+                mod_list.append(info_str)
+                print(info_str)
 
-        full_name = f"{family_name} {given_name}"
+        if family_name_jpn == family_name_kor:
+            name_kor = name_db.full_name_db[full_name_jpn_clean]["kor"].split(" ")[0]
+            if len(name_kor) < 4:
+                info_str = f"{prev_address},{family_name_jpn},{name_kor}"
+                mod_list.append(info_str)
+                print(info_str)
 
-        if name_db.check_name_exist(full_name):
-            games = name_db.full_name_db[full_name]["game"]
-            games.append(game)
+        family_name_jpn = ""
+        given_name_jpn = ""
 
-        family_name = ""
-        given_name = ""
+    # name_db.save_db()
+    return
+    for info_str in mod_list:
+        address, jpn, kor = info_str.split(",")
+
+        start, end = address.split("=")
+        start = int(start, 16)
+        end = int(end, 16)
+
+        diff = len(kor) - len(jpn)
+
+        if diff > 0:
+            end += diff * 2
+            jpn += "␀" * diff
+
+        script_jpn.replace_sentence(address, f"{start:05X}={end:05X}", jpn)
+        script_kor.replace_sentence(address, f"{start:05X}={end:05X}", kor)
+
+    script_jpn.save(f"{base_dir}/SNDATA1T.CIM_jpn.json")
+    script_kor.save(f"{base_dir}/SNDATA1T.CIM_kor.json")
 
     # name_db.save_db()
 

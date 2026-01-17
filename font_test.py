@@ -1,18 +1,9 @@
-import os
-from module.font_table import check_file, FontTable
-from module.script import write_code, write_code_1byte
+from module.script import write_code
 
 
 def main():
-    bin_path = "C:/dos/etc/m2/S01_ARMY.BIN"
-    # out_path = "C:/work_han/workspace/MAIN.EXE"
-    out_path = bin_path
-
-    font_path = "C:/work_han/workspace/font_table-dos-macross2.json"
-    # read a font table
-    if not check_file(font_path):
-        return
-    font_table = FontTable(font_path)
+    bin_path = "C:/work_han/workspace2/Suikoden-DOS-KOR-dosbox/SUHOJI/MAIN.EXE"
+    out_path = "C:/work_han/workspace2/Suikoden-DOS-KOR-dosbox/SUHOJI/MAIN.EXE"
 
     with open(bin_path, "rb") as f:
         data = f.read()
@@ -20,19 +11,24 @@ def main():
     print(f"Data size: {bin_path}({len(data):,} bytes)")
 
     # write script
-    scripts = {"69D=6B2": "께"}
-    # data = write_scripts(data, font_table, scripts)
     addresses = [
-        "0069D=006B2",
+        "33626=33635",
+        "33811=33821",
     ]
+    num_chars = [8, 8]
+    code = 0xBDE0
 
-    codes = ["94a4"]
-    num_chars = 10
-    for code, address in zip(codes, addresses):
+    codes = []
+    for num in num_chars:
+        hex = f"{code:X}"
+        codes.append(hex)
+        code += num
+
+    for code, num_char, address in zip(codes, num_chars, addresses):
         [start, end] = address.split("=")
-        data = write_code(data, start, end, code, num_chars)
+        data = write_code(data, start, end, code, num_char)
         code_int = int(code, 16)
-        for i in range(num_chars):
+        for i in range(num_char):
             print(f"{code_int + i:X}=")
 
     # code = "8a"

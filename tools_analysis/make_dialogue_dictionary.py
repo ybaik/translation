@@ -6,9 +6,9 @@ from module.font_table import FontTable
 
 def main():
     console = Console()
-    base_dir = Path("c:/work_han/workspace")
+    base_dir = Path("c:/work_han/workspace3")
     script_dirs = [
-        base_dir / "script-dos",
+        # base_dir / "script-dos",
         base_dir / "script-pc98",
     ]
 
@@ -41,6 +41,9 @@ def main():
             dst_font_table = FontTable("./font_table/font_table-kor-jin.json")
 
             # Check if custom codes exist
+            custom_codes = src.pop("custom_codes", None)
+            if custom_codes is not None:
+                src_font_table.set_custom_code(custom_codes)
             custom_codes = dst.pop("custom_codes", None)
             if custom_codes is not None:
                 dst_font_table.set_custom_code(custom_codes)

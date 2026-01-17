@@ -627,6 +627,18 @@ class Script:
 
         return True
 
+    def replace_sentence(self, address: str, new_address: str, sentence: str):
+        if address not in self.script.keys():
+            print(f"{address} is not in the script.")
+            return
+
+        if address == new_address and len(self.script[address]) == len(sentence):
+            self.script[address] = sentence
+        else:
+            del self.script[address]
+            self.script[new_address] = sentence
+            self.script = dict(sorted(self.script.items()))
+
     def extract_script(
         self,
         data: bytearray,

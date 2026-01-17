@@ -33,7 +33,7 @@ class NameDB:
             json.dump(self.full_name_db, f, ensure_ascii=False, indent=4)
         with open("name_db/family_name_db.json", "w", encoding="utf-8") as f:
             json.dump(self.family_name_db, f, ensure_ascii=False, indent=4)
-        with open("name_dbgiven_name_db.json", "w", encoding="utf-8") as f:
+        with open("name_db/given_name_db.json", "w", encoding="utf-8") as f:
             json.dump(self.given_name_db, f, ensure_ascii=False, indent=4)
 
     def check_full_name_exist(self, full_name: str) -> bool:
@@ -69,3 +69,35 @@ class NameDB:
         for k, v in self.given_name_db.items():
             if len(v) > 1:
                 print(f"이름: {k}", v)
+
+    def add_full_name(self, full_name: str, kor: str, game: str) -> None:
+        if full_name in self.full_name_db.keys():
+            # Check difference
+            if kor != self.full_name_db[full_name]["kor"]:
+                assert 0, f"{full_name} {self.full_name_db[full_name]['kor']} is different to {kor}."
+            # check game
+            if game not in self.full_name_db[full_name]["game"]:
+                self.full_name_db[full_name]["game"].append(game)
+        else:
+            self.full_name_db[full_name] = {"kor": kor, "game": [game]}
+
+        family_name_jpn, given_name_jpn = full_name.split(" ")
+        family_name_kor, given_name_kor = kor.split(" ")
+
+        # add family name
+        if family_name_jpn in self.family_name_db.keys():
+            if family_name_kor not in self.family_name_db[family_name_jpn]:
+                assert 0, (
+                    f"Family name: {family_name_jpn} {family_name_kor} is different to {self.family_name_db[family_name_jpn]}."
+                )
+        else:
+            self.family_name_db[family_name_jpn] = [family_name_kor]
+
+        # add given name
+        if given_name_jpn in self.given_name_db.keys():
+            if given_name_kor not in self.given_name_db[given_name_jpn]:
+                assert 0, (
+                    f"Given name: {given_name_jpn} {given_name_kor} is different to {self.given_name_db[given_name_jpn]}."
+                )
+        else:
+            self.given_name_db[given_name_jpn] = [given_name_kor]
