@@ -12,32 +12,48 @@ def main():
     with open(base_dir, "r", encoding="utf-8") as f:
         lines = f.readlines()
 
-    family_name = ""
-    given_name = ""
-    for address, sentence in script.script.items():
-        start, end = address.split("=")
-        start = int(start, 16)
-        end = int(end, 16)
-        if start < 0x1192:
+    family_name_jpn = ""
+    family_name_kor = ""
+    given_name_jpn = ""
+    given_name_kor = ""
+
+    for line in lines:
+        line = line.strip()
+
+        jpn, kor = line.split(":")[-1].split(",")
+        jpn = jpn.strip()
+        kor = kor.strip()
+
+        if family_name_jpn == "":
+            family_name_jpn = jpn
+            family_name_kor = kor
             continue
 
-        if len(family_name) == 0:
-            family_name = sentence
-            continue
+        given_name_jpn = jpn
+        given_name_kor = kor
 
-        if len(given_name) == 0:
-            given_name = sentence
+        full_name_jpn = f"{family_name_jpn} {given_name_jpn}"
+        full_name_kor = f"{family_name_kor} {given_name_kor}"
 
-        full_name = f"{family_name} {given_name}"
+        if name_db.check_full_name_exist(full_name_jpn):
+            print(full_name_jpn)
+            if full_name_kor != name_db.full_name_db[full_name_jpn]["kor"]:
+                print(full_name_kor, name_db.full_name_db[full_name_jpn]["kor"])
+        if name_db.check_family_name_exist(family_name_jpn):
+            print(family_name_jpn)
+            if family_name_kor not in name_db.family_name_db[family_name_jpn]:
+                print(family_name_kor, name_db.family_name_db[family_name_jpn])
+        if name_db.check_given_name_exist(given_name_jpn):
+            print(given_name_jpn)
+            if given_name_kor not in name_db.given_name_db[given_name_jpn]:
+                print(given_name_kor, name_db.given_name_db[given_name_jpn])
 
-        if name_db.check_name_exist(full_name):
-            games = name_db.full_name_db[full_name]["game"]
-            games.append(game)
+        name_db.add_full_name(full_name_jpn, full_name_kor, game)
 
-        family_name = ""
-        given_name = ""
+        family_name_jpn = ""
+        given_name_jpn = ""
 
-    # name_db.save_db()
+    name_db.save_db()
 
 
 if __name__ == "__main__":

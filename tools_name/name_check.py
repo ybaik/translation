@@ -11,8 +11,9 @@ def main():
     base_dir = "c:/work_han/workspace3/script-pc98"
     script = Script(f"{base_dir}/SNDATA1.CIM_jpn.json")
 
-    # query = {"game": "노부나가의 야망 4"}
-    # print(name_db.check_number(query))
+    print(name_db.check_number())
+    query = {"game": "노부나가의 야망 4"}
+    print(name_db.check_number(query))
 
     name_db.print_duplicate()
 
