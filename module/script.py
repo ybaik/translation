@@ -722,6 +722,30 @@ class Script:
 
         return script_log
 
+    def singlebyte_to_space(self, start_address: int, end_address: int) -> None:
+        for address, sentence in self.script.items():
+            start, end = address.split("=")
+            start = int(start, 16)
+            end = int(end, 16)
+            if start < start_address or end > end_address:
+                continue
+            if "|" not in sentence:
+                continue
+
+            is_1byte = False
+            sentence_new = ""
+            for i in range(len(sentence)):
+                if sentence[i] == "|":
+                    sentence_new += "|"
+                    is_1byte = True
+                    continue
+                if is_1byte:
+                    sentence_new += "_"
+                    is_1byte = False
+                    continue
+                sentence_new += sentence[i]
+            self.script[address] = sentence_new
+
     def write_script(self, data: bytearray, font_table: FontTable) -> Tuple[bytearray, int]:
         valid_sentence_count = 0
 
@@ -765,6 +789,10 @@ class Script:
             spos = int(code_hex_start, 16)
             epos = int(code_hex_end, 16)
             pos = spos
+
+            # # Debugging
+            # if spos < 0x30D4E:
+            #     continue
 
             # Check if the sentence is hex-only
             if "0x:" == sentence[:3]:

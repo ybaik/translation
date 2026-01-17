@@ -87,6 +87,20 @@ class FontTable:
             return False
         return True
 
+    def filter_font(self, character: str) -> None:
+        if character in self.char2code_ascii.keys():
+            self.char2code_ascii.pop(character)
+        if character in self.char2code.keys():
+            self.code2char.pop(self.char2code.get(character))
+
+        codes = []
+        for code, letter in self.code2char.items():
+            if letter == character:
+                codes.append(code)
+        for code in codes:
+            if code in self.code2char.keys():
+                self.code2char.pop(code)
+
     def _read_json(self, file_path: str):
         with open(file_path, "r", encoding="utf-8") as f:
             font_table = json.load(f)
@@ -105,6 +119,8 @@ class FontTable:
             lines = f.readlines()
             for line in lines:
                 line = line.rstrip()
+                if "=" not in line:
+                    continue
                 idx = line.find("=")
                 code_hex = line[:idx].upper()
                 character = line[idx + 1 :]
