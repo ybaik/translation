@@ -20,7 +20,7 @@ def main():
     for line in lines:
         line = line.strip()
 
-        jpn, kor = line.split(":")[-1].split(",")
+        jpn, kor = line.split(":")
         jpn = jpn.strip()
         kor = kor.strip()
 
@@ -53,7 +53,7 @@ def main():
         family_name_jpn = ""
         given_name_jpn = ""
 
-    name_db.save_db()
+    # name_db.save_db()
 
 
 if __name__ == "__main__":

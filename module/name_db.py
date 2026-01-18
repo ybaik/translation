@@ -55,10 +55,14 @@ class NameDB:
         count = 0
         for k, v in self.full_name_db.items():
             if query.get("game") is not None:
-                game = query["game"]
-                if game not in v["game"]:
+                need_skip = False
+                games = query["game"]
+                for game in games:
+                    if game not in v["game"]:
+                        need_skip = True
+                        break
+                if need_skip:
                     continue
-
             count += 1
         return count
 
