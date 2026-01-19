@@ -10,7 +10,7 @@ def main():
     query = {"game": ["nobu4", "taiko2"]}
     print(f"{name_db.check_number(query)} - 태합입지전 2 & 노부나가의 야망 4")
     print(f"{name_db.check_number()} - Total")
-    name_db.print_duplicate()
+    # name_db.print_duplicate()
 
 
 if __name__ == "__main__":
