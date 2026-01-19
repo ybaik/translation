@@ -10,13 +10,14 @@ def main():
     base_dir = "c:/work_han/workspace3/script-pc98"
 
     file_name = "SNDATA3T.CIM"
+    file_name = "MAIN.EXE"
     script_jpn = Script(f"{base_dir}/{file_name}_jpn.json")
     script_kor = Script(f"{base_dir}/{file_name}_kor.json")
 
-    family_name_jpn = ""
-    family_name_kor = ""
-    given_name_jpn = ""
-    given_name_kor = ""
+    fn_jpn = ""
+    fn_kor = ""
+    gn_jpn = ""
+    gn_kor = ""
     prev_address = ""
 
     mod_list = []
@@ -27,44 +28,45 @@ def main():
         end = int(end, 16)
         # if start < 0x1192:
         #     continue
-        # if start < 0x3F964:
-        #     continue
-        # if start > 0x41984:
-        #     continue
+        if start < 0x3F964:
+            continue
+        if start > 0x41984:
+            continue
 
-        if len(family_name_jpn) == 0:
-            family_name_jpn = sentence
-            family_name_kor = script_kor.script[address]
+        if len(fn_jpn) == 0:
+            fn_jpn = sentence
+            fn_kor = script_kor.script[address]
             prev_address = address
             continue
 
-        if len(given_name_jpn) == 0:
-            given_name_jpn = sentence
-            given_name_kor = script_kor.script[address]
+        if len(gn_jpn) == 0:
+            gn_jpn = sentence
+            gn_kor = script_kor.script[address]
 
-        family_name_jpn = family_name_jpn.replace("␀", "")
-        given_name_jpn = given_name_jpn.replace("␀", "")
+        fn_jpn = fn_jpn.replace("␀", "")
+        gn_jpn = gn_jpn.replace("␀", "")
 
-        if "0x:" in family_name_jpn:
-            family_name_jpn = name_db.get_name_from_code("family", family_name_jpn, game)
-        if "0x:" in given_name_jpn:
-            given_name_jpn = name_db.get_name_from_code("given", given_name_jpn, game)
+        if "0x:" in fn_jpn:
+            fn_jpn = name_db.get_name_from_code("family", fn_jpn, game)
+        if "0x:" in gn_jpn:
+            gn_jpn = name_db.get_name_from_code("given", gn_jpn, game)
 
-        full_name_jpn_clean = f"{family_name_jpn} {given_name_jpn}"
+        full_name_jpn_clean = f"{fn_jpn} {gn_jpn}"
 
         if not name_db.check_full_name_exist(full_name_jpn_clean):
-            db = name_db.family_name_db.get(family_name_jpn)
-            fn_kor = "?" if db is None else db.get("kor", "?")
-            db = name_db.given_name_db.get(given_name_jpn)
-            gn_kor = "?" if db is None else db.get("kor", "?")
+            db = name_db.family_name_db.get(fn_jpn)
+            db_fn_kor = "?" if db is None else db.get("kor", "?")
+            db = name_db.given_name_db.get(gn_jpn)
+            db_gn_kor = "?" if db is None else db.get("kor", "?")
 
             console.print(f"{full_name_jpn_clean} - {fn_kor} {gn_kor}")
-            if fn_kor == "?":
-                kor = name_db.given_name_db.get(family_name_jpn, "?")
+
+            if db_fn_kor == "?":
+                kor = name_db.given_name_db.get(fn_jpn, "?")
                 if kor != "?":
                     console.print("Warning: Family name is in the given name database.")
-            if gn_kor == "?":
-                kor = name_db.family_name_db.get(given_name_jpn, "?")
+            if db_gn_kor == "?":
+                kor = name_db.family_name_db.get(gn_jpn, "?")
                 if kor != "?":
                     console.print("Warning: Given name is in the family name database.")
 
@@ -75,48 +77,49 @@ def main():
             if post - prior > 6:
                 print(f"Address mismatch: {prev_address}:{post - prior}")
                 break
-            family_name_jpn = ""
-            given_name_jpn = ""
+            fn_jpn = ""
+            gn_jpn = ""
             continue
         else:
             if game not in name_db.full_name_db[full_name_jpn_clean]["game"]:
                 print(full_name_jpn_clean)
                 name_db.full_name_db[full_name_jpn_clean]["game"].append(game)
 
+        db_fn_kor, db_gn_kor = name_db.full_name_db[full_name_jpn_clean]["kor"].split(" ")
         # Check
-        if given_name_jpn == given_name_kor:
-            name_full_kor = name_db.full_name_db[full_name_jpn_clean]["kor"]
-            name_kor = name_full_kor.split(" ")[-1]
-            if len(name_kor) < 4:
-                info_str = f"{address},{given_name_jpn},{name_kor}"
-                mod_list.append(info_str)
-                print(info_str)
+        if len(gn_kor) > 3 and gn_jpn != gn_kor:
+            print(f"{full_name_jpn_clean}:{gn_jpn} - {address}")
+        if len(fn_kor) > 3 and fn_jpn != fn_kor:
+            print(f"{full_name_jpn_clean}:{fn_jpn} - {address}")
 
-        if family_name_jpn == family_name_kor:
-            name_kor = name_db.full_name_db[full_name_jpn_clean]["kor"].split(" ")[0]
-            if len(name_kor) < 4:
-                info_str = f"{prev_address},{family_name_jpn},{name_kor}"
-                mod_list.append(info_str)
-                print(info_str)
+        if len(db_gn_kor) < 4 and db_gn_kor != gn_kor:
+            info_str = f"{address},{gn_jpn},{db_gn_kor}"
+            mod_list.append(info_str)
+            print(info_str)
 
-        family_name_jpn = ""
-        given_name_jpn = ""
+        if len(db_fn_kor) < 4 and db_fn_kor != fn_kor:
+            info_str = f"{prev_address},{fn_jpn},{db_fn_kor}"
+            mod_list.append(info_str)
+            print(info_str)
 
-    for info_str in mod_list:
-        address, jpn, kor = info_str.split(",")
+        fn_jpn = ""
+        gn_jpn = ""
 
-        start, end = address.split("=")
-        start = int(start, 16)
-        end = int(end, 16)
+    # for info_str in mod_list:
+    #     address, jpn, kor = info_str.split(",")
 
-        diff = len(kor) - len(jpn)
+    #     start, end = address.split("=")
+    #     start = int(start, 16)
+    #     end = int(end, 16)
 
-        if diff > 0:
-            end += diff * 2
-            jpn += "␀" * diff
+    #     diff = len(kor) - len(jpn)
 
-        script_jpn.replace_sentence(address, f"{start:05X}={end:05X}", jpn)
-        script_kor.replace_sentence(address, f"{start:05X}={end:05X}", kor)
+    #     if diff > 0:
+    #         end += diff * 2
+    #         jpn += "␀" * diff
+
+    #     script_jpn.replace_sentence(address, f"{start:05X}={end:05X}", jpn)
+    #     script_kor.replace_sentence(address, f"{start:05X}={end:05X}", kor)
 
     # script_jpn.save(f"{base_dir}/{file_name}_jpn.json")
     # script_kor.save(f"{base_dir}/{file_name}_kor.json")
