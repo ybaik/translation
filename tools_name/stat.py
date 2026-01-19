@@ -5,11 +5,11 @@ def main():
     name_db = NameDB()
     game = "노부나가의 야망 4"
 
-    query = {"game": [game]}
+    query = {"game": ["nobu4"]}
     print(f"{name_db.check_number(query)} - 노부나가의 야망 4")
-    query = {"game": ["태합입지전 2"]}
+    query = {"game": ["taiko2"]}
     print(f"{name_db.check_number(query)} - 태합입지전 2")
-    query = {"game": [game, "태합입지전 2"]}
+    query = {"game": ["nobu4", "taiko2"]}
     print(f"{name_db.check_number(query)} - 태합입지전 2 & 노부나가의 야망 4")
     print(f"{name_db.check_number()} - Total")
     name_db.print_duplicate()

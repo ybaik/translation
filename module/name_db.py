@@ -68,11 +68,11 @@ class NameDB:
 
     def print_duplicate(self) -> None:
         for k, v in self.family_name_db.items():
-            if len(v) > 1:
-                print(f"성: {k}", v)
+            if isinstance(v["kor"], list):
+                print(f"성: {k}", v["kor"])
         for k, v in self.given_name_db.items():
-            if len(v) > 1:
-                print(f"이름: {k}", v)
+            if isinstance(v["kor"], list):
+                print(f"이름: {k}", v["kor"])
 
     def add_full_name(self, full_name: str, kor: str, game: str) -> None:
         if full_name in self.full_name_db.keys():
