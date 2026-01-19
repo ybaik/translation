@@ -3,10 +3,7 @@ from module.name_db import NameDB
 
 def main():
     name_db = NameDB()
-    game = "노부나가의 야망 4"
-    # query = {"game": "노부나가의 야망 4"}
-    # print(name_db.check_number(query))
-    # name_db.print_duplicate()
+    game = "nobu4"
 
     base_dir = "c:/work_han/workspace3/ss.txt"
     with open(base_dir, "r", encoding="utf-8") as f:

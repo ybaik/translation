@@ -36,6 +36,25 @@ class NameDB:
         with open("name_db/given_name_db.json", "w", encoding="utf-8") as f:
             json.dump(self.given_name_db, f, ensure_ascii=False, indent=4)
 
+    def get_name_from_code(self, name_type: str, code: str, game: str) -> str:
+        if name_type == "family":
+            db = self.family_name_db
+        elif name_type == "given":
+            db = self.given_name_db
+        else:
+            assert False, "name_type must be family or given"
+
+        name = code
+        code_ = code.replace("0x:", "")
+        for k, v in db.items():
+            if v.get("code") is None:
+                continue
+            if v["code"].get(game) is None:
+                continue
+            if v["code"][game] == code_:
+                name = k
+        return name
+
     def check_full_name_exist(self, full_name: str) -> bool:
         if full_name in self.full_name_db.keys():
             return True
@@ -47,7 +66,7 @@ class NameDB:
         return False
 
     def check_given_name_exist(self, given_name: str) -> bool:
-        if given_name in self.family_name_db.keys():
+        if given_name in self.given_name_db.keys():
             return True
         return False
 
@@ -90,18 +109,18 @@ class NameDB:
 
         # add family name
         if family_name_jpn in self.family_name_db.keys():
-            if family_name_kor not in self.family_name_db[family_name_jpn]:
+            if family_name_kor not in self.family_name_db[family_name_jpn]["kor"]:
                 assert 0, (
                     f"Family name: {family_name_jpn} {family_name_kor} is different to {self.family_name_db[family_name_jpn]}."
                 )
         else:
-            self.family_name_db[family_name_jpn] = [family_name_kor]
+            self.family_name_db[family_name_jpn] = {"kor": family_name_kor}
 
         # add given name
         if given_name_jpn in self.given_name_db.keys():
-            if given_name_kor not in self.given_name_db[given_name_jpn]:
+            if given_name_kor not in self.given_name_db[given_name_jpn]["kor"]:
                 assert 0, (
                     f"Given name: {given_name_jpn} {given_name_kor} is different to {self.given_name_db[given_name_jpn]}."
                 )
         else:
-            self.given_name_db[given_name_jpn] = [given_name_kor]
+            self.given_name_db[given_name_jpn] = {"kor": given_name_kor}

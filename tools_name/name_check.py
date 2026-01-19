@@ -6,7 +6,7 @@ from rich.console import Console
 def main():
     console = Console()
     name_db = NameDB()
-    game = "노부나가의 야망 4"
+    game = "nobu4"
     base_dir = "c:/work_han/workspace3/script-pc98"
 
     file_name = "SNDATA3T.CIM"
@@ -45,11 +45,18 @@ def main():
         family_name_jpn = family_name_jpn.replace("␀", "")
         given_name_jpn = given_name_jpn.replace("␀", "")
 
+        if "0x:" in family_name_jpn:
+            family_name_jpn = name_db.get_name_from_code("family", family_name_jpn, game)
+        if "0x:" in given_name_jpn:
+            given_name_jpn = name_db.get_name_from_code("given", given_name_jpn, game)
+
         full_name_jpn_clean = f"{family_name_jpn} {given_name_jpn}"
 
         if not name_db.check_full_name_exist(full_name_jpn_clean):
-            fn_kor = name_db.family_name_db.get(family_name_jpn, "?")
-            gn_kor = name_db.given_name_db.get(given_name_jpn, "?")
+            db = name_db.family_name_db.get(family_name_jpn)
+            fn_kor = "?" if db is None else db.get("kor", "?")
+            db = name_db.given_name_db.get(given_name_jpn)
+            gn_kor = "?" if db is None else db.get("kor", "?")
 
             console.print(f"{full_name_jpn_clean} - {fn_kor} {gn_kor}")
             if fn_kor == "?":

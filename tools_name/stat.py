@@ -3,8 +3,6 @@ from module.name_db import NameDB
 
 def main():
     name_db = NameDB()
-    game = "노부나가의 야망 4"
-
     query = {"game": ["nobu4"]}
     print(f"{name_db.check_number(query)} - 노부나가의 야망 4")
     query = {"game": ["taiko2"]}
