@@ -24,6 +24,12 @@ class NameDB:
         self.given_name_db = read_name_db(Path("name_db/given_name_db.json"))
 
     def save_db(self) -> None:
+        for k, v in self.full_name_db.items():
+            if "game" not in v:
+                continue
+            if len(v["game"]) > 1:
+                v["game"].sort()
+
         self.full_name_db = {k: v for k, v in sorted(self.full_name_db.items())}
         self.family_name_db = {k: v for k, v in sorted(self.family_name_db.items())}
         self.given_name_db = {k: v for k, v in sorted(self.given_name_db.items())}
@@ -70,7 +76,7 @@ class NameDB:
             return True
         return False
 
-    def check_number(self, query: dict = dict()) -> int:
+    def check_number(self, query: dict = dict(), unique=False) -> int:
         count = 0
         for k, v in self.full_name_db.items():
             if query.get("game") is not None:
@@ -82,7 +88,11 @@ class NameDB:
                         break
                 if need_skip:
                     continue
-            count += 1
+            if unique:
+                if len(v["game"]) == 1:
+                    count += 1
+            else:
+                count += 1
         return count
 
     def print_duplicate(self) -> None:

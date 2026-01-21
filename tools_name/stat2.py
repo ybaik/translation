@@ -3,7 +3,7 @@ from module.name_db import NameDB
 
 def main():
     name_db = NameDB()
-    game = "nobu4"
+    game = "nb4"
     name_set = set()
     for k, v in name_db.full_name_db.items():
         if game not in v["game"]:
@@ -20,9 +20,9 @@ def main():
 
     name_list = list(name_set)
     name_list.sort()
-    for i, name in enumerate(name_list):
-        print(f"{i + 1:03d}: {name}")
-
+    for name in name_list:
+        print(name)
+    print(len(name_list))
     return
 
     with open("c:/work_han/workspace3/names.txt", "r", encoding="utf-8") as f:
