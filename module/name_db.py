@@ -24,10 +24,8 @@ class NameDB:
         self.given_name_db = read_name_db(Path("name_db/given_name_db.json"))
 
     def save_db(self) -> None:
-        for k, v in self.full_name_db.items():
-            if "game" not in v:
-                continue
-            if len(v["game"]) > 1:
+        for v in self.full_name_db.values():
+            if "game" in v and len(v["game"]) > 1:
                 v["game"].sort()
 
         self.full_name_db = {k: v for k, v in sorted(self.full_name_db.items())}

@@ -9,8 +9,9 @@ def main():
     game = "nb3"
     base_dir = "c:/work_han/workspace3/script-pc98"
 
-    file_name = "SNDATA2.CIM"
+    file_name = "S0T.NB5"
     file_name = "MAIN.EXE"
+    file_name = "SNDATA1.CIM"
     script_jpn = Script(f"{base_dir}/{file_name}_jpn.json")
     script_kor = Script(f"{base_dir}/{file_name}_kor.json")
 
@@ -96,21 +97,22 @@ def main():
                 name_db.full_name_db[full_name_jpn_clean]["game"].append(game)
 
         db_fn_kor, db_gn_kor = name_db.full_name_db[full_name_jpn_clean]["kor"].split(" ")
-        # Check
+
+        # Check for debugging
         # if len(gn_kor) > 3 and gn_jpn != gn_kor:
         #     print(f"{full_name_jpn_clean}:{gn_jpn} - {address}")
         # if len(fn_kor) > 3 and fn_jpn != fn_kor:
         #     print(f"{full_name_jpn_clean}:{fn_jpn} - {address}")
 
-        # if len(db_gn_kor) < 4 and db_gn_kor != gn_kor:
-        #     info_str = f"{address},{gn_jpn},{db_gn_kor}"
-        #     mod_list.append(info_str)
-        #     print(info_str)
+        if len(db_gn_kor) < 4 and db_gn_kor != gn_kor:
+            info_str = f"{address},{gn_jpn},{db_gn_kor}"
+            mod_list.append(info_str)
+            print(info_str)
 
-        # if len(db_fn_kor) < 4 and db_fn_kor != fn_kor:
-        #     info_str = f"{prev_address},{fn_jpn},{db_fn_kor}"
-        #     mod_list.append(info_str)
-        #     print(info_str)
+        if len(db_fn_kor) < 4 and db_fn_kor != fn_kor:
+            info_str = f"{prev_address},{fn_jpn},{db_fn_kor}"
+            mod_list.append(info_str)
+            print(info_str)
 
         fn_jpn = ""
         gn_jpn = ""
