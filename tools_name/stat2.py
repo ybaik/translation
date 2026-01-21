@@ -18,6 +18,13 @@ def main():
         if len(gn) == 4:
             name_set.add(gn)
 
+    name_list = list(name_set)
+    name_list.sort()
+    for i, name in enumerate(name_list):
+        print(f"{i + 1:03d}: {name}")
+
+    return
+
     with open("c:/work_han/workspace3/names.txt", "r", encoding="utf-8") as f:
         lines = f.readlines()
 
@@ -31,6 +38,8 @@ def main():
         cc.add(line.strip())
     out = half_name - cc
     print(out)
+    out2 = cc - half_name
+    print(out2)
 
 
 if __name__ == "__main__":
