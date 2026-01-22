@@ -10,8 +10,8 @@ def main():
 
     platform = "dos"
     platform = "pc98"
-
-    base_dir = Path("c:/work_han/workspace4")
+    ws_num = 4
+    base_dir = Path(f"c:/work_han/workspace{ws_num}")
     ref_base_dir = base_dir
     script_base_dir = base_dir / f"script-{platform}"
 
@@ -26,8 +26,6 @@ def main():
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         console.print(file.name)
 
-        # if "SDATA" not in file.name:
-        #     continue
         if "_jpn.json" not in file.name:
             continue
         dst_path = file.parent / file.name.replace("_jpn.json", "_kor.json")

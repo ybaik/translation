@@ -55,9 +55,9 @@ def main_half():
 
 def main_full():
     name_db = NameDB()
-    game = "nb3"
-
-    base_dir = "c:/work_han/workspace3/ss.txt"
+    game = "nb5"
+    ws_num = 5
+    base_dir = f"c:/work_han/workspace{ws_num}/ss.txt"
     with open(base_dir, "r", encoding="utf-8") as f:
         lines = f.readlines()
 

@@ -6,12 +6,13 @@ from rich.console import Console
 def main():
     console = Console()
     name_db = NameDB()
-    game = "nb3"
-    base_dir = "c:/work_han/workspace3/script-pc98"
+    game = "nb5"
+    ws_num = 5
+    base_dir = f"c:/work_han/workspace{ws_num}/script-pc98"
 
     file_name = "S0T.NB5"
-    file_name = "MAIN.EXE"
-    file_name = "SNDATA1.CIM"
+    # file_name = "MAIN.EXE"
+    # file_name = "SNDATA1.CIM"
     script_jpn = Script(f"{base_dir}/{file_name}_jpn.json")
     script_kor = Script(f"{base_dir}/{file_name}_kor.json")
 

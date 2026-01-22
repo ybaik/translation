@@ -7,13 +7,15 @@ from module.font_table import FontTable
 def main():
     console = Console()
 
-    base_dir = Path("c:/work_han/workspace")
+    ws_num = 4
+    base_dir = Path(f"c:/work_han/workspace{ws_num}")
     script_dirs = [
         base_dir / "script-dos",
         base_dir / "script-pc98",
     ]
 
     # ,"s":0
+    # ,"s":1
 
     # Read an existing dictionary
     annoying_path = base_dir / "annoying.json"

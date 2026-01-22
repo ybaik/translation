@@ -4,7 +4,12 @@ from rich.console import Console
 from module.font_table import FontTable
 
 
-def main(script_path: Path):
+def main():
+    ws_num = 4
+    base_dir = Path(f"c:/work_han/workspace{ws_num}/script-pc98")
+    # script_path = base_dir / "EVENT.DAT_kor.json"
+    script_path = base_dir / "MAIN.EXE_kor.json"
+
     if not script_path.exists():
         print(f"Script file {script_path} does not exist.")
         return
@@ -15,7 +20,9 @@ def main(script_path: Path):
 
     # … ␀ ␁
     dialogue_array = {
-        "45B3A=45B49": "쓰레기 투기 금지",
+        "2B07E=2B095": "금을 얼마나 소지 할까요|␀",
+        "2B099=2B0B2": "병량을 얼마나 소지 할까요|␀",
+        "2B0B4=2B0C1": "이동할까요␀␀",
     }
     console = Console()
 
@@ -24,6 +31,7 @@ def main(script_path: Path):
 
     for script_range, dialogue in zip(dialogue_array.keys(), dialogue_array.values()):
         dialogue = dialogue.replace(" ", "|_")
+        # dialogue = dialogue.replace(" ", "_")
         length = dst_font_table.check_length_from_address(script_range)
         length_from_dialogue = dst_font_table.check_length_from_sentence(dialogue)
 
@@ -44,8 +52,4 @@ def main(script_path: Path):
 
 
 if __name__ == "__main__":
-    base_dir = Path("c:/work_han/workspace4/script-pc98")
-    script_path = base_dir / "MAIN.EXE_kor.json"
-    # script_path = base_dir / "SERIFU.DAT_kor.json"
-    # script_path = base_dir / "DANJON.DAT_kor.json"
-    main(script_path)
+    main()
