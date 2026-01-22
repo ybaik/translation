@@ -7,21 +7,16 @@ from module.font_table import FontTable
 
 def main():
     # Read a font table
-    font_table = FontTable("font_table/font_table-kor-jin.json")
+    font_table_jpn = FontTable("font_table/font_table-jpn-full.json")
+    font_table_kor = FontTable("font_table/font_table-kor-jin.json")
 
     # Get a letter or letters from a code or codes
-    codes = ["88d7", "94ca"]
-    letter = font_table.get_char(codes[0].upper())
-    word = font_table.get_chars(codes)
-    print(letter, word)
-
-    # Get a code or codes from a letter or letters
-    script = "쫓구"
-    code_hex = font_table.get_code("_")
-    codes_hex = font_table.get_codes(script)
-
-    print(code_hex)
-    print(codes_hex)
+    code_txt = "E5 62 96 BC"
+    code_list = code_txt.split(" ")
+    codes = [f"{code_list[i]}{code_list[i + 1]}" for i in range(0, len(code_list), 2)]
+    # letter = font_table_jpn.get_char(codes[0].upper())
+    word = font_table_jpn.get_chars(codes)
+    print(word)
 
 
 if __name__ == "__main__":

@@ -8,14 +8,15 @@ from module.decoding import decode
 
 
 def main():
-    base_path = Path("../workspace1/jpn-pc98")
+    base_path = Path("../workspace6/jpn-pc98")
 
     # font_table_path = "font_table/font_table-kor-jin.json"
     font_table_path = "font_table/font_table-jpn-full.json"
     font_table = FontTable(font_table_path)
 
-    sentence_to_find = "|ｾ|ｲ|ﾚ|ｰ|ﾝ"
+    sentence_to_find = "北条"
     address_to_find_hex = font_table.get_codes(sentence_to_find)
+
     print(address_to_find_hex)
     code_string_hex = ""
     for code_hex in address_to_find_hex:
@@ -40,7 +41,7 @@ def main():
         # print(file)
         with open(file, "rb") as f:
             data = f.read()
-
+        print(file.name)
         # decoding_info = "xor:0x77"
         # data = decode(data, decoding_info)
 
