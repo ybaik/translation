@@ -1,4 +1,7 @@
-from typing import Tuple
+import cv2
+import numpy as np
+
+from typing import List, Dict, Tuple
 
 
 # Font image info
@@ -68,3 +71,33 @@ def return_img_roi_1byte(code_hex: str, debug=False) -> Tuple[int, int, int, int
     ypos = row * 16
     xpos = col * 8
     return [ypos, ypos + 16, xpos, xpos + 8]
+
+
+def imread_korean(path):
+    img_array = np.fromfile(path, np.uint8)
+    img = cv2.imdecode(img_array, 0)
+    return img
+
+
+def draw_letters_on_canvas(
+    font_canvas: np.ndarray, input_cands: List[str], img_path_dict: Dict, code_list: List[str], num_letters: int
+) -> Dict[str, str]:
+    code_idx = 0
+    ret_dict_code = dict()
+
+    # Update font canvas
+    for korean in input_cands:
+        if korean not in img_path_dict:
+            code_idx += num_letters
+            continue
+        word_img = imread_korean(str(img_path_dict[korean]))
+        code_tag = ""
+        for i in range(num_letters):
+            code = code_list[code_idx + i]
+            roi = return_img_roi(code)
+            font_canvas[roi[0] : roi[1], roi[2] : roi[3]] = word_img[0:16, 16 * i : 16 * i + 16]
+            code_tag += code
+        ret_dict_code[korean] = code_tag
+        code_idx += num_letters
+
+    return ret_dict_code
