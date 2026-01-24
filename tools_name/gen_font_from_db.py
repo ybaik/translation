@@ -9,12 +9,6 @@ from module.font_table import FontTable
 from module.font_image import imread_korean, draw_letters_on_canvas
 
 
-def imread_korean(path):
-    img_array = np.fromfile(path, np.uint8)
-    img = cv2.imdecode(img_array, 0)
-    return img
-
-
 def set_4byte(base_dir: Path, base_name_db_dir: Path, font_table: FontTable, src_font_canvas: np.ndarray):
     start_code = "959F"  # 福
     input_cand_4byte = ["다이묘"]
@@ -92,6 +86,8 @@ def set_6byte(base_dir: Path, base_name_db_dir: Path, font_table: FontTable, src
                 one_bit_img = pil_img.convert("1")
                 one_bit_img.save(sav_path)
                 img_db_6byte[korean] = sav_path
+                continue
+        print(f"No font image - {korean}")
 
     # Get filtered list
     code_list = list(font_table.code2char.keys())

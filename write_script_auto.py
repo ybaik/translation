@@ -9,6 +9,7 @@ from module.check_script import diff_address
 
 skip_list = [
     # "END.EXE",
+    # "MAIN.EXE",
     # "OPEN.EXE",
     # "RPDATA.CIM",
     # "SDATA.CIM",
@@ -19,8 +20,9 @@ def main():
     platform = "dos"
     platform = "pc98"
 
-    base_dir = Path("c:/work_han/workspace")
+    ws_num = 4
 
+    base_dir = Path(f"c:/work_han/workspace{ws_num}")
     script_base_dir = base_dir / f"script-{platform}"
     src_bin_base_dir = base_dir / f"jpn-{platform}"
     dst_bin_base_dir = base_dir / f"kor-{platform}"
@@ -46,10 +48,9 @@ def main():
         if "_kor.json" not in file.name:
             continue
 
-        # if "MAC.EXE" not in file.name:
+        # if "MAIN.EXE" not in file.name:
         #     continue
-
-        # if "SERIFU.DAT" not in file.name:
+        # if "OPEN.EXE" not in file.name:
         #     continue
 
         do_skip = False
@@ -146,13 +147,9 @@ def main():
         with open(dst_data_path, "wb") as f:
             f.write(data)
 
-    if "workspace\\" in str(script_base_dir):
-        cmd = f"copy ..\\workspace\\kor-{platform}\\*.* ..\\workspace\\kor-{platform}-dosbox-x\\KAMI\\"
+    if f"workspace{ws_num}\\" in str(script_base_dir):
+        cmd = f"xcopy /E /I /Y ..\\workspace{ws_num}\\kor-{platform}\\. ..\\workspace{ws_num}\\kor-pc98-dosbox-x\\"
         os.system(cmd)
-
-    # if "workspace1\\" in str(script_base_dir):
-    #     cmd = f"xcopy /E /I /Y ..\\workspace1\\kor-{platform}\\. ..\\workspace1\\kor-p98-hdd\\"
-    #     os.system(cmd)
 
     if total_count:
         # Print remaining sentences among not completed files

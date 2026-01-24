@@ -5,24 +5,38 @@ from module.font_table import FontTable
 from module.script import extract_script
 from module.decoding import decode
 
+# custom_codes = {
+#     "EB9F": "鄆",
+#     "EBA0": "鄧",
+#     "EBA1": "郝",
+#     "EBA2": "龔",
+#     "EBA3": "蔣",
+#     "EBA4": "玘",
+#     "EBA5": "鮑",
+#     "EBA6": "俅",
+#     "EBA7": "鄔",
+#     "EBA8": "烕",
+#     "EBA9": "燁",
+#     "EBAA": "褚",
+#     "EBAB": "貹",
+#     "EBAC": "龐",
+#     "EBAD": "戩",
+# }
+
 
 def main():
+    workspace = "workspace5"
     platform = "pc98"
-    bin_path = f"../workspace0/jpn-{platform}"
+    bin_path = f"../{workspace}/jpn-{platform}"
     font_table_path = "font_table/font_table-jpn-full.json"
     extended_word = "_jpn"
-    script_path = f"../workspace0/script_init-{platform}-jpn"
+    script_path = f"../{workspace}/script_init-{platform}"
 
-    # bin_path = "../workspace/m3-dos"
-    # font_table_path = "../workspace/font_table-dos-macross3.json"
-    # extended_word = "_dos"
-    # script_path = "../workspace/m3-script"
-
-    # bin_path = "../workspace/KOUKAI-KOR-HDD"
-    # font_table_path = "font_table/font_table-kor-jin.json"
+    # dos kor
+    # bin_path = f"../{workspace}/kor-{platform}"
+    # font_table_path = f"../{workspace}/font_table-kor-suho.tbl"
     # extended_word = "_kor"
-
-    # ref_dir = Path("../workspace/KOR-patch")
+    # script_path = f"../{workspace}/script_init-{platform}"
 
     length_threshold_in_bytes = 1
     check_ascii = True
@@ -39,7 +53,7 @@ def main():
         src_data_path = f"{bin_path}/{file}"
         dst_script_path = f"{script_path}/{file}{extended_word}.json"
 
-        # if "OPEN.EXE" not in file:
+        # if "SNDATA3" not in file:
         #     continue
 
         if not os.path.isfile(src_data_path):
@@ -48,6 +62,10 @@ def main():
         print(f"{file} ===========================================")
         # Read a font table
         font_table = FontTable(font_table_path)
+
+        # Set custom codes
+        # if custom_codes is not None:
+        #     font_table.set_custom_code(custom_codes)
 
         # Read a target binary data
         with open(src_data_path, "rb") as f:
