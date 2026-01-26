@@ -329,6 +329,7 @@ class Script:
                     code_int = int(codes[i * 2 : i * 2 + 2], 16)
                     if code_int != binary_data[spos + i]:
                         is_diff = True
+                        err_reason = f"{code_int:02X}/{binary_data[spos + i]:02x}"
                         break
             else:
                 idx = 0

@@ -48,7 +48,7 @@ def main():
     font_table_jpn = FontTable("font_table/font_table-jpn-full.json")
 
     # Get a code or codes from a letter or letters
-    script = "꼍텐"
+    script = "꽥"  # 籠城
     codes_hex = font_table_kor.get_codes(script)
 
     # 반각 체크
@@ -63,13 +63,17 @@ def main():
     # codes_hex = [codes[i : i + 4] for i in range(0, len(codes), 4)]
 
     # print(codes_hex)
-
     hex_str = ""
+    hex_str_rev = ""
     for code_hex in codes_hex:
-        hex_str += code_hex[2:]  # + " "
-        hex_str += code_hex[:2]  # + " "
+        hex_str_rev += code_hex[2:]  # + " "
+        hex_str_rev += code_hex[:2]  # + " "
+        hex_str_rev += " "
+        hex_str += code_hex
         hex_str += " "
+
     print(hex_str)
+    print(hex_str_rev)
 
     jpn_script = font_table_jpn.get_chars(codes_hex)
     print(jpn_script)
