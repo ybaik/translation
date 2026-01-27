@@ -27,8 +27,8 @@ def main():
     src_bin_base_dir = base_dir / f"jpn-{platform}"
     dst_bin_base_dir = base_dir / f"kor-{platform}"
 
-    src_font_table_path = "font_table/font_table-jpn-full.json"
-    dst_font_table_path = "font_table/font_table-kor-jin.json"
+    src_font_table_path = Path("font_table/font_table-jpn-full.json")
+    dst_font_table_path = Path("font_table/font_table-kor-jin.json")
 
     # ===================================================================
     # For debugging printsE
@@ -85,8 +85,8 @@ def main():
         console.print(f"[yellow] Start:{src_data_path}[/yellow]")
 
         # Read source and destination font tables
-        src_font_table = FontTable(src_font_table_path)
-        dst_font_table = FontTable(dst_font_table_path)
+        src_font_table = FontTable(src_font_table_path, script_base_dir)
+        dst_font_table = FontTable(dst_font_table_path, script_base_dir)
 
         # Read source and destination script
         src_script = Script(str(src_script_path))

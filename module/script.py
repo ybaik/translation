@@ -130,7 +130,6 @@ class Script:
         self.script = dict()
         self.zero_padding = None
         self.encoding = None
-        self.custom_codes = None
         self.custom_input = None
 
         # Read a script if the file path is specified
@@ -147,10 +146,6 @@ class Script:
         # Get encoding
         if "encoding" in self.script.keys():
             self.encoding = self.script.pop("encoding")
-
-        # Get custom codes
-        if "custom_codes" in self.script.keys():
-            self.custom_codes = self.script.pop("custom_codes")
 
         # Get custom input
         if "custom_input" in self.script.keys():
@@ -185,13 +180,6 @@ class Script:
             print(f"Unknown error occurred: {e}")
 
         return data
-
-    def set_custom_codes(self, custom_codes: Dict) -> None:
-        """Set custom codes
-        Args:
-            custom_codes (Dict): A dictionary of custom codes.
-        """
-        self.custom_codes = custom_codes
 
     def set_address_padding(self, address_padding: int = 5) -> None:
         """Set address padding
@@ -231,10 +219,6 @@ class Script:
         if self.encoding is not None:
             save_dict["encoding"] = self.encoding
 
-        # Set custom codes
-        if self.custom_codes is not None:
-            save_dict["custom_codes"] = self.custom_codes
-
         # Set custom input
         if self.custom_input is not None:
             save_dict["custom_input"] = self.custom_input
@@ -266,9 +250,6 @@ class Script:
         # Check script
         count_false_length = 0
         count_false_characters = 0
-
-        if self.custom_codes is not None:
-            font_table.set_custom_code(self.custom_codes)
 
         for address, sentence in self.script.items():
             if "=" not in address:
@@ -306,10 +287,6 @@ class Script:
         # Decoding bianry data
         if self.encoding is not None:
             binary_data = decode(binary_data, self.encoding)
-
-        # Font table update
-        if self.custom_codes is not None:
-            font_table.set_custom_code(self.custom_codes)
 
         diff_status = False
         err_reason = ""
@@ -765,10 +742,6 @@ class Script:
         # Check if decoding is needed
         if self.encoding is not None:
             data = decode(data, self.encoding)
-
-        # Check if custom codes exist
-        if self.custom_codes is not None:
-            font_table.set_custom_code(self.custom_codes)
 
         # Check if custom inputs exist
         if self.custom_input is not None:

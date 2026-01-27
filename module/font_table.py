@@ -1,12 +1,12 @@
-import os
 import json
 from copy import deepcopy
+from pathlib import Path
 from typing import List, Dict, Tuple
 from .jisx0201 import jisx0201_table
 
 
 class FontTable:
-    def __init__(self, file_path: str) -> None:
+    def __init__(self, file_path: Path, custom_char_dir: Path = None) -> None:
         # Initialize
         self.code2char = dict()
         self.char2code = dict()
@@ -14,7 +14,7 @@ class FontTable:
         self.code_int_max = 0
 
         # Check if the file exists
-        if not os.path.exists(file_path):
+        if not file_path.exists():
             raise FileNotFoundError(f"{file_path} does not exist.")
 
         # Set code 1 byte (jisx0201)
@@ -24,10 +24,16 @@ class FontTable:
         # Read font table
         self.read_font_table(file_path)
 
-    def set_custom_code(self, custom_codes: Dict = {}) -> None:
+        # Check if custom chars exist
+        if (custom_char_dir / "custom_char.json").exists():
+            with open(custom_char_dir / "custom_char.json", "r", encoding="utf-8") as f:
+                custom_chars = json.load(f)
+            self.set_custom_char(custom_chars)
+
+    def set_custom_char(self, custom_chars: Dict = {}) -> None:
         update_1byte = False
         update_2byte = False
-        for k, v in custom_codes.items():
+        for k, v in custom_chars.items():
             if len(k) == 2:  # 1-byte code
                 old_code = self.char2code_ascii.get(v, None)
                 if old_code is not None:
@@ -43,7 +49,7 @@ class FontTable:
                 self.code2char[k] = v
                 update_2byte = True
             else:
-                raise ValueError(f"Invalid code length: {k} during custom code setting.")
+                raise ValueError(f"Invalid code length: {k} during custom char setting.")
 
         if update_1byte:
             self.char2code_ascii = {v: k for k, v in self.code2char_ascii.items()}
@@ -52,11 +58,12 @@ class FontTable:
             for k, v in self.code2char.items():
                 self.char2code.setdefault(v, k)
 
-    def read_font_table(self, file_path: str) -> bool:
-        if not os.path.isfile(file_path):
+    def read_font_table(self, file_path: Path) -> bool:
+        if not file_path.exists():
             print(f"No {file_path} exist.")
             return False
-        _, ext = os.path.splitext(file_path)
+
+        ext = file_path.suffix
         if ext == ".tbl":
             self._read_tbl(file_path)
         elif ext == ".json":
@@ -72,12 +79,12 @@ class FontTable:
 
         return True
 
-    def write_font_table(self, file_path: str) -> bool:
+    def write_font_table(self, file_path: Path) -> bool:
         if self.code2char is None:
             print("No font table to write.")
             return False
 
-        _, ext = os.path.splitext(file_path)
+        ext = file_path.suffix
         if ext == ".tbl":
             self._write_tbl(file_path)
         elif ext == ".json":
@@ -101,7 +108,7 @@ class FontTable:
             if code in self.code2char.keys():
                 self.code2char.pop(code)
 
-    def _read_json(self, file_path: str):
+    def _read_json(self, file_path: Path):
         with open(file_path, "r", encoding="utf-8") as f:
             font_table = json.load(f)
 
@@ -111,7 +118,7 @@ class FontTable:
         self.code_int_max = int(codes[-1], 16)
         self.code2char = font_table
 
-    def _read_tbl(self, file_path: str) -> None:
+    def _read_tbl(self, file_path: Path) -> None:
         font_table = dict()
 
         # Read font table
@@ -136,7 +143,7 @@ class FontTable:
         self.code_int_max = int(codes[-1], 16)
         self.code2char = font_table
 
-    def _read_tbl_1byte(self, file_path: str) -> None:
+    def _read_tbl_1byte(self, file_path: Path) -> None:
         with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
@@ -156,12 +163,12 @@ class FontTable:
                 else:
                     print(f"duplicated: {code_hex}")
 
-    def _write_json(self, file_path: str) -> None:
+    def _write_json(self, file_path: Path) -> None:
         font_table = dict(sorted(self.code2char.items()))
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(font_table, f, ensure_ascii=False, indent=2)
 
-    def _write_tbl(self, file_path: str) -> None:
+    def _write_tbl(self, file_path: Path) -> None:
         table_for_tbl = ""
         for code, letter in sorted(self.code2char.items()):
             table_for_tbl += f"{code}={letter}\n"

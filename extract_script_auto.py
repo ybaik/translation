@@ -5,24 +5,6 @@ from module.font_table import FontTable
 from module.script import extract_script
 from module.decoding import decode
 
-# custom_codes = {
-#     "EB9F": "鄆",
-#     "EBA0": "鄧",
-#     "EBA1": "郝",
-#     "EBA2": "龔",
-#     "EBA3": "蔣",
-#     "EBA4": "玘",
-#     "EBA5": "鮑",
-#     "EBA6": "俅",
-#     "EBA7": "鄔",
-#     "EBA8": "烕",
-#     "EBA9": "燁",
-#     "EBAA": "褚",
-#     "EBAB": "貹",
-#     "EBAC": "龐",
-#     "EBAD": "戩",
-# }
-
 
 def main():
     workspace = "workspace5"
@@ -30,7 +12,8 @@ def main():
     bin_path = f"../{workspace}/jpn-{platform}"
     font_table_path = "font_table/font_table-jpn-full.json"
     extended_word = "_jpn"
-    script_path = f"../{workspace}/script_init-{platform}"
+    script_init_path = f"../{workspace}/script_init-{platform}"
+    script_base_path = f"../{workspace}/script-{platform}"
 
     # dos kor
     # bin_path = f"../{workspace}/kor-{platform}"
@@ -51,7 +34,7 @@ def main():
 
     for file in files:
         src_data_path = f"{bin_path}/{file}"
-        dst_script_path = f"{script_path}/{file}{extended_word}.json"
+        dst_script_path = f"{script_init_path}/{file}{extended_word}.json"
 
         # if "SNDATA3" not in file:
         #     continue
@@ -61,11 +44,7 @@ def main():
 
         print(f"{file} ===========================================")
         # Read a font table
-        font_table = FontTable(font_table_path)
-
-        # Set custom codes
-        # if custom_codes is not None:
-        #     font_table.set_custom_code(custom_codes)
+        font_table = FontTable(font_table_path, script_base_path)
 
         # Read a target binary data
         with open(src_data_path, "rb") as f:
