@@ -1,4 +1,5 @@
 import os
+import json
 from pathlib import Path
 from rich.console import Console
 
@@ -43,6 +44,12 @@ def main():
     # if (base_dir / "complete_list.txt").exists():
     #     with open(base_dir / "complete_list.txt", "r") as f:
     #         skip_list = f.read().splitlines()
+
+    custom_word_path = script_base_dir / "custom_word.json"
+    custom_words = {}
+    if custom_word_path.exists():
+        with open(custom_word_path, "r", encoding="utf-8") as f:
+            custom_words = json.load(f)
 
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         if "_kor.json" not in file.name:
@@ -128,7 +135,7 @@ def main():
             console.print(f"[green] json and data match.[/green] [green]{src_data_path}[/green]")
 
         # Write the destination script to the binary data in memory
-        data, valid_sentence_count = dst_script.write_script(data, dst_font_table)
+        data, valid_sentence_count = dst_script.write_script(data, dst_font_table, custom_words)
         if len(dst_script.script):
             valid_p = valid_sentence_count / len(dst_script.script) * 100
             msg = f"Valid sentence percentege (done/total): {valid_p:.2f}%"

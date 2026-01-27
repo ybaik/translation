@@ -21,6 +21,13 @@ def main():
 
     # Read a pair of scripts
     for script_dir in script_dirs:
+        # Read a custom word dictionary
+        custom_word_path = script_dir / "custom_word.json"
+        custom_words = {}
+        if custom_word_path.exists():
+            with open(custom_word_path, "r", encoding="utf-8") as f:
+                custom_words = json.load(f)
+
         for file in script_dir.rglob("*.json"):  # Use rglob to search subdirectories
             if "_jpn.json" not in file.name:
                 continue
@@ -38,29 +45,26 @@ def main():
             with open(dst_path, "r", encoding="utf-8") as f:
                 dst = json.load(f)
 
-            src_font_table = FontTable("./font_table/font_table-jpn-full.json")
-            dst_font_table = FontTable("./font_table/font_table-kor-jin.json")
-
-            # Check if custom codes exist
-            custom_codes = src.pop("custom_codes", None)
-            if custom_codes is not None:
-                src_font_table.set_custom_code(custom_codes)
-            custom_codes = dst.pop("custom_codes", None)
-            if custom_codes is not None:
-                dst_font_table.set_custom_code(custom_codes)
+            src_font_table = FontTable(
+                file_path=Path("./font_table/font_table-jpn-full.json"), custom_char_dir=script_dir
+            )
+            dst_font_table = FontTable(
+                file_path=Path("./font_table/font_table-kor-jin.json"), custom_char_dir=script_dir
+            )
 
             # check address
             for address, src_sentence in src.items():
                 if "=" not in address:
                     continue
-
                 # Check if the address is in the destination script
                 if address not in dst:
                     continue
 
                 # Check if the src and dst sentences are valid
                 length = src_font_table.check_length_from_address(address)
-                length_from_src_sentence = src_font_table.check_length_from_sentence(src_sentence)
+                length_from_src_sentence = src_font_table.check_length_from_sentence(
+                    sentence=src_sentence, custom_words=custom_words
+                )
 
                 if length != length_from_src_sentence:
                     console.print(f"{address} {file_tag}", style="red")
@@ -69,7 +73,9 @@ def main():
 
                 # Check if the src and dst sentences are valid
                 dst_sentence = dst[address]
-                length_from_dst_sentence = dst_font_table.check_length_from_sentence(dst_sentence)
+                length_from_dst_sentence = dst_font_table.check_length_from_sentence(
+                    sentence=dst_sentence, custom_words=custom_words
+                )
                 if length != length_from_dst_sentence:
                     console.print(f"{address} {file_tag}", style="red")
                     assert 0, f"Kor sentence length is not matched. {address}:{length} != {length_from_dst_sentence}"

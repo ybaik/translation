@@ -1,6 +1,7 @@
 import sys
 
 sys.path.append("./")
+from pathlib import Path
 from module.font_table import FontTable
 
 import unicodedata
@@ -44,11 +45,11 @@ def jisx0201_to_unicode(
 
 
 def main():
-    font_table_kor = FontTable("font_table/font_table-kor-jin.json")
-    font_table_jpn = FontTable("font_table/font_table-jpn-full.json")
+    font_table_kor = FontTable(Path("font_table/font_table-kor-jin.json"))
+    font_table_jpn = FontTable(Path("font_table/font_table-jpn-full.json"))
 
     # Get a code or codes from a letter or letters
-    script = "꽥"  # 籠城
+    script = "무"  # 籠城
     codes_hex = font_table_kor.get_codes(script)
 
     # 반각 체크

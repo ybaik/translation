@@ -1,3 +1,4 @@
+import re
 import json
 from pathlib import Path
 from typing import Dict, Tuple
@@ -736,7 +737,7 @@ class Script:
                 sentence_new += sentence[i]
             self.script[address] = sentence_new
 
-    def write_script(self, data: bytearray, font_table: FontTable) -> Tuple[bytearray, int]:
+    def write_script(self, data: bytearray, font_table: FontTable, custom_words: Dict = None) -> Tuple[bytearray, int]:
         valid_sentence_count = 0
 
         # Check if decoding is needed
@@ -801,6 +802,8 @@ class Script:
             skip_sentence = False
             check_1byte = False
             for character in sentence:
+                if character in ["{", "}"]:
+                    continue
                 if character == "|":
                     check_1byte = True
                     continue
@@ -831,37 +834,52 @@ class Script:
             valid_sentence_count += 1
 
             # Write characters in the sentence
-            idx_char = 0
-            while idx_char < len(sentence):
-                character = sentence[idx_char]
+            parts = re.split(r"\{([^}]+)\}", sentence)
+            is_word = False
+            for part in parts:
+                if not part:
+                    is_word = not is_word
+                    continue
 
-                # Check if the letter is a 1-byte character
-                if character == "|":
-                    idx_char += 1
-                    character = sentence[idx_char]
-
-                    if font_table.get_code_ascii(character) is not None:
-                        code_hex = font_table.get_code_ascii(character)
-                        code_int = int(code_hex, 16)
-                        data[pos] = code_int
+                if is_word:
+                    if custom_words and part in custom_words:
+                        hex_value = custom_words[part]
+                        num_bytes = len(hex_value) // 2
+                        for i in range(num_bytes):
+                            byte_str = hex_value[i * 2 : i * 2 + 2]
+                            if pos + i >= len(data):
+                                break
+                            data[pos + i] = int(byte_str, 16)
+                        pos += num_bytes
                     else:
-                        assert 0, f"{code_hex_start}:{character} is not in the 1-byte font table."
-                    pos += 1
-                else:  # Input 2-bytes character
-                    if character in ["@"]:  # an ignore character
-                        pass
-                    elif font_table.get_code(character) is not None:
-                        code_hex = font_table.get_code(character)
-                        code_int = int(code_hex, 16)
-
-                        code1 = (code_int & 0xFF00) >> 8
-                        code2 = code_int & 0x00FF
-                        data[pos] = code1
-                        data[pos + 1] = code2
-                    else:
-                        assert 0, f"{character} is not in the 2-byte font table."
-                    pos += 2
-                idx_char += 1
+                        raise ValueError(f"Custom word '{part}' not found in custom_words for address {address}")
+                else:
+                    idx_char = 0
+                    while idx_char < len(part):
+                        character = part[idx_char]
+                        if character == "|":
+                            idx_char += 1
+                            if idx_char < len(part):
+                                character = part[idx_char]
+                                if font_table.get_code_ascii(character) is not None:
+                                    code_hex = font_table.get_code_ascii(character)
+                                    data[pos] = int(code_hex, 16)
+                                else:
+                                    assert 0, f"{code_hex_start}:{character} is not in the 1-byte font table."
+                                pos += 1
+                        elif character in ["@"]:
+                            pos += 2
+                        else:
+                            if font_table.get_code(character) is not None:
+                                code_hex = font_table.get_code(character)
+                                code_int = int(code_hex, 16)
+                                data[pos] = (code_int & 0xFF00) >> 8
+                                data[pos + 1] = code_int & 0x00FF
+                            else:
+                                assert 0, f"{character} is not in the 2-byte font table."
+                            pos += 2
+                        idx_char += 1
+                is_word = not is_word
 
         # Check if encoding is needed
         if self.encoding is not None:

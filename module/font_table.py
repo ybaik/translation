@@ -25,7 +25,7 @@ class FontTable:
         self.read_font_table(file_path)
 
         # Check if custom chars exist
-        if (custom_char_dir / "custom_char.json").exists():
+        if custom_char_dir is not None and (custom_char_dir / "custom_char.json").exists():
             with open(custom_char_dir / "custom_char.json", "r", encoding="utf-8") as f:
                 custom_chars = json.load(f)
             self.set_custom_char(custom_chars)
@@ -234,16 +234,46 @@ class FontTable:
         length_from_address = int(code_hex_end, 16) - int(code_hex_start, 16) + 1
         return length_from_address
 
-    def check_length_from_sentence(self, sentence: str) -> int:
+    def check_length_from_sentence(self, sentence: str, custom_words: Dict = None) -> int:
         # Check if the sentence is hex-only
         if "0x:" == sentence[:3]:
             sentence = sentence[3:].split("#")[0]  # Remove the hex-only code and the comment
             return len(sentence) // 2
 
-        num_one_byte = sentence.count("|")
-        num_two_byte = len(sentence) - num_one_byte * 2
-        length_from_sentence = num_one_byte + num_two_byte * 2
-        return length_from_sentence
+        total_length = 0
+        i = 0
+        while i < len(sentence):
+            if sentence[i] == "{":
+                end_idx = sentence.find("}", i)
+                if end_idx != -1:
+                    word = sentence[i + 1 : end_idx]
+                    if custom_words and word in custom_words:
+                        hex_value = custom_words[word]
+                        total_length += len(hex_value) // 2
+                        i = end_idx + 1
+                        continue
+                    else:
+                        raise ValueError(
+                            f"Custom word '{{{word}}}' not found in provided custom_words for length check."
+                        )
+
+            character = sentence[i]
+            if character == "|":
+                if i + 1 < len(sentence):
+                    total_length += 1  # The character after '|' is 1-byte
+                    i += 1  # Move past the 1-byte character
+                else:
+                    # Trailing '|' without a character, treat as an error or 0 length.
+                    # For now, let's just count 0 for the pipe itself, and next loop will handle past end.
+                    pass
+            elif character == "@":
+                total_length += 2
+            else:
+                # All other characters are assumed 2-byte
+                total_length += 2
+            i += 1
+
+        return total_length
 
     def check_length_from_table(self, sentence: str) -> int:
         length = 0
