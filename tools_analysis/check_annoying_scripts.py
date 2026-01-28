@@ -27,11 +27,17 @@ def main():
 
     print(f"Number of annoying scripts = {len(annoying)}")
 
-    src_font_table = FontTable("./font_table/font_table-jpn-full.json")
-    dst_font_table = FontTable("./font_table/font_table-kor-jin.json")
-
     # Read a pair of scripts
     for script_dir in script_dirs:
+        src_font_table = FontTable(Path("./font_table/font_table-jpn-full.json"), script_dir)
+        dst_font_table = FontTable(Path("./font_table/font_table-kor-jin.json"), script_dir)
+
+        custom_word_path = script_dir / "custom_word.json"
+        custom_words = {}
+        if custom_word_path.exists():
+            with open(custom_word_path, "r", encoding="utf-8") as f:
+                custom_words = json.load(f)
+
         for file in script_dir.rglob("*.json"):  # Use rglob to search subdirectories
             if "_jpn.json" not in file.name:
                 continue
@@ -59,10 +65,14 @@ def main():
                 if address not in dst:
                     continue
 
-                length_from_src_sentence = src_font_table.check_length_from_sentence(src_sentence)
+                length_from_src_sentence = src_font_table.check_length_from_sentence(
+                    sentence=src_sentence, custom_words=custom_words
+                )
                 # length_from_src_sentence = src_font_table.verify_sentence(src_sentence)
                 dst_sentence = dst[address]
-                length_from_dst_sentence = dst_font_table.check_length_from_sentence(dst_sentence)
+                length_from_dst_sentence = dst_font_table.check_length_from_sentence(
+                    sentence=dst_sentence, custom_words=custom_words
+                )
                 # length_from_dst_sentence = dst_font_table.verify_sentence(dst_sentence)
 
                 if length_from_src_sentence != length_from_dst_sentence:

@@ -79,25 +79,50 @@ def imread_korean(path):
     return img
 
 
+def crop_paste(img_src, img_dst, roi_src, roi_dst):
+    img_dst[roi_dst[0] : roi_dst[1], roi_dst[2] : roi_dst[3]] = img_src[
+        roi_src[0] : roi_src[1], roi_src[2] : roi_src[3]
+    ]
+    return img_dst
+
+
 def draw_letters_on_canvas(
-    font_canvas: np.ndarray, input_cands: List[str], img_path_dict: Dict, code_list: List[str], num_letters: int
+    font_canvas: np.ndarray,
+    input_cands: List[str],
+    img_path_dict: Dict,
+    code_list: List[str],
+    num_letters: int,
+    need_merge=False,
 ) -> Dict[str, str]:
     code_idx = 0
     ret_dict_code = dict()
 
     # Update font canvas
     for korean in input_cands:
-        if korean not in img_path_dict:
+        if not need_merge:
+            if korean not in img_path_dict:
+                code_idx += num_letters
+                continue
+            word_img = imread_korean(str(img_path_dict[korean]))
+            code_tag = ""
+            for i in range(num_letters):
+                code = code_list[code_idx + i]
+                roi = return_img_roi(code)
+                font_canvas[roi[0] : roi[1], roi[2] : roi[3]] = word_img[0:16, 16 * i : 16 * i + 16]
+                code_tag += code
+            ret_dict_code[korean] = code_tag
             code_idx += num_letters
-            continue
-        word_img = imread_korean(str(img_path_dict[korean]))
-        code_tag = ""
-        for i in range(num_letters):
-            code = code_list[code_idx + i]
+        else:  # Need to merge
+            word_img = np.full((16, 16), 255, dtype=np.uint8)
+
+            word_img[:, 0:8] = imread_korean(str(img_path_dict[korean[0]]))
+            if korean[1] != "|":
+                word_img[:, 8:] = imread_korean(str(img_path_dict[korean[1]]))
+
+            code = code_list[code_idx]
             roi = return_img_roi(code)
-            font_canvas[roi[0] : roi[1], roi[2] : roi[3]] = word_img[0:16, 16 * i : 16 * i + 16]
-            code_tag += code
-        ret_dict_code[korean] = code_tag
-        code_idx += num_letters
+            font_canvas[roi[0] : roi[1], roi[2] : roi[3]] = word_img
+            code_idx += 1
+            ret_dict_code[korean] = code
 
     return ret_dict_code
