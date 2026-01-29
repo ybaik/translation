@@ -16,13 +16,13 @@ def main():
     with open(script_path, "r", encoding="utf-8") as f:
         src_script = json.load(f)
 
-    dst_font_table = FontTable("./font_table/font_table-kor-jin.json")
+    dst_font_table = FontTable(file_path=Path("./font_table/font_table-kor-jin.json"), custom_char_dir=base_dir)
 
     # … ␀ ␁
     dialogue_array = {
-        "2B07E=2B095": "금을 얼마나 소지 할까요|␀",
-        "2B099=2B0B2": "병량을 얼마나 소지 할까요|␀",
-        "2B0B4=2B0C1": "이동할까요␀␀",
+        "48786=48791": "접견을 청해 ",
+        "48794=4879B": "찾아␀␀",
+        "4879E=487A7": "왔습니다|.|␀",
     }
     console = Console()
 

@@ -5,7 +5,6 @@ from rich.console import Console
 
 from module.script import Script
 from module.font_table import FontTable
-from module.check_script import diff_address
 
 
 skip_list = [
@@ -21,7 +20,7 @@ def main():
     platform = "dos"
     platform = "pc98"
 
-    ws_num = 4
+    ws_num = 3
 
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
     script_base_dir = base_dir / f"script-{platform}"
@@ -111,7 +110,7 @@ def main():
         data = src_script.apply_zero_padding(data)
 
         # Compare addresses in the source and destination scripts
-        count_diff = diff_address(src_script.script, dst_script.script)
+        count_diff = src_script.diff_addresses(dst_script.script)
         if count_diff:
             return
 

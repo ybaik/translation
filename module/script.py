@@ -1,4 +1,5 @@
 import re
+import copy
 import json
 from pathlib import Path
 from typing import Dict, Tuple
@@ -268,6 +269,37 @@ class Script:
                 count_false_characters += count_false_character
 
         return count_false_length, count_false_characters
+
+    def diff_addresses(self, dst_script: Dict) -> int:
+        """
+        Compare the address of two scripts
+
+        Parameters:
+            dst_script (Dict): The script to check.
+
+        Returns:
+            int: The number of differences between the two scripts.
+        """
+        reversed = False
+        if len(self.script.keys()) >= len(dst_script):
+            scripts_1 = self.script
+            scripts_2 = dst_script
+        else:
+            scripts_1 = dst_script
+            scripts_2 = self.script
+            reversed = True
+
+        count_diff = 0
+        for key, _ in scripts_1.items():
+            if scripts_2.get(key) is None:
+                if reversed:
+                    print(f"Diff = src address [], dst address [{key}]")
+                else:
+                    print(f"Diff = src address [{key}], dst address []")
+                count_diff += 1
+
+        print(f"Number of diff = {count_diff}")
+        return count_diff
 
     def validate_with_binary(self, font_table: FontTable, binary_data=None, binary_path: Path = None) -> bool:
         """Check the script with a binary data
@@ -712,30 +744,6 @@ class Script:
             length = 0
 
         return script_log
-
-    def singlebyte_to_space(self, start_address: int, end_address: int) -> None:
-        for address, sentence in self.script.items():
-            start, end = address.split("=")
-            start = int(start, 16)
-            end = int(end, 16)
-            if start < start_address or end > end_address:
-                continue
-            if "|" not in sentence:
-                continue
-
-            is_1byte = False
-            sentence_new = ""
-            for i in range(len(sentence)):
-                if sentence[i] == "|":
-                    sentence_new += "|"
-                    is_1byte = True
-                    continue
-                if is_1byte:
-                    sentence_new += "_"
-                    is_1byte = False
-                    continue
-                sentence_new += sentence[i]
-            self.script[address] = sentence_new
 
     def write_script(self, data: bytearray, font_table: FontTable, custom_words: Dict = None) -> Tuple[bytearray, int]:
         valid_sentence_count = 0
