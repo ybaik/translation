@@ -88,7 +88,7 @@ def crop_paste(img_src, img_dst, roi_src, roi_dst):
 
 def draw_letters_on_canvas(
     font_canvas: np.ndarray,
-    input_cands: List[str],
+    input_cands: List,
     img_path_dict: Dict,
     code_list: List[str],
     num_letters: int,
@@ -98,12 +98,12 @@ def draw_letters_on_canvas(
     ret_dict_code = dict()
 
     # Update font canvas
-    for korean in input_cands:
+    for korean, font_name in input_cands:
         if not need_merge:
-            if korean not in img_path_dict:
+            if korean not in img_path_dict[font_name]:
                 code_idx += num_letters
                 continue
-            word_img = imread_korean(str(img_path_dict[korean]))
+            word_img = imread_korean(str(img_path_dict[font_name][korean]))
             code_tag = ""
             for i in range(num_letters):
                 code = code_list[code_idx + i]
@@ -115,9 +115,9 @@ def draw_letters_on_canvas(
         else:  # Need to merge
             word_img = np.full((16, 16), 255, dtype=np.uint8)
 
-            word_img[:, 0:8] = imread_korean(str(img_path_dict[korean[0]]))
-            if korean[1] != "|":
-                word_img[:, 8:] = imread_korean(str(img_path_dict[korean[1]]))
+            word_img[:, 0:8] = imread_korean(str(img_path_dict[font_name][korean[0]]))
+            if korean[1] != "_":
+                word_img[:, 8:] = imread_korean(str(img_path_dict[font_name][korean[1]]))
 
             code = code_list[code_idx]
             roi = return_img_roi(code)

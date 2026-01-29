@@ -97,6 +97,10 @@ def main():
     src_font_canvas = cv2.imread(str(src_font_canvas_path), cv2.IMREAD_GRAYSCALE)
 
     letter_2byte = set()
+    # Add custom word
+    letter_2byte.add("여름")
+    letter_2byte.add("가을")
+    letter_2byte.add("겨울")
 
     # Name
     db = NameDB()
@@ -105,7 +109,7 @@ def main():
             assert 0, f"Game tag is not in the name database - {jpn}."
         if "kor" not in data:
             assert 0, f"Kor tag is not in the name database - {jpn}."
-        if "nb4" not in data["game"]:
+        if "nb3" not in data["game"]:
             continue
         kors = data["kor"]
         for kor in kors.split(" "):
@@ -114,32 +118,10 @@ def main():
                 print(1)
 
     # Region
-    with open(db_dir / "region_db.json", "r", encoding="utf-8") as f:
+    with open(db_dir / "nb3" / "region_db.json", "r", encoding="utf-8") as f:
         region_db = json.load(f)
         for v in region_db.values():
             space = split_and_pair(v, letter_2byte)
-            if space:
-                print(1)
-
-    # Mountain, etc.
-    with open(db_dir / "nb4" / "nb4_산천성.json", "r", encoding="utf-8") as f:
-        san_db = json.load(f)
-        for v in san_db.values():
-            text = v["kor"]
-            if text[-1] == "산":
-                text = text[:-1]
-            if text[-2:] == "산성":
-                text = text[:-2]
-            space = split_and_pair(text, letter_2byte)
-            if space:
-                print(1)
-
-    # 다기
-    with open(db_dir / "nb4" / "nb4_다기.json", "r", encoding="utf-8") as f:
-        san_db = json.load(f)
-        for k, v in san_db.items():
-            kor = v["kor"].replace(" ", "")
-            space = split_and_pair(kor, letter_2byte)
             if space:
                 print(1)
 
@@ -158,7 +140,7 @@ def main():
     ret_code_dict |= set_2byte(base_dir, letter_2byte, font_table, src_font_canvas)
 
     # Save font canvas image
-    dst_font_canvas_path = base_dir / "nobu4-BISCO.bmp"
+    dst_font_canvas_path = base_dir / "nobu3-BISCO.bmp"
     pil_img = Image.fromarray(src_font_canvas)
     one_bit_img = pil_img.convert("1")
     one_bit_img.save(dst_font_canvas_path)
