@@ -7,13 +7,14 @@ from module.decoding import decode
 
 
 def main():
-    workspace = "workspace5"
+    ws_num = 5
+    workspace = f"workspace{ws_num}"
     platform = "pc98"
-    bin_path = f"../{workspace}/jpn-{platform}"
-    font_table_path = "font_table/font_table-jpn-full.json"
+    bin_dir = Path(f"../{workspace}/jpn-{platform}")
+    font_table_path = Path("font_table/font_table-jpn-full.json")
     extended_word = "_jpn"
-    script_init_path = f"../{workspace}/script_init-{platform}"
-    script_base_path = f"../{workspace}/script-{platform}"
+    script_init_dir = Path(f"../{workspace}/script_init-{platform}")
+    script_dir = Path(f"../{workspace}/script-{platform}")
 
     # dos kor
     # bin_path = f"../{workspace}/kor-{platform}"
@@ -29,14 +30,20 @@ def main():
     decoding_base_path = f"../workspace0/jpn-decoded-{platform}"
     # =================================================================
 
-    files = os.listdir(bin_path)
+    files = os.listdir(bin_dir)
     # files = os.listdir(ref_dir)
 
-    for file in files:
-        src_data_path = f"{bin_path}/{file}"
-        dst_script_path = f"{script_init_path}/{file}{extended_word}.json"
+    for file in bin_dir.rglob("*.*"):
+        src_data_path = file
+        dst_script_path = script_init_dir / (str(file.relative_to(bin_dir)) + extended_word + ".json")
 
-        # if "SNDATA3" not in file:
+        if not dst_script_path.parent.exists():
+            dst_script_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # if "NOBU3" not in file.name:
+        #     continue
+
+        # if file.suffix not in [".COM", ".EXE"]:
         #     continue
 
         if not os.path.isfile(src_data_path):
@@ -44,7 +51,7 @@ def main():
 
         print(f"{file} ===========================================")
         # Read a font table
-        font_table = FontTable(font_table_path, script_base_path)
+        font_table = FontTable(font_table_path, script_dir)
 
         # Read a target binary data
         with open(src_data_path, "rb") as f:

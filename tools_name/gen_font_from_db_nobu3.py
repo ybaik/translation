@@ -12,7 +12,7 @@ def set_4byte(base_dir: Path, font_table: FontTable, src_font_canvas: np.ndarray
     start_code = "9540"  # 鼻
     input_cand_4byte = []
 
-    input_cand_4byte.append(["다이묘", "둥근모"])
+    input_cand_4byte.append(["다이묘", "비스코"])
     input_cand_4byte.append(["와-과", "비스코"])
     input_cand_4byte.append(["은-는", "비스코"])
     input_cand_4byte.append(["을-를", "비스코"])
@@ -101,6 +101,7 @@ def main():
     letter_2byte.add("여름")
     letter_2byte.add("가을")
     letter_2byte.add("겨울")
+    letter_2byte.add("아침")
 
     # Name
     db = NameDB()

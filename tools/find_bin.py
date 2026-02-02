@@ -1,4 +1,3 @@
-import os
 import sys
 from pathlib import Path
 
@@ -8,13 +7,13 @@ from module.decoding import decode
 
 
 def main():
-    base_path = Path("../workspace6/jpn-pc98")
+    base_path = Path("../workspace3/jpn-pc98")
 
     # font_table_path = "font_table/font_table-kor-jin.json"
-    font_table_path = "font_table/font_table-jpn-full.json"
+    font_table_path = Path("font_table/font_table-jpn-full.json")
     font_table = FontTable(font_table_path)
 
-    sentence_to_find = "北条"
+    sentence_to_find = "基昭"
     address_to_find_hex = font_table.get_codes(sentence_to_find)
 
     print(address_to_find_hex)

@@ -27,6 +27,7 @@ def main():
     src_bin_base_dir = base_dir / f"jpn-{platform}"
     dst_bin_base_dir = base_dir / f"kor-{platform}"
 
+    binary_input_dir = base_dir / f"binary_inputs-{platform}"
     src_font_table_path = Path("font_table/font_table-jpn-full.json")
     dst_font_table_path = Path("font_table/font_table-kor-jin.json")
 
@@ -134,7 +135,9 @@ def main():
             console.print(f"[green] json and data match.[/green] [green]{src_data_path}[/green]")
 
         # Write the destination script to the binary data in memory
-        data, valid_sentence_count = dst_script.write_script(data, dst_font_table, custom_words)
+        data, valid_sentence_count = dst_script.write_script(
+            data=data, font_table=dst_font_table, custom_words=custom_words, binary_input_dir=binary_input_dir
+        )
         if len(dst_script.script):
             valid_p = valid_sentence_count / len(dst_script.script) * 100
             msg = f"Valid sentence percentege (done/total): {valid_p:.2f}%"

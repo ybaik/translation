@@ -1,5 +1,4 @@
 import re
-import copy
 import json
 from pathlib import Path
 from typing import Dict, Tuple
@@ -133,6 +132,7 @@ class Script:
         self.zero_padding = None
         self.encoding = None
         self.custom_input = None
+        self.bianry_input = None
 
         # Read a script if the file path is specified
         if len(file_path):
@@ -152,6 +152,9 @@ class Script:
         # Get custom input
         if "custom_input" in self.script.keys():
             self.custom_input = self.script.pop("custom_input")
+
+        if "bianry_input" in self.script.keys():
+            self.bianry_input = self.script.pop("bianry_input")
 
     def apply_zero_padding(self, data: bytearray) -> bytearray:
         """Apply zero padding to the binary data
@@ -745,7 +748,9 @@ class Script:
 
         return script_log
 
-    def write_script(self, data: bytearray, font_table: FontTable, custom_words: Dict = None) -> Tuple[bytearray, int]:
+    def write_script(
+        self, data: bytearray, font_table: FontTable, custom_words: Dict = None, binary_input_dir: Path = None
+    ) -> Tuple[bytearray, int]:
         valid_sentence_count = 0
 
         # Check if decoding is needed
@@ -773,6 +778,31 @@ class Script:
                 for i in range(num_codes):
                     code_int = int(codes[i * 2 : i * 2 + 2], 16)
                     data[spos + i] = code_int
+
+        if self.bianry_input is not None and binary_input_dir is not None and binary_input_dir.exists():
+            for address, desc in self.bianry_input.items():
+                [code_hex_start, code_hex_end] = address.split("=")
+                spos = int(code_hex_start, 16)
+                epos = int(code_hex_end, 16)
+
+                # Need to isolate descriptions
+                file_name = desc.split("#")[0]
+
+                file_path = binary_input_dir / file_name
+                if not file_path.exists():
+                    print(f"{file_path.name} is not exists.")
+                    continue
+                with open(file_path, "rb") as f:
+                    binary_data = f.read()
+                binary_data = bytearray(binary_data)
+
+                # Check if the format is right
+                num_codes = epos - spos + 1
+                if len(binary_data) != num_codes:
+                    raise ValueError(
+                        f"The length of binary input is not matched. {address}:{len(binary_data)} != {num_codes}"
+                    )
+                data[spos : epos + 1] = binary_data
 
         # Write scripts
         for address, sentence in self.script.items():

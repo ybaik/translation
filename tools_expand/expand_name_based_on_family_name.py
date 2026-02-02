@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from module.script import Script
 from module.name_db import NameDB
@@ -22,7 +23,7 @@ def split_and_pair(text: str, pairs: list) -> bool:
 def main():
     # To add 1byte space to the family name for isolating the given name
     # Only apply to the limited address range
-    ws_num = 4
+    ws_num = 3
     game = f"nb{ws_num}"
 
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
@@ -38,6 +39,12 @@ def main():
         db[k.split(" ")[0]] = v["kor"].split(" ")[0]
         # given name
         db_gn[k.split(" ")[-1]] = v["kor"].split(" ")[-1]
+
+    # Region is included for NB3
+    if ws_num == 3:
+        with open("C:/work_han/translation/name_db/nb3/region_db.json", "r", encoding="utf-8") as f:
+            region_db = json.load(f)
+        db |= region_db
 
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         print(file.name)
@@ -81,13 +88,16 @@ def main():
 
             if game == "nb3":
                 if "MAIN.EXE" in file.name:
-                    if start < 0x24C6A or start > 0x26FED:
+                    # if start < 0x24C6A or start > 0x26FED:
+                    if start < 0x24656 or start > 0x26FED:
                         continue
                 if "SNDATA1.CIM" in file.name:
-                    if start < 0xD38:
+                    # if start < 0xD38:
+                    if start < 0x724:
                         continue
                 if "SNDATA2.CIM" in file.name:
-                    if start < 0xD38:
+                    # if start < 0xD38:
+                    if start < 0x724:
                         continue
             elif game == "nb4":
                 if "MAIN.EXE" in file.name:
