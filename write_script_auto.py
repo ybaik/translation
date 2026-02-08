@@ -9,10 +9,14 @@ from module.font_table import FontTable
 
 skip_list = [
     # "END.EXE",
-    # "MAIN.EXE",
+    # "KOEI.COM",
     # "OPEN.EXE",
-    # "RPDATA.CIM",
-    # "SDATA.CIM",
+    # "SNDATA1.CIM",
+    # "SNDATA1T.CIM",
+    # "SNDATA2.CIM",
+    # "SNDATA2T.CIM",
+    # "SNDATA3.CIM",
+    # "SNDATA3T.CIM",
 ]
 
 
@@ -20,7 +24,7 @@ def main():
     platform = "dos"
     platform = "pc98"
 
-    ws_num = 3
+    ws_num = 1
 
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
     script_base_dir = base_dir / f"script-{platform}"
@@ -60,12 +64,8 @@ def main():
         # if "OPEN.EXE" not in file.name:
         #     continue
 
-        do_skip = False
-        for skip in skip_list:
-            if skip in file.name:
-                do_skip = True
-                break
-        if do_skip:
+        org_fn = file.name.replace("_kor.json", "")
+        if org_fn in skip_list:
             continue
 
         # Check paths
@@ -157,7 +157,8 @@ def main():
             f.write(data)
 
     if f"workspace{ws_num}\\" in str(script_base_dir):
-        cmd = f"xcopy /E /I /Y ..\\workspace{ws_num}\\kor-{platform}\\. ..\\workspace{ws_num}\\kor-pc98-dosbox-x\\"
+        emul = "dosbox-x" if platform == "pc98" else "dosbox"
+        cmd = f"xcopy /E /I /Y ..\\workspace{ws_num}\\kor-{platform}\\. ..\\workspace{ws_num}\\kor-{platform}-{emul}\\"
         os.system(cmd)
 
     if total_count:

@@ -27,7 +27,7 @@ def main():
     check_ascii_restriction = False  # If True, the first ASCII code needs to be x20
 
     decoding_info = "xor:0x96"
-    decoding_base_path = f"../workspace0/jpn-decoded-{platform}"
+    decoding_base_path = f"../{workspace}/jpn-{platform}-decoded"
     # =================================================================
 
     files = os.listdir(bin_dir)
@@ -40,7 +40,7 @@ def main():
         if not dst_script_path.parent.exists():
             dst_script_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # if "NOBU3" not in file.name:
+        # if "MAIN.EXE" not in file.name:
         #     continue
 
         # if file.suffix not in [".COM", ".EXE"]:
@@ -60,9 +60,10 @@ def main():
 
         # Decoding
         # data = decode(data, decoding_info)
-        # decoding_path = f"{decoding_base_path}/{file}"
+        # decoding_path = f"{decoding_base_path}/{file.name}"
         # with open(decoding_path, "wb") as f:
         #     f.write(data)
+        # continue
 
         print(f"Data size: {src_data_path}({len(data):,} bytes)")
 

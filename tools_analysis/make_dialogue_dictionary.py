@@ -6,7 +6,7 @@ from module.font_table import FontTable
 
 def main():
     console = Console()
-    ws_num = 4
+    ws_num = 5
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
     script_dirs = [
         # base_dir / "script-dos",
@@ -18,6 +18,9 @@ def main():
     # Read an existing dictionary
     dictionary_path = base_dir / "dictionary.json"
     annoying_path = base_dir / "annoying.json"
+
+    # Check num of key
+    num_sentences = 0
 
     # Read a pair of scripts
     for script_dir in script_dirs:
@@ -52,7 +55,10 @@ def main():
                 file_path=Path("./font_table/font_table-kor-jin.json"), custom_char_dir=script_dir
             )
 
-            # check address
+            # Check sentences
+            num_sentences += len(src.items())
+
+            # Check address
             for address, src_sentence in src.items():
                 if "=" not in address:
                     continue
@@ -102,6 +108,9 @@ def main():
                 if dst_sentence not in dictionary[src_sentence]["translated"]:
                     dictionary[src_sentence]["count"] += 1
                     dictionary[src_sentence]["translated"].append(dst_sentence)
+
+    print("Number of sentences = ", num_sentences)
+    print("Number of sentence keys = ", len(dictionary.keys()))
 
     # Save a dictionary
     with open(dictionary_path, "w", encoding="utf-8") as f:
