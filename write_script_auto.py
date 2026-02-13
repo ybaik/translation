@@ -1,8 +1,9 @@
 import os
 import json
 from pathlib import Path
+from rich import box
+from rich.table import Table
 from rich.console import Console
-
 from module.script import Script
 from module.font_table import FontTable
 
@@ -17,6 +18,21 @@ skip_list = [
     # "SNDATA2T.CIM",
     # "SNDATA3.CIM",
     # "SNDATA3T.CIM",
+    # "CLOSE.EXE",
+    # "OPEN.EXE",
+    # "SNRDATA.DAT",
+    # "SNRDATA.EPI",
+    # "STAGE01S.DAT",
+    # "STAGE02S.DAT",
+    # "STAGE03S.DAT",
+    # "STAGE04S.DAT",
+    # "STAGE05S.DAT",
+    # "STAGE06S.DAT",
+    # "STAGE07S.DAT",
+    # "STAGE08S.DAT",
+    # "STAGE09S.DAT",
+    # "STAGE10S.DAT",
+    # "STAGE11S.DAT",
 ]
 
 
@@ -24,7 +40,7 @@ def main():
     platform = "dos"
     platform = "pc98"
 
-    ws_num = 1
+    ws_num = 5
 
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
     script_base_dir = base_dir / f"script-{platform}"
@@ -38,6 +54,11 @@ def main():
     # ===================================================================
     # For debugging printsE
     console = Console()
+    table = Table(box=box.SIMPLE_HEAD)
+    table.add_column("파일", justify="left")
+    table.add_column("진행률", justify="right")
+    table.add_column("비고", justify="right")
+
     total_valid = 0
     total_count = 0
     total_valid_file = 0
@@ -140,14 +161,17 @@ def main():
         )
         if len(dst_script.script):
             valid_p = valid_sentence_count / len(dst_script.script) * 100
-            msg = f"Valid sentence percentege (done/total): {valid_p:.2f}%"
-            msg += f" ({valid_sentence_count}/{len(dst_script.script)})"
-            console.print(msg)
-
             total_valid += valid_sentence_count
             total_count += len(dst_script.script)
             total_count_file += 1
-
+            precision = 1 if valid_p >= 100 else 2
+            style = None if precision == 1 else "#00e5ff"
+            table.add_row(
+                file.name.replace("_kor.json", ""),
+                f"{valid_p:.{precision}f} %",
+                f"{valid_sentence_count}/{len(dst_script.script)}",
+                style=style,
+            )
             completed_list.append((src_data_path, valid_p))
             if valid_p == 100:
                 total_valid_file += 1
@@ -164,7 +188,8 @@ def main():
     if total_count:
         # Print remaining sentences among not completed files
         percentage = total_valid / total_count * 100
-        console.print(f"Total valid sentences: {total_valid}/{total_count} ({percentage:.2f}))%")
+        precision = 1 if percentage >= 100 else 2
+        table.add_row("Total", f"{percentage:.{precision}f} %", f"{total_valid}/{total_count}", style="bold yellow")
 
         # Print the status of total files
         total_valid_file += len(skip_list)
@@ -173,10 +198,9 @@ def main():
         console.print(f"Total files: {total_valid_file}/{total_count_file} ({percentage:.2f}))%")
 
         for i, (file, percent) in enumerate(completed_list):
-            if percent == 100:
-                console.print(f"[green]{i + 1}[/green] {file.name}, {percent:.2f}")
-            else:
-                console.print(f"[yellow]{i + 1}[/yellow] {file.name}, {percent:.2f}")
+            color = "green" if percent == 100 else "yellow"
+            console.print(f"[{color}]{i + 1}[/{color}] {file.name}, {percent:.2f}")
+    console.print(table)
 
 
 if __name__ == "__main__":

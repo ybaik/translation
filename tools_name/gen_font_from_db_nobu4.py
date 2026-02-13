@@ -143,6 +143,19 @@ def main():
             if space:
                 print(1)
 
+    # 추가
+    letter_2byte.add("리큐")
+    letter_2byte.add("츠다")
+    letter_2byte.add("소큐")
+    letter_2byte.add("소닌")
+    letter_2byte.add("유칸")
+    letter_2byte.add("카노")
+    letter_2byte.add("에이")
+    letter_2byte.add("유쇼")
+    letter_2byte.add("산라")
+    letter_2byte.add("키쿠")
+    letter_2byte.add("테이")
+
     letter_2byte = list(letter_2byte)
     letter_2byte.sort()
     print(len(letter_2byte))

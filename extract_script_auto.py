@@ -26,7 +26,8 @@ def main():
     check_ascii = True
     check_ascii_restriction = False  # If True, the first ASCII code needs to be x20
 
-    decoding_info = "xor:0x96"
+    decoding_enable = False
+    decoding_info = "xor:0x83"
     decoding_base_path = f"../{workspace}/jpn-{platform}-decoded"
     # =================================================================
 
@@ -40,8 +41,8 @@ def main():
         if not dst_script_path.parent.exists():
             dst_script_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # if "MAIN.EXE" not in file.name:
-        #     continue
+        if "MAIN" not in file.name:
+            continue
 
         # if file.suffix not in [".COM", ".EXE"]:
         #     continue
@@ -51,7 +52,8 @@ def main():
 
         print(f"{file} ===========================================")
         # Read a font table
-        font_table = FontTable(font_table_path, script_dir)
+        # font_table = FontTable(font_table_path, script_dir)
+        font_table = FontTable(font_table_path)
 
         # Read a target binary data
         with open(src_data_path, "rb") as f:
@@ -59,11 +61,12 @@ def main():
         data = bytearray(data)
 
         # Decoding
-        # data = decode(data, decoding_info)
-        # decoding_path = f"{decoding_base_path}/{file.name}"
-        # with open(decoding_path, "wb") as f:
-        #     f.write(data)
-        # continue
+        if decoding_enable:
+            data = decode(data, decoding_info)
+            decoding_path = f"{decoding_base_path}/{file.name}"
+            with open(decoding_path, "wb") as f:
+                f.write(data)
+            continue
 
         print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
