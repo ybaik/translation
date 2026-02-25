@@ -1,3 +1,4 @@
+import re
 import sys
 from pathlib import Path
 
@@ -8,82 +9,44 @@ from module.decoding import decode
 
 def main():
     ws_num = 5
-    base_path = Path(f"../workspace{ws_num}/jpn-pc98")
+    base_path = Path(f"../workspace{ws_num}/jpn-pc98-decoded")
 
-    check_xor = True
+    check_xor = False
 
     # font_table_path = "font_table/font_table-kor-jin.json"
     font_table_path = Path("font_table/font_table-jpn-full.json")
     font_table = FontTable(font_table_path)
 
-    sentence_to_find = "出現"
+    sentence_to_find = "水色"
     address_to_find_hex = font_table.get_codes(sentence_to_find)
-
     print(address_to_find_hex)
-    code_string_hex = ""
-    for code_hex in address_to_find_hex:
-        code_hex = code_hex.replace("0x", "")
-        code_string_hex += code_hex
-
-    # code_string_hex = "CAB5B3"
-    size_byte = len(code_string_hex) // 2
-    code_array_int = []
-    for i in range(size_byte):
-        code_int = int(code_string_hex[i * 2 : i * 2 + 2], 16)
-        code_array_int.append(code_int)
+    target_bytes = bytearray.fromhex("".join(address_to_find_hex))
 
     for file in base_path.rglob("*.*"):  # Use rglob to search subdirectories
         if not file.is_file():
             continue
         print(file.name)
-        # if "MAIN" not in file:
-        #     continue
-
-        if "M" not in file.name:
+        if "MESS03" not in file.name:
             continue
+
+        with open(file, "rb") as f:
+            raw_data = f.read()
 
         if check_xor:
             for dc in range(0, 0xFF):
                 decoding_info = f"xor:0x{dc:02X}"
                 # Read a json script
                 # print(file)
-                with open(file, "rb") as f:
-                    data = f.read()
-                data = decode(data, decoding_info)
+                data = decode(raw_data, decoding_info)
+                position = data.find(target_bytes)
 
-                i = 0
-                count = 0
-                while i < len(data) - 1 - size_byte:
-                    found = True
-                    for j in range(size_byte):
-                        # Extract a 2byte code
-                        code_int = data[i + j]
-
-                        if code_array_int[j] != code_int:
-                            found = False
-                            break
-                    if found:
-                        count += 1
-                        print(f"found a candidate file: {i:X} - {file}:{count}, xor:{dc:02X}")
-                    i += 1
+                if position != -1:
+                    print(f"found a candidate file: {position:X} - {file}, xor:{dc:02X}")
         else:
-            with open(file, "rb") as f:
-                data = f.read()
-            i = 0
-            count = 0
-            while i < len(data) - 1 - size_byte:
-                found = True
-                for j in range(size_byte):
-                    # Extract a 2byte code
-                    code_int = data[i + j]
-
-                    if code_array_int[j] != code_int:
-                        found = False
-                        break
-                if found:
-                    count += 1
-                    print(f"found a candidate file: {i:X} - {file}:{count}")
-                i += 1
+            matches = re.finditer(re.escape(target_bytes), raw_data)
+            positions = [match.start() for match in matches]
+            for position in positions:
+                print(f"found a candidate file: 0x{position:X} - {file}")
 
 
 if __name__ == "__main__":
