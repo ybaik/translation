@@ -85,7 +85,8 @@ def main():
             code_len = len(code) // 4
 
             if len(sentence) == code_len:
-                kor_script.script[address] = f"0x:{code}# {kor}"
+                # kor_script.script[address] = f"0x:{code}# {kor}"
+                kor_script.script[address] = f"{{{kor}}}"
                 continue
 
             if len(sentence) > code_len:
@@ -105,7 +106,8 @@ def main():
 
                 end += diff * 2
                 jpn_sentence = sentence + "␀" * diff
-                kor_sentence = f"0x:{code}# {kor}"
+                # kor_sentence = f"0x:{code}# {kor}"
+                kor_sentence = f"{{{kor}}}"
                 mod_list_jpn.append([address, f"{start:05X}={end:05X}", jpn_sentence])
                 mod_list_kor.append([address, f"{start:05X}={end:05X}", kor_sentence])
 

@@ -9,50 +9,33 @@ from module.font_table import FontTable
 
 
 skip_list = [
-    # "END.EXE",
-    # "KOEI.COM",
-    # "OPEN.EXE",
-    # "SNDATA1.CIM",
-    # "SNDATA1T.CIM",
-    # "SNDATA2.CIM",
-    # "SNDATA2T.CIM",
-    # "SNDATA3.CIM",
-    # "SNDATA3T.CIM",
-    # "CLOSE.EXE",
-    # "OPEN.EXE",
-    # "SNRDATA.DAT",
-    # "SNRDATA.EPI",
-    # "STAGE01S.DAT",
-    # "STAGE02S.DAT",
-    # "STAGE03S.DAT",
-    # "STAGE04S.DAT",
-    # "STAGE05S.DAT",
-    # "STAGE06S.DAT",
-    # "STAGE07S.DAT",
-    # "STAGE08S.DAT",
-    # "STAGE09S.DAT",
-    # "STAGE10S.DAT",
-    # "STAGE11S.DAT",
+    "MESS09.DAT",
+    "MESS10.DAT",
+    "MESS11.DAT",
+    "MESS12.DAT",
 ]
 
 
 def main():
     platform = "dos"
     platform = "pc98"
-
     ws_num = 5
+    tag = ""
+    # tag = "-steam"
+
+    global skip_list
 
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
-    script_base_dir = base_dir / f"script-{platform}"
-    src_bin_base_dir = base_dir / f"jpn-{platform}"
-    dst_bin_base_dir = base_dir / f"kor-{platform}"
+    script_base_dir = base_dir / f"script-{platform}{tag}"
+    src_bin_base_dir = base_dir / f"jpn-{platform}{tag}"
+    dst_bin_base_dir = base_dir / f"kor-{platform}{tag}"
 
     binary_input_dir = base_dir / f"binary_inputs-{platform}"
     src_font_table_path = Path("font_table/font_table-jpn-full.json")
     dst_font_table_path = Path("font_table/font_table-kor-jin.json")
 
     # ===================================================================
-    # For debugging printsE
+    # For debugging prints
     console = Console()
     table = Table(box=box.SIMPLE_HEAD)
     table.add_column("파일", justify="left")
@@ -66,10 +49,10 @@ def main():
 
     completed_list = []
 
-    # if (base_dir / "complete_list.txt").exists():
-    #     with open(base_dir / "complete_list.txt", "r") as f:
-    #         skip_list = f.read().splitlines()
-
+    if (base_dir / "complete_list.txt").exists():
+        with open(base_dir / "complete_list.txt", "r") as f:
+            skip_list += f.read().splitlines()
+            skip_list = list(set(skip_list))
     custom_word_path = script_base_dir / "custom_word.json"
     custom_words = {}
     if custom_word_path.exists():
@@ -80,7 +63,7 @@ def main():
         if "_kor.json" not in file.name:
             continue
 
-        # if "MAIN.EXE" not in file.name:
+        # if "MESS03" not in file.name:
         #     continue
         # if "OPEN.EXE" not in file.name:
         #     continue
