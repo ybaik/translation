@@ -10,27 +10,37 @@ from module.decoding import decode
 def main():
     ws_num = 5
     base_path = Path(f"../workspace{ws_num}/jpn-pc98-decoded")
+    # base_path = Path(f"../workspace{ws_num}/kor-pc98-dosbox-x")
+    # base_path = Path(f"../workspace{ws_num}/save")
 
     check_xor = False
 
-    # font_table_path = "font_table/font_table-kor-jin.json"
+    font_table_path = Path("font_table/font_table-kor-jin.json")
     font_table_path = Path("font_table/font_table-jpn-full.json")
     font_table = FontTable(font_table_path)
 
-    sentence_to_find = "水色"
+    sentence_to_find = "명계"
     address_to_find_hex = font_table.get_codes(sentence_to_find)
-    print(address_to_find_hex)
     target_bytes = bytearray.fromhex("".join(address_to_find_hex))
+    print(address_to_find_hex)
+
+    sentence_to_replace = ""
+    found_to_replace = False
+    if len(sentence_to_replace) and not check_xor:
+        address_to_replace_hex = font_table.get_codes(sentence_to_replace)
+        replace_bytes = bytearray.fromhex("".join(address_to_replace_hex))
 
     for file in base_path.rglob("*.*"):  # Use rglob to search subdirectories
         if not file.is_file():
             continue
         print(file.name)
-        if "MESS03" not in file.name:
+        # if "MESS11" not in file.name:
+        #     continue
+        if ".SV" not in file.name:
             continue
 
         with open(file, "rb") as f:
-            raw_data = f.read()
+            raw_data = bytearray(f.read())
 
         if check_xor:
             for dc in range(0, 0xFF):
@@ -47,6 +57,14 @@ def main():
             positions = [match.start() for match in matches]
             for position in positions:
                 print(f"found a candidate file: 0x{position:X} - {file}")
+
+                if len(sentence_to_replace):
+                    found_to_replace = True
+                    raw_data[position : position + len(replace_bytes)] = replace_bytes
+
+        if found_to_replace:
+            with open(file, "wb") as f:
+                f.write(raw_data)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,10 @@
+import os
 import sys
 
 sys.path.append("./")
 from pathlib import Path
 from module.font_table import FontTable
+from module.sound import hiragana_pronunciation
 
 import unicodedata
 
@@ -45,12 +47,24 @@ def jisx0201_to_unicode(
 
 
 def main():
+    os.system("clear")
     font_table_kor = FontTable(Path("font_table/font_table-kor-jin.json"))
     font_table_jpn = FontTable(Path("font_table/font_table-jpn-full.json"))
 
     # Get a code or codes from a letter or letters
-    script = "무"  # 籠城
+    script = ""
+    sound = "타요우다."
     codes_hex = font_table_kor.get_codes(script)
+
+    jpn = ""
+    if len(sound):
+        for letter in sound:
+            ch = hiragana_pronunciation.get(letter)
+            if ch is None:
+                print(letter)
+            else:
+                jpn += ch
+        print(jpn)
 
     # 반각 체크
     # halfwidth = "|ﾌ|ﾞ|ﾘ|ﾀ|ｲ|".replace("|", "")
@@ -77,7 +91,7 @@ def main():
     print(hex_str_rev)
 
     jpn_script = font_table_jpn.get_chars(codes_hex)
-    print(jpn_script)
+    print(jpn_script + jpn)
 
 
 if __name__ == "__main__":
