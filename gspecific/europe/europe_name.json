@@ -1,0 +1,497 @@
+{
+    "Abrams": {
+        "role": "America",
+        "jpn_org": "|ｴ|ｲ|ﾌ|ﾞ|ﾗ|ﾑ|ｽ",
+        "jpn": "エイブラムス"
+    },
+    "Alexander": {
+        "role": "Britain",
+        "jpn_org": "|ｱ|ﾚ|ｸ|ｻ|ﾝ|ﾀ|ﾞ|ｰ",
+        "jpn": "アレクサンダー"
+    },
+    "Arnim": {
+        "role": "Germany",
+        "jpn_org": "|ｱ|ﾙ|ﾆ|ﾑ",
+        "jpn": "アルニム"
+    },
+    "Auchinleck": {
+        "role": "Britain",
+        "jpn_org": "|ｵ|ｰ|ｷ|ﾝ|ﾚ|ｯ|ｸ",
+        "jpn": "オーキンレック"
+    },
+    "Banaux": {
+        "role": "France",
+        "jpn_org": "|ﾌ|ﾞ|ｰ|ﾆ|ｭ",
+        "jpn": "ブーニュ"
+    },
+    "Bauxdey": {
+        "role": "France",
+        "jpn_org": "|ﾎ|ﾞ|ｰ|ﾃ|ﾞ",
+        "jpn": "ボーデ"
+    },
+    "Bayerlein": {
+        "role": "Germany",
+        "jpn_org": "|ﾊ|ﾞ|ｲ|ｴ|ﾙ|ﾗ|ｲ|ﾝ",
+        "jpn": "バイエルライン"
+    },
+    "Bismarck": {
+        "role": "Germany",
+        "jpn_org": "|ﾋ|ﾞ|ｽ|ﾏ|ﾙ|ｸ",
+        "jpn": "ビスマルク"
+    },
+    "Bradley": {
+        "role": "America",
+        "jpn_org": "|ﾌ|ﾞ|ﾗ|ｯ|ﾄ|ﾞ|ﾚ|ｰ",
+        "jpn": "ブラッドレー"
+    },
+    "Brogado": {
+        "role": "France",
+        "jpn_org": "|ﾌ|ﾞ|ﾛ|ｶ|ｰ|ﾄ|ﾞ",
+        "jpn": "ブロカード"
+    },
+    "Bruno": {
+        "role": "France",
+        "jpn_org": "|ﾌ|ﾞ|ﾙ|ﾉ|ｰ",
+        "jpn": "ブルノー"
+    },
+    "Bunobichi": {
+        "role": "France",
+        "jpn_org": "|ﾌ|ﾞ|ﾇ|ﾋ|ﾞ|ｯ|ﾁ",
+        "jpn": "ブヌビッチ"
+    },
+    "Busch": {
+        "role": "Germany",
+        "jpn_org": "|ﾌ|ﾞ|ｯ|ｼ|ｭ",
+        "jpn": "ブッシュ"
+    },
+    "Cambell": {
+        "role": "Britain",
+        "jpn_org": "|ｷ|ｬ|ﾑ|ﾍ|ﾞ|ﾙ",
+        "jpn": "キャムベル"
+    },
+    "Chuicov": {
+        "role": "Russia",
+        "jpn_org": "|ﾁ|ｭ|ｲ|ｺ|ﾌ",
+        "jpn": "チュイコフ"
+    },
+    "Clay": {
+        "role": "Britain",
+        "jpn_org": "|ｸ|ﾚ|ｰ",
+        "jpn": "クレー"
+    },
+    "Collins": {
+        "role": "America",
+        "jpn_org": "|ｺ|ﾘ|ﾝ|ｽ|ﾞ",
+        "jpn": "コリンズ"
+    },
+    "Corap": {
+        "role": "France",
+        "jpn_org": "|ｺ|ﾗ|ｰ|ﾌ|ﾟ",
+        "jpn": "コラープ"
+    },
+    "Cota": {
+        "role": "America",
+        "jpn_org": "|ｺ|ｰ|ﾀ",
+        "jpn": "コータ"
+    },
+    "Cunningham": {
+        "role": "Britain",
+        "jpn_org": "|ｶ|ﾆ|ﾝ|ｶ|ﾞ|ﾑ",
+        "jpn": "カニンガム"
+    },
+    "De Gaulle": {
+        "role": "France",
+        "jpn_org": "|ﾄ|ﾞ|ｺ|ﾞ|ｰ|ﾙ",
+        "jpn": "ドゴール"
+    },
+    "Degar": {
+        "role": "America",
+        "jpn_org": "|ﾃ|ﾞ|ｨ|ｶ|ﾞ|ｰ",
+        "jpn": "ディガー"
+    },
+    "Dempsey": {
+        "role": "Britain",
+        "jpn_org": "|ﾃ|ﾞ|ﾝ|ﾌ|ﾟ|ｼ|ｰ",
+        "jpn": "デンプシー"
+    },
+    "Dietrich": {
+        "role": "Germany",
+        "jpn_org": "|ﾃ|ﾞ|ｨ|ｰ|ﾄ|ﾘ|ｯ|ﾋ",
+        "jpn": "ディートリッヒ"
+    },
+    "Eisenhower": {
+        "role": "Miscellaneous",
+        "jpn_org": "|ｱ|ｲ|ｾ|ﾞ|ﾝ|ﾊ|ﾜ|ｰ",
+        "jpn": "アイゼンハワー"
+    },
+    "Freybague": {
+        "role": "Britain",
+        "jpn_org": "|ﾌ|ﾚ|ｲ|ﾊ|ﾞ|ｰ|ｸ|ﾞ",
+        "jpn": "フレイバーグ"
+    },
+    "Fuller": {
+        "role": "America",
+        "jpn_org": "|ﾌ|ﾗ|ｰ",
+        "jpn": "フラー"
+    },
+    "Galanin": {
+        "role": "Russia",
+        "jpn_org": "|ｶ|ﾞ|ﾗ|ﾆ|ﾝ",
+        "jpn": "ガラニン"
+    },
+    "Gale": {
+        "role": "Britain",
+        "jpn_org": "|ｹ|ﾞ|ｲ|ﾙ",
+        "jpn": "ゲイル"
+    },
+    "Gavin": {
+        "role": "America",
+        "jpn_org": "|ｷ|ﾞ|ｬ|ﾋ|ﾞ|ﾝ",
+        "jpn": "ギャビン"
+    },
+    "Gilgres": {
+        "role": "America",
+        "jpn_org": "|ｷ|ﾞ|ﾙ|ﾌ|ﾞ|ﾚ|ｽ",
+        "jpn": "ギルブレス"
+    },
+    "Giraud": {
+        "role": "America",
+        "jpn_org": "|ｼ|ﾞ|ﾛ|ｰ",
+        "jpn": "ジロー"
+    },
+    "Gort": {
+        "role": "Britain",
+        "jpn_org": "|ｺ|ﾞ|ｯ|ﾄ|ｰ",
+        "jpn": "ゴットー"
+    },
+    "Guderian": {
+        "role": "Germany",
+        "jpn_org": "|ｸ|ﾞ|ｰ|ﾃ|ﾞ|ﾘ|ｱ|ﾝ",
+        "jpn": "グーデリアン"
+    },
+    "Halder": {
+        "role": "Miscellaneous",
+        "jpn_org": "|ﾊ|ﾙ|ﾀ|ﾞ|ｰ",
+        "jpn": "ハルダー"
+    },
+    "Harding": {
+        "role": "Britain",
+        "jpn_org": "|ﾊ|ｰ|ﾃ|ﾞ|ｨ|ﾝ|ｸ|ﾞ",
+        "jpn": "ハーディング"
+    },
+    "Haus": {
+        "role": "Germany",
+        "jpn_org": "|ﾎ|ｽ",
+        "jpn": "ホス"
+    },
+    "Hausser": {
+        "role": "Germany",
+        "jpn_org": "|ﾊ|ｳ|ｻ|ｰ",
+        "jpn": "ハウサー"
+    },
+    "Heilmann": {
+        "role": "Germany",
+        "jpn_org": "|ﾊ|ｲ|ﾙ|ﾏ|ﾝ",
+        "jpn": "ハイルマン"
+    },
+    "Heinrici": {
+        "role": "Germany",
+        "jpn_org": "|ﾊ|ｲ|ﾝ|ﾘ|ｷ",
+        "jpn": "ハインリキ"
+    },
+    "Heydte": {
+        "role": "Germany",
+        "jpn_org": "|ﾊ|ｲ|ﾃ",
+        "jpn": "ハイテ"
+    },
+    "Hitler": {
+        "role": "Miscellaneous",
+        "jpn_org": "|ﾋ|ﾄ|ﾗ|ｰ",
+        "jpn": "ヒトラー"
+    },
+    "Hoth": {
+        "role": "Germany",
+        "jpn_org": "|ﾎ|ﾄ",
+        "jpn": "ホト"
+    },
+    "Howie": {
+        "role": "America",
+        "jpn_org": "|ﾊ|ｳ|ｲ",
+        "jpn": "ハウイ"
+    },
+    "Katucov": {
+        "role": "Russia",
+        "jpn_org": "|ｶ|ﾄ|ｩ|ｺ|ﾌ",
+        "jpn": "カトゥコフ"
+    },
+    "Kempf": {
+        "role": "Germany",
+        "jpn_org": "|ｹ|ﾝ|ﾌ|ﾟ|ﾌ",
+        "jpn": "ケンプフ"
+    },
+    "Kesselring": {
+        "role": "Germany",
+        "jpn_org": "|ｹ|ｯ|ｾ|ﾙ|ﾘ|ﾝ|ｸ",
+        "jpn": "ケッセルリンク"
+    },
+    "Klavel": {
+        "role": "Germany",
+        "jpn_org": "|ｸ|ﾙ|ｰ|ｳ|ｪ|ﾙ",
+        "jpn": "クルーウェル"
+    },
+    "Kleist": {
+        "role": "Germany",
+        "jpn_org": "|ｸ|ﾗ|ｲ|ｽ|ﾄ",
+        "jpn": "クライスト"
+    },
+    "Kluge": {
+        "role": "Germany",
+        "jpn_org": "|ｸ|ﾙ|ｰ|ｹ|ﾞ",
+        "jpn": "クルーゲ"
+    },
+    "Kokott": {
+        "role": "Germany",
+        "jpn_org": "|ｺ|ｺ|ｯ|ﾄ",
+        "jpn": "ココット"
+    },
+    "Konev": {
+        "role": "Russia",
+        "jpn_org": "|ｺ|ｰ|ﾈ|ﾌ",
+        "jpn": "コーネフ"
+    },
+    "Kuechler": {
+        "role": "Germany",
+        "jpn_org": "|ｸ|ﾗ|ｲ|ｽ|ﾄ",
+        "jpn": "クライスト"
+    },
+    "La Fontaine": {
+        "role": "France",
+        "jpn_org": "|ﾗ|ﾌ|ｫ|ﾝ|ﾃ|ｰ|ﾇ",
+        "jpn": "ラフォンテーヌ"
+    },
+    "Lamke": {
+        "role": "Germany",
+        "jpn_org": "|ﾗ|ﾑ|ｹ",
+        "jpn": "ラムケ"
+    },
+    "Lehr": {
+        "role": "Germany",
+        "jpn_org": "|ﾏ|ｲ|ﾔ|ｰ",
+        "jpn": "マイヤー"
+    },
+    "List": {
+        "role": "Germany",
+        "jpn_org": "|ﾘ|ｽ|ﾄ",
+        "jpn": "リスト"
+    },
+    "Manstein": {
+        "role": "Germany",
+        "jpn_org": "|ﾏ|ﾝ|ｼ|ｭ|ﾀ|ｲ|ﾝ",
+        "jpn": "マンシュタイン"
+    },
+    "Manteuffel": {
+        "role": "Germany",
+        "jpn_org": "|ﾏ|ﾝ|ﾄ|ｲ|ﾌ|ｪ|ﾙ",
+        "jpn": "マントイフェル"
+    },
+    "Marcus": {
+        "role": "Germany",
+        "jpn_org": "|ﾏ|ﾙ|ｸ|ｽ",
+        "jpn": "マルクス"
+    },
+    "McAuliffe": {
+        "role": "America",
+        "jpn_org": "|ﾏ|ｯ|ｺ|ｰ|ﾘ|ﾌ",
+        "jpn": "マッコーリフ"
+    },
+    "Middleton": {
+        "role": "America",
+        "jpn_org": "|ﾐ|ﾄ|ﾞ|ﾙ|ﾄ|ﾝ",
+        "jpn": "ミドルトン"
+    },
+    "Monet": {
+        "role": "France",
+        "jpn_org": "|ﾓ|ﾈ",
+        "jpn": "モネ"
+    },
+    "Montgomery": {
+        "role": "Britain",
+        "jpn_org": "|ﾓ|ﾝ|ﾄ|ｺ|ﾞ|ﾒ|ﾘ|ｰ",
+        "jpn": "モントゴメリー"
+    },
+    "Morris": {
+        "role": "America",
+        "jpn_org": "|ﾓ|ﾘ|ｽ",
+        "jpn": "モリス"
+    },
+    "Nehring": {
+        "role": "Germany",
+        "jpn_org": "|ﾈ|ｰ|ﾘ|ﾝ|ｸ|ﾞ",
+        "jpn": "ネーリング"
+    },
+    "O'Connor": {
+        "role": "Britain",
+        "jpn_org": "|ｵ|ｺ|ﾅ|ｰ",
+        "jpn": "オコナー"
+    },
+    "Ottoway": {
+        "role": "America",
+        "jpn_org": "|ｵ|ﾄ|ｳ|ｪ|ｲ",
+        "jpn": "オトウェイ"
+    },
+    "Patton": {
+        "role": "America",
+        "jpn_org": "|ﾊ|ﾟ|ｯ|ﾄ|ﾝ",
+        "jpn": "パットン"
+    },
+    "Peiper": {
+        "role": "Germany",
+        "jpn_org": "|ﾊ|ﾟ|ｲ|ﾊ|ﾟ|ｰ",
+        "jpn": "パイパー"
+    },
+    "Pias": {
+        "role": "Britain",
+        "jpn_org": "|ﾋ|ﾟ|ｱ|ｰ|ｽ",
+        "jpn": "ピアース"
+    },
+    "Popov": {
+        "role": "Russia",
+        "jpn_org": "|ﾌ|ﾟ|ﾎ|ﾌ",
+        "jpn": "プホフ"
+    },
+    "Ravenstein": {
+        "role": "Germany",
+        "jpn_org": "|ﾗ|ﾌ|ｪ|ﾝ|ｼ|ｭ|ﾀ|ｲ",
+        "jpn": "ラフェンシュタイ"
+    },
+    "Reichenau": {
+        "role": "Germany",
+        "jpn_org": "|ﾗ|ｲ|ﾍ|ﾅ|ｳ",
+        "jpn": "ライヘナウ"
+    },
+    "Reitel": {
+        "role": "Russia",
+        "jpn_org": "|ﾚ|ｲ|ﾃ|ﾙ",
+        "jpn": "レイテル"
+    },
+    "Roberts": {
+        "role": "America",
+        "jpn_org": "|ﾛ|ﾊ|ﾞ|ｰ|ﾂ",
+        "jpn": "ロバーツ"
+    },
+    "Rokossovsky": {
+        "role": "Russia",
+        "jpn_org": "|ﾛ|ｺ|ｿ|ﾌ|ｽ|ｷ|ｰ",
+        "jpn": "ロコソフスキー"
+    },
+    "Romanenko": {
+        "role": "Russia",
+        "jpn_org": "|ﾛ|ﾏ|ﾈ|ﾝ|ｺ",
+        "jpn": "ロマネンコ"
+    },
+    "Rommel": {
+        "role": "Germany",
+        "jpn_org": "|ﾛ|ﾝ|ﾒ|ﾙ",
+        "jpn": "ロンメル"
+    },
+    "Rotmistrov": {
+        "role": "Russia",
+        "jpn_org": "|ﾛ|ﾄ|ﾐ|ｽ|ﾄ|ﾛ|ﾌ",
+        "jpn": "ロトミストロフ"
+    },
+    "Rundstedt": {
+        "role": "Germany",
+        "jpn_org": "|ﾙ|ﾝ|ﾄ|ｼ|ｭ|ﾃ|ｯ|ﾄ",
+        "jpn": "ルントシュテット"
+    },
+    "Sanders": {
+        "role": "America",
+        "jpn_org": "|ｻ|ﾝ|ﾀ|ﾞ|ｰ|ｽ",
+        "jpn": "サンダース"
+    },
+    "Schwepenberg": {
+        "role": "Germany",
+        "jpn_org": "|ｼ|ｭ|ｳ|ﾞ|ｪ|ﾍ|ﾟ|ﾝ",
+        "jpn": "シュヴェペン"
+    },
+    "Silkow": {
+        "role": "Germany",
+        "jpn_org": "|ｼ|ﾙ|ｺ|ｳ",
+        "jpn": "シルコウ"
+    },
+    "Skorzeny": {
+        "role": "Germany",
+        "jpn_org": "|ｽ|ｺ|ﾙ|ﾂ|ｪ|ﾆ|ｰ",
+        "jpn": "スコルツェニー"
+    },
+    "Skripkin": {
+        "role": "Russia",
+        "jpn_org": "|ｽ|ｸ|ﾘ|ﾌ|ﾟ|ｷ|ﾝ",
+        "jpn": "スクリプキン"
+    },
+    "Smith": {
+        "role": "Miscellaneous",
+        "jpn_org": "|ｽ|ﾐ|ｽ",
+        "jpn": "スミス"
+    },
+    "Stalin": {
+        "role": "Miscellaneous",
+        "jpn_org": "|ｽ|ﾀ|ｰ|ﾘ|ﾝ",
+        "jpn": "スターリン"
+    },
+    "Stumme": {
+        "role": "Germany",
+        "jpn_org": "|ｼ|ｭ|ﾄ|ﾑ|ﾒ",
+        "jpn": "シュトムメ"
+    },
+    "Tacchini": {
+        "role": "Germany",
+        "jpn_org": "|ﾀ|ｯ|ｷ|ｰ|ﾆ",
+        "jpn": "タッキーニ"
+    },
+    "Tassigny": {
+        "role": "France",
+        "jpn_org": "|ﾀ|ｯ|ｼ|ｰ|ﾆ",
+        "jpn": "タッシーニ"
+    },
+    "Taylor": {
+        "role": "America",
+        "jpn_org": "|ﾃ|ｲ|ﾗ|ｰ",
+        "jpn": "テイラー"
+    },
+    "Thoma": {
+        "role": "Germany",
+        "jpn_org": "|ﾄ|ｰ|ﾏ",
+        "jpn": "トーマ"
+    },
+    "Tokopf": {
+        "role": "Germany",
+        "jpn_org": "|ﾃ|ｲ|ﾌ|ｰ",
+        "jpn": "テイフー"
+    },
+    "Vasilevsky": {
+        "role": "Miscellaneous",
+        "jpn_org": "|ﾜ|ｼ|ﾚ|ﾌ|ｽ|ｷ|ｰ",
+        "jpn": "ワシレフスキー"
+    },
+    "Vatutin": {
+        "role": "Russia",
+        "jpn_org": "|ﾊ|ﾞ|ﾂ|ｰ|ﾁ|ﾝ",
+        "jpn": "バツーチン"
+    },
+    "Wavell": {
+        "role": "Britain",
+        "jpn_org": "|ｳ|ｪ|ｰ|ｳ|ﾞ|ｪ|ﾙ",
+        "jpn": "ウェーヴェル"
+    },
+    "Wenck": {
+        "role": "Germany",
+        "jpn_org": "|ｳ|ｪ|ﾝ|ｸ",
+        "jpn": "ウェンク"
+    },
+    "Zhucov": {
+        "role": "Russia",
+        "jpn_org": "|ｼ|ﾞ|ｭ|ｰ|ｺ|ﾌ",
+        "jpn": "ジューコフ"
+    }
+}

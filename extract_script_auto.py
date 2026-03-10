@@ -7,14 +7,13 @@ from module.decoding import decode
 
 
 def main():
-    ws_num = 5
+    ws_num = 3
     workspace = f"workspace{ws_num}"
     platform = "pc98"
     bin_dir = Path(f"../{workspace}/jpn-{platform}")
     font_table_path = Path("font_table/font_table-jpn-full.json")
     extended_word = "_jpn"
     script_init_dir = Path(f"../{workspace}/script_init-{platform}")
-    script_dir = Path(f"../{workspace}/script-{platform}")
 
     # dos kor
     # bin_path = f"../{workspace}/kor-{platform}"
@@ -31,18 +30,15 @@ def main():
     decoding_base_path = f"../{workspace}/jpn-{platform}-decoded"
     # =================================================================
 
-    files = os.listdir(bin_dir)
-    # files = os.listdir(ref_dir)
-
-    for file in bin_dir.rglob("*.*"):
+    for file in bin_dir.rglob("*"):
         src_data_path = file
         dst_script_path = script_init_dir / (str(file.relative_to(bin_dir)) + extended_word + ".json")
 
         if not dst_script_path.parent.exists():
             dst_script_path.parent.mkdir(parents=True, exist_ok=True)
 
-        if "MAIN" not in file.name:
-            continue
+        # if "SCEDATA" not in file.name:
+        #     continue
 
         # if file.suffix not in [".COM", ".EXE"]:
         #     continue
@@ -52,7 +48,6 @@ def main():
 
         print(f"{file} ===========================================")
         # Read a font table
-        # font_table = FontTable(font_table_path, script_dir)
         font_table = FontTable(font_table_path)
 
         # Read a target binary data

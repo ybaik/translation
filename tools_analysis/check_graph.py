@@ -15,8 +15,9 @@ def main():
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
     script_base_dir = base_dir / f"script-{platform}"
 
-    inputs = ["43970=43975"]
-    is_kor = True
+    inputs = ["4445A=44468"]
+    print_jpn = True
+    print_kor = True
 
     # Read a graph info
     graph_path = script_base_dir / "MAIN.EXE_con.json"
@@ -28,7 +29,6 @@ def main():
     # Read a pair of scripts
     src_script = Script(str(script_base_dir / "MAIN.EXE_jpn.json"))
     dst_script = Script(str(script_base_dir / "MAIN.EXE_kor.json"))
-    script = dst_script if is_kor else src_script
 
     for graph in graph_db:
         include = True
@@ -39,17 +39,28 @@ def main():
         if not include:
             continue
 
-        text = ""
+        text_kor = ""
+        text_jpn = ""
         for address in graph:
             if "=" not in address:
-                sentence = address
+                sentence_jpn = address
+                sentence_kor = address
             else:
-                sentence = script.script[address]
+                sentence_jpn = src_script.script[address]
+                sentence_kor = dst_script.script[address]
+
             if address in inputs:
                 idx = inputs.index(address) % 4
-                sentence = f"[{colors[idx]}]{sentence}[/{colors[idx]}]"
-            text += sentence
-        console.print(text)
+                sentence_jpn = f"[{colors[idx]}]{sentence_jpn}[/{colors[idx]}]"
+                sentence_kor = f"[{colors[idx]}]{sentence_kor}[/{colors[idx]}]"
+            text_jpn += sentence_jpn
+            text_kor += sentence_kor
+
+        if print_jpn:
+            console.print(text_jpn)
+        if print_kor:
+            console.print(text_kor)
+        print(" ")
 
     graph_db.sort()
     with open(graph_path, "w", encoding="utf-8") as f:
