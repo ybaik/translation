@@ -39,13 +39,15 @@ def set_4byte(base_dir: Path, font_table: FontTable, src_font_canvas: np.ndarray
     code_idx = code_list.index(start_code)
     code_list = code_list[code_idx:]
 
-    return draw_letters_on_canvas(
+    ret_dict_code, code_idx = draw_letters_on_canvas(
         font_canvas=src_font_canvas,
         input_cands=input_cand_4byte,
         img_path_dict=img_db_4byte,
         code_list=code_list,
         num_letters=2,
     )
+
+    return ret_dict_code
 
 
 def set_2byte(base_dir: Path, input_cand_2byte: list, font_table: FontTable, src_font_canvas: np.ndarray):
@@ -63,7 +65,7 @@ def set_2byte(base_dir: Path, input_cand_2byte: list, font_table: FontTable, src
     code_idx = code_list.index(start_code)
     code_list = code_list[code_idx:]
 
-    return draw_letters_on_canvas(
+    ret_dict_code, code_idx = draw_letters_on_canvas(
         font_canvas=src_font_canvas,
         input_cands=input_cand_2byte,
         img_path_dict=img_db_1byte,
@@ -71,6 +73,8 @@ def set_2byte(base_dir: Path, input_cand_2byte: list, font_table: FontTable, src
         num_letters=1,
         need_merge=True,
     )
+
+    return ret_dict_code
 
 
 def split_and_pair(text: str, pairs: set) -> None:

@@ -62,14 +62,25 @@ def return_img_roi_1byte(code_hex: str, debug=False) -> Tuple[int, int, int, int
     if code > 0xFF or code < 0:
         raise ValueError(f"{code_hex} is not a supported range.")
 
-    col = code
-    row = 0
+    # col = code
+    # row = 0
+
+    # # Set a patch ROI
+    # if debug:
+    #     print(row, col)
+    # ypos = row * 16
+    # xpos = col * 8
+
+    col = 20
+    row = code - 128  # 32
 
     # Set a patch ROI
     if debug:
         print(row, col)
+
     ypos = row * 16
     xpos = col * 8
+
     return [ypos, ypos + 16, xpos, xpos + 8]
 
 
@@ -125,4 +136,4 @@ def draw_letters_on_canvas(
             code_idx += 1
             ret_dict_code[korean] = code
 
-    return ret_dict_code
+    return ret_dict_code, code_idx

@@ -47,8 +47,12 @@ def main():
 
         # given name
         db[k.split(" ")[-1]] = v["kor"].split(" ")[-1]
+
         # family name
-        db[k.split(" ")[0]] = v["kor"].split(" ")[0]
+        if k.split(" ")[0] == "北条":
+            db[k.split(" ")[0]] = "호조"
+        else:
+            db[k.split(" ")[0]] = v["kor"].split(" ")[0]
 
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         print(file.name)

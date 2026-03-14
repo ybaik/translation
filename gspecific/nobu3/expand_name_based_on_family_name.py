@@ -35,10 +35,15 @@ def main():
     for k, v in name_db.full_name_db.items():
         if game not in v["game"]:
             continue
-        # family name
-        db[k.split(" ")[0]] = v["kor"].split(" ")[0]
+
         # given name
         db_gn[k.split(" ")[-1]] = v["kor"].split(" ")[-1]
+
+        # family name
+        if k.split(" ")[0] == "北条":
+            db[k.split(" ")[0]] = "호조"
+        else:
+            db[k.split(" ")[0]] = v["kor"].split(" ")[0]
 
     # Region is included for NB3
     if ws_num == 3:
@@ -81,11 +86,7 @@ def main():
             start = int(start, 16)
             end = int(end, 16)
 
-            # if address == "400FF=40102":
-            #     print(address)
-
             # Check address limit for the specific file
-
             if game == "nb3":
                 if "MAIN.EXE" in file.name:
                     # if start < 0x24C6A or start > 0x26FED:
