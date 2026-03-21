@@ -853,7 +853,7 @@ class Script:
                     code = font_table.get_code_ascii(character)
                     if character in ["･", "¥"]:  # 1byte Japanese character
                         pass
-                    elif int(code, 16) > 0x7E and int(code, 16) < 0xF0:  # 1byte Japanese character
+                    elif int(code, 16) > 0xA3 and int(code, 16) < 0xF0:  # 1byte Japanese character
                         skip_sentence = True
                         break
                     check_1byte = False

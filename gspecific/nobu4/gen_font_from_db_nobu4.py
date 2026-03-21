@@ -8,6 +8,50 @@ from module.font_table import FontTable
 from module.font_image import draw_letters_on_canvas
 
 
+def set_font(
+    base_dir: Path,
+    font_table: FontTable,
+    src_font_canvas: np.ndarray,
+    start_code: str,
+    num_letters: int,
+    input_cands: list,
+):
+    # Read image information
+    img_db = dict()
+
+    num_bytes = num_letters * 2
+
+    for korean, font_name in input_cands:
+        if font_name in img_db:
+            continue
+        img_db[font_name] = dict()
+        font_dir = f"byte{num_bytes}" if font_name == "default" else f"byte{num_bytes}{font_name}"
+        for letter_path in (base_dir / font_dir).rglob("*.bmp"):
+            img_db[font_name][letter_path.stem] = letter_path
+
+    # Check if the image file exists
+    for korean, font_name in input_cands:
+        if korean not in img_db[font_name]:
+            print(f"{korean} - no font")
+
+    # Get filtered list
+    code_list = list(font_table.code2char.keys())
+    code_idx = code_list.index(start_code)
+    code_list = code_list[code_idx:]
+
+    ret_dict_code, next_code_idx = draw_letters_on_canvas(
+        font_canvas=src_font_canvas,
+        input_cands=input_cands,
+        img_path_dict=img_db,
+        code_list=code_list,
+        num_letters=num_letters,
+    )
+
+    next_code = code_list[next_code_idx]
+
+    return ret_dict_code, next_code
+
+
 def set_4byte(base_dir: Path, font_table: FontTable, src_font_canvas: np.ndarray):
     start_code = "9540"  # 鼻
     input_cand_4byte = []
@@ -50,7 +94,7 @@ def set_4byte(base_dir: Path, font_table: FontTable, src_font_canvas: np.ndarray
     return ret_dict_code
 
 
-def set_2byte(base_dir: Path, input_cand_2byte: list, font_table: FontTable, src_font_canvas: np.ndarray):
+def set_2byte_merge(base_dir: Path, input_cand_2byte: list, font_table: FontTable, src_font_canvas: np.ndarray):
     start_code = "959F"  # 福
 
     # Read 4byte image information
@@ -166,13 +210,29 @@ def main():
     # print(letter_2byte)
 
     ret_code_dict = {}
+    start_code = "9540"  # 鼻
+    input_cand = []
+    input_cand.append(["는", "비스코"])
+    input_cand.append(["가", "비스코"])
+    input_cand.append(["를", "비스코"])
+    input_cand.append(["와", "비스코"])
+    input_cand.append(["의", "비스코"])
+    code_dict, next_code = set_font(base_dir, font_table, src_font_canvas, start_code, 1, input_cand)
+    ret_code_dict |= code_dict
 
     # set 4byte letters
-    ret_code_dict |= set_4byte(base_dir, font_table, src_font_canvas)
+    input_cand = []
+    input_cand.append(["다이묘", "비스코"])
+    input_cand.append(["와-과", "비스코"])
+    input_cand.append(["은-는", "비스코"])
+    input_cand.append(["을-를", "비스코"])
+    input_cand.append(["이-가", "비스코"])
+    code_dict, next_code = set_font(base_dir, font_table, src_font_canvas, next_code, 2, input_cand)
+    ret_code_dict |= code_dict
 
-    # Set 2byte letters
+    # Set merged 2byte letters
     letter_2byte = [[s, "default"] for s in letter_2byte]  # Change format
-    ret_code_dict |= set_2byte(base_dir, letter_2byte, font_table, src_font_canvas)
+    ret_code_dict |= set_2byte_merge(base_dir, letter_2byte, font_table, src_font_canvas)
 
     # Save font canvas image
     dst_font_canvas_path = base_dir / "nobu4-BISCO.bmp"

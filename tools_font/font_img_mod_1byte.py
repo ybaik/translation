@@ -26,7 +26,10 @@ def main():
         return
     else:
         font_dir = Path("C:/work_han/font_update_db/byte1")
-        target_list = ["로", "베", "에", "요", "유", "이", "조", "쥰", "츠", "켄", "히"]
+        target_list = ["니", "로", "베", "에", "요", "유", "이", "조", "쥰", "츠", "켄", "혼", "히"]
+        target_list.sort()
+        print(target_list)
+
         start_code_int = 0xB1
 
         for i, letter in enumerate(target_list):
