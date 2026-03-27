@@ -818,6 +818,10 @@ class Script:
             # # Debugging
             # if spos < 0x30D4E:
             #     continue
+            # if address == "40250=40254":
+            #     print(1)
+            # if "佐" in sentence:
+            #     print(1)
 
             # Check if the sentence is hex-only
             if "0x:" == sentence[:3]:
@@ -839,8 +843,14 @@ class Script:
             # Check if there is a unsupported letter in the sentence
             skip_sentence = False
             check_1byte = False
+            check_brace = False
             for character in sentence:
-                if character in ["{", "}"]:
+                if check_brace:
+                    if character == "}":
+                        check_brace = False
+                    continue
+                if character == "{":
+                    check_brace = True
                     continue
                 if character == "|":
                     check_1byte = True
@@ -914,7 +924,7 @@ class Script:
                                 data[pos] = (code_int & 0xFF00) >> 8
                                 data[pos + 1] = code_int & 0x00FF
                             else:
-                                assert 0, f"{character} is not in the 2-byte font table."
+                                assert 0, f"{character} is not in the 2-byte font table. - {address}:{sentence}"
                             pos += 2
                         idx_char += 1
                 is_word = not is_word

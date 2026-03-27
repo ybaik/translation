@@ -12,6 +12,9 @@ def main():
     query = {"game": ["nb5"]}
     print(f"{name_db.check_number(query)} - 노부나가의 야망 5")
     print(f"{name_db.check_number(query, unique=True)} - 노부나가의 야망 5 - unique")
+    query = {"game": ["taiko1"]}
+    print(f"{name_db.check_number(query)} - 태합입지전 1")
+    print(f"{name_db.check_number(query, unique=True)} - 태합입지전 1 - unique")
     query = {"game": ["taiko2"]}
     print(f"{name_db.check_number(query)} - 태합입지전 2")
     print(f"{name_db.check_number(query, unique=True)} - 태합입지전 2 - unique")

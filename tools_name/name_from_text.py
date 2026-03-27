@@ -55,8 +55,8 @@ def main_half():
 
 def main_full():
     name_db = NameDB()
-    game = "nb5"
-    ws_num = 5
+    game = "taiko1"
+    ws_num = 1
     base_dir = f"c:/work_han/workspace{ws_num}/ss.txt"
     with open(base_dir, "r", encoding="utf-8") as f:
         lines = f.readlines()
@@ -67,6 +67,9 @@ def main_full():
         jpn, kor = line.split("-")
         full_name_jpn = jpn.strip()
         full_name_kor = kor.strip()
+
+        if "?" in full_name_kor:
+            continue
 
         family_name_jpn, given_name_jpn = full_name_jpn.split(" ")
         family_name_kor, given_name_kor = full_name_kor.split(" ")

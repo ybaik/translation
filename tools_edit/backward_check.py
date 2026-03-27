@@ -14,7 +14,12 @@ def is_sjis_lead_byte(byte_val: int) -> bool:
 
 
 def backward_check(
-    data: bytearray, start_address: int, end_address: int, font_table: FontTable, search_str: str = None
+    data: bytearray,
+    start_address: int,
+    end_address: int,
+    font_table: FontTable,
+    search_str: str = None,
+    consider_1byte: bool = True,
 ):
     """
     Finds the true start of a sentence within a data range and returns the full sentence
@@ -23,7 +28,7 @@ def backward_check(
     """
 
     # Helper for forward decoding the final byte range
-    def _decode_forward(sub_data: bytearray) -> str:
+    def _decode_forward(sub_data: bytearray, consider_1byte: bool) -> str:
         sentence = ""
         i = 0
         while i < len(sub_data):
@@ -37,19 +42,20 @@ def backward_check(
                     continue
 
             # 1-byte char check
-            code_int = sub_data[i]
-            char = font_table.get_char_ascii(f"{code_int:02X}")
-            if char:
-                sentence += "|" + char
-            elif 0x20 <= code_int <= 0x7E:
-                # Fallback for simple ASCII not in the font table
-                try:
-                    sentence += chr(code_int)
-                except:
-                    sentence += "?"
-            else:
-                sentence += "?"  # Placeholder for other unmapped bytes
-            i += 1
+            if consider_1byte:
+                code_int = sub_data[i]
+                char = font_table.get_char_ascii(f"{code_int:02X}")
+                if char:
+                    sentence += "|" + char
+                elif 0x20 <= code_int <= 0x7E:
+                    # Fallback for simple ASCII not in the font table
+                    try:
+                        sentence += chr(code_int)
+                    except:
+                        sentence += "?"
+                else:
+                    sentence += "?"  # Placeholder for other unmapped bytes
+                i += 1
         return sentence
 
     # --- Step 1: Determine where the backward scan should start from ---
@@ -85,12 +91,13 @@ def backward_check(
                 temp_pos -= 2
                 is_char_found = True
 
-        if not is_char_found:
-            # Try to parse a 1-byte character at temp_pos
-            code_int = data[temp_pos]
-            if font_table.get_char_ascii(f"{code_int:02X}") or (0x20 <= code_int <= 0x7E):
-                temp_pos -= 1
-                is_char_found = True
+        if consider_1byte:
+            if not is_char_found:
+                # Try to parse a 1-byte character at temp_pos
+                code_int = data[temp_pos]
+                if font_table.get_char_ascii(f"{code_int:02X}") or (0x20 <= code_int <= 0x7E):
+                    temp_pos -= 1
+                    is_char_found = True
 
         if not is_char_found:
             # Hit a boundary (not a valid char), so the sentence started at temp_pos + 1
@@ -103,19 +110,22 @@ def backward_check(
 
     # --- Step 3: Decode the final sentence and return ---
     final_sentence_data = data[final_start_address : end_address + 1]
-    final_sentence = _decode_forward(final_sentence_data)
+    final_sentence = _decode_forward(final_sentence_data, consider_1byte)
 
     return final_start_address, end_address, final_sentence
 
 
 def main():
-    ws_num = 5
+    ws_num = 2
     platform = "pc98"
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
     script_dir = base_dir / f"script-{platform}"
-    bin_dir = base_dir / f"jpn-{platform}-decoded"
+    bin_dir = base_dir / f"jpn-{platform}"
 
-    script_path = script_dir / "MESS11.DAT_jpn.json"
+    script_path = script_dir / "MAIN.EXE_jpn.json"
+    # script_path = script_dir / "TBS.DAT_jpn.json"
+    script_path = script_dir / "BSDATA2.TR2_jpn.json"
+
     bin_path = bin_dir / script_path.name.replace("_jpn.json", "")
     if not bin_path.exists():
         print(f"No bin file found!: {bin_path}")
@@ -126,35 +136,36 @@ def main():
 
     console = Console()
     font_table = FontTable(file_path=Path("./font_table/font_table-jpn-full.json"), custom_char_dir=script_dir)
+    consider_1byte = False
     overwrite = False
     # overwrite = True
-    source_array = {
-        "00529=0053D": "ャ气ダンテよ、|W|5|N|C|1|9|1",
-        "01FDB=02018": "ャャャャャャャャャャャャャャ|<ヮр|ﾌ役目は終わったようだ。|H|Z|C|1|9|2",
-        "0201A=0204C": "ャャャャャャャ|Cモ|ｱこまで本当によく頑張った。|W|5|N|C|1|9|3",
-        "0204E=02088": "ャャャャャィヮ|cるはあの炎に包まれた門、魂の門だけだ。|W|5|C|1|9|4",
-        "0208A=020A7": "|Aロ|sくがよい、ダンテよ。|H|Z|C|1|9|5",
-        "020A9=020E8": "ャャャャャャャャャ|@ヰ|ｹなる炎の洗礼を受けずにこの先へ進むこと|C|1|9|6",
-        "020EA=02104": "ャ|Gモ|ﾍ不可能なのだ。|W|5|N|C|1|9|7",
-        "02106=02144": "ャャャャャャャャャャャェモ|ｩりそめの炎を恐れてはならない。|H|Z|C|1|9|8",
-        "02146=0217B": "ャャャャ|Eワ|i女ベアトリーチェがあの魂の門の向こうで|C|1|9|9",
-        "0217D=021A4": "ャ|Dレ|Nが来るのを待っているはずだ。|H|Z|C|2|0|0",
-        "021A6=021D5": "ャャャャャ|Kモ|ｳあ、ダンテよ。|W|5_勇気を出すのだ。",
-    }
+
+    source_array = {}
 
     dialogue_array = {
-        "0052D=0053D": "ャ气ダンテよ、|W|5|N|C|1|9|1",
-        "01FDB=02018": "ャャャャャャャャャャャャャャ|<ヮр|ﾌ役目は終わったようだ。|H|Z|C|1|9|2",
-        "0201A=0204C": "ャャャャャャャ|Cモ|ｱこまで本当によく頑張った。|W|5|N|C|1|9|3",
-        "0204E=02088": "ャャャャャィヮ|cるはあの炎に包まれた門、魂の門だけだ。|W|5|C|1|9|4",
-        "0208A=020A7": "|Aロ|sくがよい、ダンテよ。|H|Z|C|1|9|5",
-        "020A9=020E8": "ャャャャャャャャャ|@ヰ|ｹなる炎の洗礼を受けずにこの先へ進むこと|C|1|9|6",
-        "020EA=02104": "ャ|Gモ|ﾍ不可能なのだ。|W|5|N|C|1|9|7",
-        "02106=02144": "ャャャャャャャャャャャェモ|ｩりそめの炎を恐れてはならない。|H|Z|C|1|9|8",
-        "02146=0217B": "ャャャャ|Eワ|i女ベアトリーチェがあの魂の門の向こうで|C|1|9|9",
-        "0217D=021A4": "ャ|Dレ|Nが来るのを待っているはずだ。|H|Z|C|2|0|0",
-        "021A6=021D5": "ャャャャャ|Kモ|ｳあ、ダンテよ。|W|5_勇気を出すのだ。",
+        # "0003A=0003E": "|@柴田",
+        # "000B0=000B4": "|P金森",
+        # "000EB=000EF": "|P滝川",
+        # "00126=0012A": "|@下方",
+        # "00161=00167": "|@蜂須賀",
+        # "0019C=001A0": "|P生駒",
+        # "001D5=001DB": "|/|␁|@前野",
+        # "00212=00216": "|P村井",
+        # "0024C=00251": "|␁|@平手",
+        # "00288=0028E": "|P佐久間",
+        # "002C3=002C7": "|P拝郷",
+        # "002FC=00302": "|/|␁|P織田",
+        # "00339=0033D": "|p蜂屋",
+        # "00374=00378": "|`丹羽",
+        # "003AF=003B3": "|@木下",
     }
+
+    script = Script(str(script_path))
+    for address, sentence in script.script.items():
+        if "0x:" in sentence:
+            continue
+        source_array[address] = sentence
+        dialogue_array[address] = sentence
 
     # Check address
     result_dict = dict()
@@ -182,7 +193,7 @@ def main():
         if search_str is None:
             print(src_sentence)
 
-        s, e, sentence_new = backward_check(bin, start_address, end_address, font_table, search_str)
+        s, e, sentence_new = backward_check(bin, start_address, end_address, font_table, search_str, consider_1byte)
         result_dict[f"{s:05X}={e:05X}"] = sentence_new
 
     # Final print
