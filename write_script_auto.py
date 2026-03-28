@@ -8,20 +8,15 @@ from module.script import Script
 from module.font_table import FontTable
 
 
-skip_list = [
-    "MESS09.DAT",
-    "MESS10.DAT",
-    "MESS11.DAT",
-    "MESS12.DAT",
-]
+skip_list = []
 
 
 def main():
     platform = "dos"
-    platform = "pc98"
-    ws_num = 5
+    # platform = "pc98"
+    ws_num = 2
     tag = ""
-    # tag = "-steam"
+    # tag = "-bdrive"
 
     global skip_list
 
@@ -49,10 +44,11 @@ def main():
 
     completed_list = []
 
-    if (base_dir / "complete_list.txt").exists():
-        with open(base_dir / "complete_list.txt", "r") as f:
-            skip_list += f.read().splitlines()
-            skip_list = list(set(skip_list))
+    # if (base_dir / "complete_list.txt").exists():
+    #     with open(base_dir / "complete_list.txt", "r") as f:
+    #         skip_list += f.read().splitlines()
+    #         skip_list = list(set(skip_list))
+
     custom_word_path = script_base_dir / "custom_word.json"
     custom_words = {}
     if custom_word_path.exists():
@@ -63,7 +59,7 @@ def main():
         if "_kor.json" not in file.name:
             continue
 
-        # if "MESS03" not in file.name:
+        # if "MAIN.EXE" not in file.name:
         #     continue
         # if "OPEN.EXE" not in file.name:
         #     continue
@@ -132,7 +128,7 @@ def main():
         # console.print(f"[yellow] End:{src_data_path}[/yellow]")
 
         # Check source script with binary data
-        is_diff = src_script.validate_with_binary(font_table=src_font_table, binary_data=data)
+        is_diff = src_script.validate_with_binary(font_table=src_font_table, binary_path=src_data_path)
         if is_diff:
             console.print(f"[yellow] json and data doesn't match.[/yellow] [green]{src_data_path}[/green]")
         else:

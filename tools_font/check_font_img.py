@@ -11,16 +11,16 @@ def crop_paste(img_src, img_dst, roi_src, roi_dst):
 
 
 def main():
-    font_bmp_path = "c:/work_han/workspace4/inindo-font-kor.bmp"
+    font_bmp_path = "c:/work_han/ThinDungGeunMo.bmp"
     img_src = cv2.imread(font_bmp_path, 0)
 
-    val = 0x9571
+    val = 0x889F
     code = ""
     for i in range(4):
         code += f"{val:X}"
         val += 1
 
-    code = "97C397C4"
+    code = "889F"
     code = code.replace("0x:", "")
     code = code.split("#")[0]
 
@@ -42,7 +42,7 @@ def main():
     nw = w * 8
     resized = cv2.resize(canvas, dsize=(nw, nh), interpolation=cv2.INTER_AREA)
     cv2.imshow("patch", resized)
-    cv2.waitKey(1000)
+    cv2.waitKey()
     cv2.imwrite("debug.jpg", resized)
 
 

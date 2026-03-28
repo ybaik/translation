@@ -24,11 +24,12 @@ def align_length(jpn: str, kor: str, jpn_len: int, kor_len: int):
 def main():
     console = Console()
     name_db = NameDB()
-    game = "taiko1"
-    ws_num = 1
-    base_dir = f"c:/work_han/workspace{ws_num}/script-pc98"
+    game = "taiko2"
+    ws_num = 2
+    base_dir = f"c:/work_han/workspace{ws_num}/script-dos"
 
-    for file_name in ["TBS.DAT", "MAIN.EXE"]:
+    # for file_name in ["BSDATA1.TR2", "BSDATA2.TR2"]:
+    for file_name in ["SNDATA1.TR2", "SNDATA2.TR2"]:
         script_jpn = Script(f"{base_dir}/{file_name}_jpn.json")
         script_kor = Script(f"{base_dir}/{file_name}_kor.json")
 
@@ -43,12 +44,12 @@ def main():
             start = int(start, 16)
             end = int(end, 16)
 
-            if game == "taiko1":
-                if file_name == "MAIN.EXE":
-                    if start < 0x5671C:
-                        continue
-                    if start > 0x5A9B3:
-                        continue
+            if file_name == "SNDATA1.TR2":
+                if start > 0x05704:
+                    continue
+            if file_name == "SNDATA2.TR2":
+                if start > 0x0577A:
+                    continue
 
             if len(fn_jpn_raw) == 0:
                 fn_jpn_raw = sentence
@@ -57,6 +58,11 @@ def main():
 
             if len(gn_jpn_raw) == 0:
                 gn_jpn_raw = sentence
+
+            if "0x:" in fn_jpn_raw:
+                fn_jpn_raw = ""
+                gn_jpn_raw = ""
+                continue
 
             fn_jpn = fn_jpn_raw.replace("|_", "").replace("|␀", "").replace("␀", "")
             gn_jpn = gn_jpn_raw.replace("|_", "").replace("|␀", "").replace("␀", "")

@@ -57,7 +57,7 @@ def main():
 
     font_name = "ThinDungGeunMo_cp949_full"
     base_dir = Path("c:/work_han/font_")
-    src_fnt_path = Path("C:/work_han/font_dosjp/JIS_genpei.FNT")
+    src_fnt_path = Path("C:/work_han/font_dosjp/JIS.FNT")
 
     font_dict = load_to_dictionary(base_dir / f"{font_name}.tbl")
     font_bin_path = base_dir / f"{font_name}.bin"

@@ -1,17 +1,41 @@
-def _xor_process(data, encoding_info):
+import struct
+
+
+def _xor_process(data, encoding_info: str, is_encoding=False):
     if "xor" in encoding_info:
-        encoding_key = encoding_info.split(":")[-1]
-        encoding_key = int(encoding_key, 16)
-        data = bytearray([b ^ encoding_key for b in data])
+        xor_key = encoding_info.split(":")[-1]
+        xor_key = int(xor_key, 16)
+        data = bytearray([b ^ xor_key for b in data])
+    if "taikou2" in encoding_info:
+        # For Taikou 2 decoding / encoding only
+        # Extract xor key
+        seed1 = data[0x12]
+        seed2 = data[0x13]
+        xor_key = seed1 ^ seed2
+
+        if is_encoding:
+            stored_checksum = struct.unpack("<H", data[0x10:0x12])[0]
+            # Compute checksum from predefined data region =(0x58C~)
+            checksum = 0
+            for b in data[0x58C:]:
+                checksum = (checksum + b) & 0xFFFF
+
+            # Update checksum if it is different
+            if checksum != stored_checksum:
+                struct.pack_into("<H", data, 0x10, checksum)
+
+        # XOR the data for predefined region =(0x58C~)
+        data[0x58C:] = bytearray([b ^ xor_key for b in data[0x58C:]])
+
     return data
 
 
-def decode(data, encoding_info):
-    return _xor_process(data, encoding_info)
+def decode(data, encoding_info: str):
+    return _xor_process(data=data, encoding_info=encoding_info, is_encoding=False)
 
 
-def encode(data, encoding_info):
-    return _xor_process(data, encoding_info)
+def encode(data, encoding_info: str):
+    return _xor_process(data=data, encoding_info=encoding_info, is_encoding=True)
 
 
 def convert_3to4bpp(in_path, out_path):

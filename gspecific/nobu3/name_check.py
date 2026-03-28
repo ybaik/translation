@@ -6,44 +6,54 @@ from rich.console import Console
 def main():
     console = Console()
     name_db = NameDB()
-    game = "taiko2"
-    ws_num = 2
-    base_dir = f"c:/work_han/workspace{ws_num}/script-dos"
+    game = "nb5"
+    ws_num = 5
+    base_dir = f"c:/work_han/workspace{ws_num}/script-pc98"
 
-    file_name = "SNDATA2.TR2"
+    file_name = "S0T.NB5"
     # file_name = "MAIN.EXE"
+    # file_name = "SNDATA1.CIM"
     script_jpn = Script(f"{base_dir}/{file_name}_jpn.json")
     script_kor = Script(f"{base_dir}/{file_name}_kor.json")
 
     fn_jpn = ""
+    fn_kor = ""
     gn_jpn = ""
+    gn_kor = ""
     prev_address = ""
+
+    mod_list = []
 
     for address, sentence in script_jpn.script.items():
         start, end = address.split("=")
         start = int(start, 16)
         end = int(end, 16)
+        # if start < 0x1192:
+        #     continue
+        # if start < 0x3F964:
+        #     continue
+        # if start > 0x41984:
+        #     continue
 
-        if game == "taiko1":
+        if game == "nb3":
+            if file_name in ["SNDATA1.CIM", "SNDATA2.CIM"]:
+                if start < 0xD38:
+                    continue
             if file_name == "MAIN.EXE":
-                if start < 0x5671C:
+                if start < 0x24C6A:
                     continue
-                if start > 0x5A9B3:
+                if start > 0x26FED:
                     continue
-        if game == "taiko2":
-            if file_name == "SNDATA1.TR2":
-                if start > 0x05704:
-                    continue
-            if file_name == "SNDATA2.TR2":
-                if start > 0x0577A:
-                    continue
+
         if len(fn_jpn) == 0:
             fn_jpn = sentence
+            fn_kor = script_kor.script[address]
             prev_address = address
             continue
 
         if len(gn_jpn) == 0:
             gn_jpn = sentence
+            gn_kor = script_kor.script[address]
 
         fn_jpn = fn_jpn.replace("␀", "")
         gn_jpn = gn_jpn.replace("␀", "")
@@ -88,24 +98,41 @@ def main():
                 name_db.full_name_db[full_name_jpn_clean]["game"].append(game)
 
         db_fn_kor, db_gn_kor = name_db.full_name_db[full_name_jpn_clean]["kor"].split(" ")
+
+        # Check for debugging
+        # if len(gn_kor) > 3 and gn_jpn != gn_kor:
+        #     print(f"{full_name_jpn_clean}:{gn_jpn} - {address}")
+        # if len(fn_kor) > 3 and fn_jpn != fn_kor:
+        #     print(f"{full_name_jpn_clean}:{fn_jpn} - {address}")
+
+        if len(db_gn_kor) < 4 and db_gn_kor != gn_kor:
+            info_str = f"{address},{gn_jpn},{db_gn_kor}"
+            mod_list.append(info_str)
+            print(info_str)
+
+        if len(db_fn_kor) < 4 and db_fn_kor != fn_kor:
+            info_str = f"{prev_address},{fn_jpn},{db_fn_kor}"
+            mod_list.append(info_str)
+            print(info_str)
+
         fn_jpn = ""
         gn_jpn = ""
 
-    # for info_str in mod_list:
-    #     address, jpn, kor = info_str.split(",")
+    for info_str in mod_list:
+        address, jpn, kor = info_str.split(",")
 
-    #     start, end = address.split("=")
-    #     start = int(start, 16)
-    #     end = int(end, 16)
+        start, end = address.split("=")
+        start = int(start, 16)
+        end = int(end, 16)
 
-    #     diff = len(kor) - len(jpn)
+        diff = len(kor) - len(jpn)
 
-    #     if diff > 0:
-    #         end += diff * 2
-    #         jpn += "␀" * diff
+        if diff > 0:
+            end += diff * 2
+            jpn += "␀" * diff
 
-    #     script_jpn.replace_sentence(address, f"{start:05X}={end:05X}", jpn)
-    #     script_kor.replace_sentence(address, f"{start:05X}={end:05X}", kor)
+        script_jpn.replace_sentence(address, f"{start:05X}={end:05X}", jpn)
+        script_kor.replace_sentence(address, f"{start:05X}={end:05X}", kor)
 
     # script_jpn.save(f"{base_dir}/{file_name}_jpn.json")
     # script_kor.save(f"{base_dir}/{file_name}_kor.json")
