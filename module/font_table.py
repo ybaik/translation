@@ -1,15 +1,18 @@
 import json
+import logging
 from copy import deepcopy
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import Optional
 from .jisx0201 import jisx0201_table
+
+logger = logging.getLogger(__name__)
 
 
 class FontTable:
-    def __init__(self, file_path: Path, custom_char_dir: Path = None) -> None:
+    def __init__(self, file_path: Path, custom_char_dir: Optional[Path] = None) -> None:
         # Initialize
-        self.code2char = dict()
-        self.char2code = dict()
+        self.code2char: dict[str, str] = dict()
+        self.char2code: dict[str, str] = dict()
         self.code_int_min = 0xFFFF
         self.code_int_max = 0
 
@@ -30,7 +33,7 @@ class FontTable:
                 custom_chars = json.load(f)
             self.set_custom_char(custom_chars)
 
-    def set_custom_char(self, custom_chars: Dict = {}) -> None:
+    def set_custom_char(self, custom_chars: dict = {}) -> None:
         update_1byte = False
         update_2byte = False
         for k, v in custom_chars.items():
@@ -60,7 +63,7 @@ class FontTable:
 
     def read_font_table(self, file_path: Path) -> bool:
         if not file_path.exists():
-            print(f"No {file_path} exist.")
+            logger.error(f"No {file_path} exist.")
             return False
 
         ext = file_path.suffix
@@ -69,7 +72,7 @@ class FontTable:
         elif ext == ".json":
             self._read_json(file_path)
         else:
-            print(f"{ext} is not a supported format.")
+            logger.error(f"{ext} is not a supported format.")
             return False
 
         # Make char2code table
@@ -81,7 +84,7 @@ class FontTable:
 
     def write_font_table(self, file_path: Path) -> bool:
         if self.code2char is None:
-            print("No font table to write.")
+            logger.error("No font table to write.")
             return False
 
         ext = file_path.suffix
@@ -90,7 +93,7 @@ class FontTable:
         elif ext == ".json":
             self._write_json(file_path)
         else:
-            print("f{ext} is not a supported format.")
+            logger.error(f"{ext} is not a supported format.")
             return False
         return True
 
@@ -135,7 +138,7 @@ class FontTable:
                 if font_table.get(code_hex) is None:
                     font_table[code_hex] = character
                 else:
-                    print(f"duplicated: {code_hex}")
+                    logger.warning(f"duplicated: {code_hex}")
 
         codes = list(font_table.keys())
         codes.sort()
@@ -161,7 +164,7 @@ class FontTable:
                     self.code2char_ascii[code_hex] = character
                     self.char2code_ascii[character] = code_hex
                 else:
-                    print(f"duplicated: {code_hex}")
+                    logger.warning(f"duplicated: {code_hex}")
 
     def _write_json(self, file_path: Path) -> None:
         font_table = dict(sorted(self.code2char.items()))
@@ -213,7 +216,7 @@ class FontTable:
     def get_code_ascii(self, character: str) -> str:
         return self.char2code_ascii.get(character)
 
-    def get_codes(self, sentence: str) -> List[str]:
+    def get_codes(self, sentence: str) -> list[str]:
         codes_hex = []
         check_ascii = False
         for character in sentence:
@@ -234,7 +237,7 @@ class FontTable:
         length_from_address = int(code_hex_end, 16) - int(code_hex_start, 16) + 1
         return length_from_address
 
-    def check_length_from_sentence(self, sentence: str, custom_words: Dict = None) -> int:
+    def check_length_from_sentence(self, sentence: str, custom_words: dict = None) -> int:
         # Check if the sentence is hex-only
         if "0x:" == sentence[:3]:
             sentence = sentence[3:].split("#")[0]  # Remove the hex-only code and the comment
@@ -256,6 +259,7 @@ class FontTable:
                         raise ValueError(
                             f"Custom word '{{{word}}}' not found in provided custom_words for length check."
                         )
+                        # print(f"Custom word '{{{word}}}' not found in provided custom_words for length check.")
 
             character = sentence[i]
             if character == "|":
@@ -282,7 +286,7 @@ class FontTable:
             length += len(code) // 2
         return length
 
-    def verify_sentence(self, sentence: str) -> Tuple[bool, str]:
+    def verify_sentence(self, sentence: str) -> tuple[int, str]:
         count_false_character = 0
         false_characters = ""
         check_ascii = False

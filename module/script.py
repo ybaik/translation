@@ -132,7 +132,7 @@ class Script:
         self.zero_padding = None
         self.encoding = None
         self.custom_input = None
-        self.bianry_input = None
+        self.binary_input = None
 
         # Read a script if the file path is specified
         if len(file_path):
@@ -153,8 +153,8 @@ class Script:
         if "custom_input" in self.script.keys():
             self.custom_input = self.script.pop("custom_input")
 
-        if "bianry_input" in self.script.keys():
-            self.bianry_input = self.script.pop("bianry_input")
+        if "binary_input" in self.script.keys():
+            self.binary_input = self.script.pop("binary_input")
 
     def apply_zero_padding(self, data: bytearray) -> bytearray:
         """Apply zero padding to the binary data
@@ -779,8 +779,8 @@ class Script:
                     code_int = int(codes[i * 2 : i * 2 + 2], 16)
                     data[spos + i] = code_int
 
-        if self.bianry_input is not None and binary_input_dir is not None and binary_input_dir.exists():
-            for address, desc in self.bianry_input.items():
+        if self.binary_input is not None and binary_input_dir is not None and binary_input_dir.exists():
+            for address, desc in self.binary_input.items():
                 [code_hex_start, code_hex_end] = address.split("=")
                 spos = int(code_hex_start, 16)
                 epos = int(code_hex_end, 16)
@@ -790,7 +790,7 @@ class Script:
 
                 file_path = binary_input_dir / file_name
                 if not file_path.exists():
-                    print(f"{file_path.name} is not exists.")
+                    logger.warning(f"{file_path.name} does not exist.")
                     continue
                 with open(file_path, "rb") as f:
                     binary_data = f.read()
@@ -818,7 +818,7 @@ class Script:
             # # Debugging
             # if spos < 0x30D4E:
             #     continue
-            # if address == "40250=40254":
+            # if address == "082CF=082FA":
             #     print(1)
             # if "佐" in sentence:
             #     print(1)

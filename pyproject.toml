@@ -1,4 +1,37 @@
-# pyproject.toml
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "translation"
+version = "0.1.0"
+authors = [
+  { name="Youngki Baik", email="hyunxx@gmail.com" },
+]
+description = "Python package for game translation"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+    "pillow",
+    "opencv-python",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "pytest",
+]
+
+[tool.setuptools]
+packages = ["module"]
 
 [tool.ruff]
 line-length = 120
+target-version = "py39"

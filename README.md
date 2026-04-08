@@ -1,5 +1,13 @@
-# Translation
-Python package for game translation
+# Translation Toolkit
+
+A modern Python package for reverse engineering and translating Japanese video games into Korean.
+
+## Features
+- **Script Extraction**: Extract Japanese text from binary files with font table support.
+- **Script Injection**: Inject translated Korean text back into game binaries.
+- **Font Management**: Handle custom font tables (.tbl, .json) and font image generation.
+- **Encoding Support**: Built-in support for common encoding/decoding schemes (e.g., XOR).
+- **Name Database**: Manage character names for consistent translation.
 
 ## Installation
 
@@ -7,31 +15,39 @@ Python package for game translation
 - Python 3.9+
 
 ### Setup
-1. Clone repository:
+1. Clone the repository:
+   ```bash
+   git clone git@github:ybaik/translation.git
+   cd translation
+   ```
+
+2. Install in editable mode with development dependencies:
+   ```bash
+   pip install -e ".[dev]"
+   ```
+
+## Usage
+
+### 1. Extract Scripts
+Extract Japanese text from game data:
 ```bash
-git clone git@github.com:ybaik/translation.git
-cd translation
+python extract_script_auto.py
 ```
 
-2. Install dependencies and package:
+### 2. Translate
+Translate the extracted JSON (e.g., `S01_VIS_jpn.json`) to Korean (e.g., `S01_VIS_kor.json`).
+
+### 3. Patch Game Data
+Inject the translated script back into the binary:
 ```bash
-   pip install -e .
+python write_script_auto.py
 ```
 
-### Usage
-1. Extract scripts from game data:
-```bash
-python extract_script_auto.py # after modifying the inputs in the script
-```
+## Project Structure
+- `module/`: Core library (Script, FontTable, etc.)
+- `tools/`: Utility scripts for translation and conversion.
+- `font_table/`: Predefined font tables for various platforms.
+- `name_db/`: Databases for consistent character name translation.
 
-2. Translate scripts:
-```bash
-python tools/fit_scripts.py # after modifying the inputs in the script
-```
-
-3. Patch game data:
-```bash
-python write_script_auto.py # after modifying the inputs in the script
-```
-
-Note: Recommended to use conda or virtual environment
+## License
+MIT License
