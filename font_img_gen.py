@@ -68,10 +68,10 @@ def save_font_image(
 
 def main():
     # # Read 8x16 font
-    font_path = r"C:\Users\hyunx\Downloads\genpei_200608\genpei\jis.fnt"
+    font_path = r"C:\work_han\font_\ThinDungGeunMo_cp949_full.fnt"
     font_width, font_height = 8, 16
     im_cols, im_rows = 16, 14
-    font_img_path = "C:/work_han/workspace/font_chr.png"
+    font_img_path = "C:/work_han/font_chr.png"
     save_font_image(
         font_path=font_path,
         font_width=font_width,
@@ -85,11 +85,13 @@ def main():
 
     offset = im_cols * font_width * im_rows * font_height
     # Read 16x16 font
-    font_path = r"C:\Users\hyunx\Downloads\genpei_200608\genpei\jis.fnt"
+    font_path = r"C:\work_han\font_dosjp\JIS_KOR.FNT"
+    font_path = r"C:\work_han\font_dosjp\JIS_genpei.FNT"
+    # font_path = r"../workspace2\taikou2-ThinDungGeunMo.fnt"
     font_width, font_height = 16, 16
     offset = 0
-    im_cols, im_rows = 70, 64
-    font_img_path = "C:/work_han/workspace/han_fnt.png"
+    im_cols, im_rows = 70, 70  # 64
+    font_img_path = "C:/work_han/han_fnt.png"
     save_font_image(
         font_path=font_path,
         font_width=font_width,

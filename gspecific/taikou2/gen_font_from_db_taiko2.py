@@ -189,11 +189,13 @@ def main():
     # print(len(fset), len(gset))
     # print(fset)
     # print(gset)
-    letter_2byte = list(letter_2byte)
 
     # 추가
-    letter_2byte.append("사노")
+    letter_2byte.add("미마")
+    letter_2byte.add("사노")
+    letter_2byte.add("시키")
 
+    letter_2byte = list(letter_2byte)
     letter_2byte.sort()
     print(len(letter_2byte))
 
@@ -231,13 +233,17 @@ def main():
     input_cand.append(["시나노", "둥근모"])
     input_cand.append(["시모사", "둥근모"])
     input_cand.append(["야마토", "둥근모"])
+    input_cand.append(["와카사", "둥근모"])
     input_cand.append(["에치고", font_name])
     input_cand.append(["에치젠", font_name])
     input_cand.append(["오와리", "둥근모"])
     input_cand.append(["이나바", "둥근모"])
+    input_cand.append(["이마이", "둥근모"])
     input_cand.append(["이와미", "둥근모"])
     input_cand.append(["이즈모", font_name])
     input_cand.append(["코즈케", "둥근모"])
+    input_cand.append(["키요스", "둥근모"])
+    input_cand.append(["타지마", "둥근모"])
     input_cand.append(["하리마", font_name])
     input_cand.append(["히타치", font_name])
 

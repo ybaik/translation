@@ -22,7 +22,6 @@ def align_length(jpn: str, kor: str, jpn_len: int, kor_len: int):
 
 
 def main():
-    console = Console()
     name_db = NameDB()
     game = "taiko1"
     ws_num = 1

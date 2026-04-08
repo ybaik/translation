@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+from pathlib import Path
+from module.font_table import FontTable
 from module.font_image import return_img_roi
 
 
@@ -14,15 +16,23 @@ def main():
     font_bmp_path = "c:/work_han/ThinDungGeunMo.bmp"
     img_src = cv2.imread(font_bmp_path, 0)
 
-    val = 0x889F
-    code = ""
-    for i in range(4):
-        code += f"{val:X}"
-        val += 1
+    script = "와시즈"
+    font_table_kor = FontTable(Path("font_table/font_table-kor-jin.json"))
+    codes = font_table_kor.get_codes(script)
 
-    code = "889F"
-    code = code.replace("0x:", "")
-    code = code.split("#")[0]
+    code = ""
+    for code_hex in codes:
+        code += code_hex
+
+    # val = 0x889F
+    # code = ""
+    # for i in range(4):
+    #     code += f"{val:X}"
+    #     val += 1
+
+    # code = "935791968CB4"
+    # code = code.replace("0x:", "")
+    # code = code.split("#")[0]
 
     if len(code) % 2 != 0:
         assert 0, f"The length of code is not matched. {code}"
@@ -43,7 +53,7 @@ def main():
     resized = cv2.resize(canvas, dsize=(nw, nh), interpolation=cv2.INTER_AREA)
     cv2.imshow("patch", resized)
     cv2.waitKey()
-    cv2.imwrite("debug.jpg", resized)
+    cv2.imwrite("debug.png", canvas)
 
 
 if __name__ == "__main__":
