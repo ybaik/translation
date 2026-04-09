@@ -1,13 +1,13 @@
 import json
 from pathlib import Path
 from rich.console import Console
-from module.font_table import FontTable
+from module.font_table import get_cached_font_table
 
 
 def main():
     console = Console()
 
-    ws_num = 4
+    ws_num = 1
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
     script_dirs = [
         base_dir / "script-dos",
@@ -29,8 +29,12 @@ def main():
 
     # Read a pair of scripts
     for script_dir in script_dirs:
-        src_font_table = FontTable(Path("./font_table/font_table-jpn-full.json"), script_dir)
-        dst_font_table = FontTable(Path("./font_table/font_table-kor-jin.json"), script_dir)
+        src_font_table = get_cached_font_table(
+            file_path=Path("./font_table/font_table-jpn-full.json"), base_dir=base_dir, custom_char_dir=script_dir
+        )
+        dst_font_table = get_cached_font_table(
+            file_path=Path("./font_table/font_table-kor-jin.json"), base_dir=base_dir, custom_char_dir=script_dir
+        )
 
         custom_word_path = script_dir / "custom_word.json"
         custom_words = {}

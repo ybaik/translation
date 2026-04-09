@@ -5,7 +5,7 @@ from rich import box
 from rich.table import Table
 from rich.console import Console
 from module.script import Script
-from module.font_table import FontTable
+from module.font_table import get_cached_font_table
 
 
 skip_list = []
@@ -13,8 +13,8 @@ skip_list = []
 
 def main():
     platform = "dos"
-    # platform = "pc98"
-    ws_num = 2
+    platform = "pc98"
+    ws_num = 1
     tag = ""
     # tag = "-bdrive"
 
@@ -92,8 +92,12 @@ def main():
         console.print(f"[yellow] Start:{src_data_path}[/yellow]")
 
         # Read source and destination font tables
-        src_font_table = FontTable(src_font_table_path, script_base_dir)
-        dst_font_table = FontTable(dst_font_table_path, script_base_dir)
+        src_font_table = get_cached_font_table(
+            file_path=src_font_table_path, base_dir=base_dir, custom_char_dir=script_base_dir
+        )
+        dst_font_table = get_cached_font_table(
+            file_path=dst_font_table_path, base_dir=base_dir, custom_char_dir=script_base_dir
+        )
 
         # Read source and destination script
         src_script = Script(str(src_script_path))

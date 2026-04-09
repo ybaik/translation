@@ -1,11 +1,40 @@
+from __future__ import annotations
 import json
+import pickle
 import logging
 from copy import deepcopy
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any, cast
 from .jisx0201 import jisx0201_table
 
 logger = logging.getLogger(__name__)
+
+
+def get_cached_font_table(file_path: Path, base_dir: Path, custom_char_dir: Path) -> FontTable:
+    cache_path = base_dir / file_path.name.replace(".json", ".pkl")
+    custom_char_path = custom_char_dir / "custom_char.json"
+
+    if cache_path.exists():
+        mtime_cache = cache_path.stat().st_mtime
+        mtime_font = file_path.stat().st_mtime
+        mtime_custom = custom_char_path.stat().st_mtime if custom_char_path.exists() else 0
+
+        if mtime_cache > mtime_font and mtime_cache > mtime_custom:
+            try:
+                with open(cache_path, "rb") as f:
+                    return cast(FontTable, pickle.load(f))
+            except (pickle.PickleError, EOFError, AttributeError):
+                pass  # Create a new cache file when loading fails
+
+    # Create a new cache file and save it
+    font_table = FontTable(file_path=file_path, custom_char_dir=custom_char_dir)
+    try:
+        with open(cache_path, "wb") as f:
+            pickle.dump(font_table, f)
+    except Exception:
+        pass  # Continue execution even if saving fails
+
+    return font_table
 
 
 class FontTable:
