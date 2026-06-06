@@ -1,4 +1,5 @@
 import struct
+from module.compress.lzss_gss2 import LZSS_GSS2
 
 
 def _xor_process(data, encoding_info: str, is_encoding=False):
@@ -26,6 +27,14 @@ def _xor_process(data, encoding_info: str, is_encoding=False):
 
         # XOR the data for predefined region =(0x58C~)
         data[0x58C:] = bytearray([b ^ xor_key for b in data[0x58C:]])
+
+    if "lzss:gss2" in encoding_info:
+        lzss = LZSS_GSS2()
+        if is_encoding:
+            data = lzss.compress(data)
+        else:
+            data = lzss.decompress(data)
+        data = bytearray(data)
 
     return data
 

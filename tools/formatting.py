@@ -2,7 +2,6 @@ from pathlib import Path
 from rich.console import Console
 
 from module.script import Script
-from module.check_script import diff_address
 
 
 def main():
@@ -35,7 +34,7 @@ def main():
         dst_script = Script(str(dst_script_path))
 
         # Compare addresses in the source and destination scripts
-        count_diff = diff_address(src_script.script, dst_script.script)
+        count_diff = src_script.diff_addresses(dst_script.script)
         if count_diff:
             return
 
