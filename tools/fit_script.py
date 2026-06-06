@@ -5,14 +5,14 @@ from module.font_table import get_cached_font_table
 
 
 def main():
-    ws_num = 1
+    ws_num = 6
     platform = "dos"
     platform = "pc98"
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
     base_script_dir = base_dir / f"script-{platform}"
     script_path = base_script_dir / "MAIN.EXE_kor.json"
     script_path = base_script_dir / "MESSAGE.DAT_kor.json"
-    # script_path = base_dir / "OPEN.EXE_kor.json"
+    script_path = base_script_dir / "DATA/ITEMDOC.TBZ_kor.json"
 
     custom_word_path = base_script_dir / "custom_word.json"
     custom_words = {}
@@ -26,8 +26,8 @@ def main():
 
     # … ␀ ␁
     dialogue_array = {
-        "024E5=02512": "{다이묘} 동향을 알고 싶다고|?|␂오고 가는 정으로 돈 |␂",
-        "02536=02571": "그런가,아쉽구먼._|␂오랜만에 반야탕을 |␂맛볼 수 있나 했더만|.",
+        "016D1=016F0": "혼돈의 무수한 암흑검이 대상을_ ",
+        "016F2=01705": "난도질하는 마법._ ",
     }
 
     console = Console()
@@ -37,6 +37,8 @@ def main():
     for script_range, dialogue in dialogue_array.items():
         dialogue = dialogue.replace(" ", "|_")
         # dialogue = dialogue.replace(" ", "_")
+
+        dialogue_array[script_range] = dialogue
         length = dst_font_table.check_length_from_address(script_range)
         length_from_dialogue = dst_font_table.check_length_from_sentence(sentence=dialogue, custom_words=custom_words)
 

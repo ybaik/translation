@@ -116,15 +116,16 @@ def backward_check(
 
 
 def main():
-    ws_num = 2
+    ws_num = 8
     platform = "pc98"
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
     script_dir = base_dir / f"script-{platform}"
-    bin_dir = base_dir / f"jpn-{platform}"
+    bin_dir = base_dir / f"jpn-{platform}-decoded"
 
     script_path = script_dir / "MAIN.EXE_jpn.json"
     # script_path = script_dir / "TBS.DAT_jpn.json"
-    script_path = script_dir / "BSDATA2.TR2_jpn.json"
+    # script_path = script_dir / "BSDATA2.TR2_jpn.json"
+    script_path = script_dir / "MESS12.DAT_jpn.json"
 
     bin_path = bin_dir / script_path.name.replace("_jpn.json", "")
     if not bin_path.exists():
@@ -136,36 +137,36 @@ def main():
 
     console = Console()
     font_table = FontTable(file_path=Path("./font_table/font_table-jpn-full.json"), custom_char_dir=script_dir)
-    consider_1byte = False
+    consider_1byte = True
     overwrite = False
     # overwrite = True
 
-    source_array = {}
-
-    dialogue_array = {
-        # "0003A=0003E": "|@柴田",
-        # "000B0=000B4": "|P金森",
-        # "000EB=000EF": "|P滝川",
-        # "00126=0012A": "|@下方",
-        # "00161=00167": "|@蜂須賀",
-        # "0019C=001A0": "|P生駒",
-        # "001D5=001DB": "|/|␁|@前野",
-        # "00212=00216": "|P村井",
-        # "0024C=00251": "|␁|@平手",
-        # "00288=0028E": "|P佐久間",
-        # "002C3=002C7": "|P拝郷",
-        # "002FC=00302": "|/|␁|P織田",
-        # "00339=0033D": "|p蜂屋",
-        # "00374=00378": "|`丹羽",
-        # "003AF=003B3": "|@木下",
+    source_array = {
+        "00061=0008E": "ムヰ|e友ペイリトオスと共にゼウスの娘との結婚|C|6|3",
+        "00817=00867": "ャャャャャャャャャャャャャャャャャャ|ｼモ驍|ﾄ、ペルセポネの誘拐に失敗して冥界に|C|6|4",
+        "0086E=00898": "幽閉される。|H|Zテセウスはヘラクレスによっ|C|6|5",
+        "0089A=008C9": "ャδモ|ﾄ救い出されるが、ペイリトオスは足に根が|C|6|6",
+        "008CB=008FA": "ャγヰ|ｶえてしまっていたために救出されなかった|C|6|7",
+        "008FC=0092B": "ャβメ|B|H|Z現在、親友ペイリトオスのことを案じな|C|6|8",
+        "0092D=0094B": "ャιモ|ｪら賢人の丘に住んでいる。",
     }
 
-    script = Script(str(script_path))
-    for address, sentence in script.script.items():
-        if "0x:" in sentence:
-            continue
-        source_array[address] = sentence
-        dialogue_array[address] = sentence
+    dialogue_array = {
+        "00061=0008E": "ムヰ|e友ペイリトオスと共にゼウスの娘との結婚|C|6|3",
+        "00817=00867": "ャャャャャャャャャャャャャャャャャャ|ｼモ驍|ﾄ、ペルセポネの誘拐に失敗して冥界に|C|6|4",
+        "0086E=00898": "幽閉される。|H|Zテセウスはヘラクレスによっ|C|6|5",
+        "0089A=008C9": "ャδモ|ﾄ救い出されるが、ペイリトオスは足に根が|C|6|6",
+        "008CB=008FA": "ャγヰ|ｶえてしまっていたために救出されなかった|C|6|7",
+        "008FC=0092B": "ャβメ|B|H|Z現在、親友ペイリトオスのことを案じな|C|6|8",
+        "0092D=0094B": "ャιモ|ｪら賢人の丘に住んでいる。",
+    }
+
+    # script = Script(str(script_path))
+    # for address, sentence in script.script.items():
+    #     if "0x:" in sentence:
+    #         continue
+    #     source_array[address] = sentence
+    #     dialogue_array[address] = sentence
 
     # Check address
     result_dict = dict()

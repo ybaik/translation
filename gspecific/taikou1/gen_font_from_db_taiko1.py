@@ -198,6 +198,7 @@ def main():
     letter_2byte.add("라이")
     letter_2byte.add("로쿠")
     letter_2byte.add("슈_")
+    letter_2byte.add("스노")
     letter_2byte.add("사키")
     letter_2byte.add("시키")
     letter_2byte.add("에이")
