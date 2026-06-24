@@ -6,18 +6,18 @@ from module.script import Script
 
 def main():
     console = Console()
-    base_dir = Path("c:/work_han/workspace2")
+    ws_num = 4
+    base_dir = Path(f"c:/work_han/workspace{ws_num}")
     script_base_dir = base_dir
 
-    script_base_dir = Path("c:/work_han/workspace2/script-pc98")
+    script_base_dir = Path("c:/work_han/workspace{ws_num}/script-pc98")
     # script_base_dir = Path("c:/work_han/backup")
 
-    find_source = False
+    find_source = True
     restriction = False
-    print_correspond_sentence = False
 
-    sentence = ""
-    sentence_kor = "정말이지,"
+    sentence = "厳島"
+    sentence_kor = "사콘"
     sentence_kor = sentence_kor.replace(" ", "_")
 
     # Read a pair of scripts

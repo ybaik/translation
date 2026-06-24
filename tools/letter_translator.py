@@ -14,9 +14,11 @@ def main():
     font_table_jpn = FontTable(Path("font_table/font_table-jpn-full.json"))
 
     # Get a code or codes from a letter or letters
-    script = "혓룐"
+    script = "오다"
     sound = ""
     codes_hex = font_table_kor.get_codes(script)
+    # codes_hex = font_table_jpn.get_codes(script)
+    print(codes_hex)
 
     jpn = ""
     if len(sound):
@@ -34,12 +36,6 @@ def main():
     # print(jisx0201_to_unicode(halfwidth))
     # return
 
-    # codes = "76 57 44 23 61 21 10 0A 11 1B 12 00 20 00 28 13 42 05 21 1D 13 00 00 00 00".replace(" ", "")
-    # print(codes)
-    # return
-    # codes_hex = [codes[i : i + 4] for i in range(0, len(codes), 4)]
-
-    # print(codes_hex)
     hex_str = ""
     hex_str_rev = ""
     for code_hex in codes_hex:
@@ -50,9 +46,10 @@ def main():
         hex_str += " "
 
     print(hex_str)
-    print(hex_str_rev)
+    # print(hex_str_rev)
 
     jpn_script = font_table_jpn.get_chars(codes_hex)
+    # jpn_script = font_table_kor.get_chars(codes_hex)
     print(jpn_script + jpn)
 
 

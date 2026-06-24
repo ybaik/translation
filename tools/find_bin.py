@@ -8,7 +8,7 @@ from module.decoding import decode
 
 
 def main():
-    ws_num = 3
+    ws_num = 5
     base_path = Path(f"../workspace{ws_num}/jpn-pc98")
     # base_path = Path(f"../workspace{ws_num}/kor-pc98-dosbox-x")
     # base_path = Path(f"../workspace{ws_num}/save")
@@ -19,8 +19,9 @@ def main():
     font_table_path = Path("font_table/font_table-jpn-full.json")
     font_table = FontTable(font_table_path)
 
-    sentence_to_find = "独軍、"
+    sentence_to_find = "冥界の魔神"
     address_to_find_hex = font_table.get_codes(sentence_to_find)
+    address_to_find_hex = "4E 50 4B".replace(" ", "")
     target_bytes = bytearray.fromhex("".join(address_to_find_hex))
     print(address_to_find_hex)
 
@@ -33,7 +34,7 @@ def main():
     for file in base_path.rglob("*"):  # Use rglob to search subdirectories
         if not file.is_file():
             continue
-        print(file.name)
+        # print(file.name)
         # if "MESS11" not in file.name:
         #     continue
         # if ".SV" not in file.name:

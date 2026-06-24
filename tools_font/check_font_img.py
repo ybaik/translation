@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from PIL import Image
 from pathlib import Path
 from module.font_table import FontTable
 from module.font_image import return_img_roi
@@ -13,10 +14,17 @@ def crop_paste(img_src, img_dst, roi_src, roi_dst):
 
 
 def main():
-    font_bmp_path = "c:/work_han/ThinDungGeunMo.bmp"
+    font_out_dir = "c:/work_han/font_update_db/test"
+
+    font_name = "둥근모"  # "둥근모", "비스코"
+    if font_name == "둥근모":
+        font_bmp_path = "c:/work_han/ThinDungGeunMo.bmp"
+    if font_name == "비스코":
+        font_bmp_path = "c:/work_han/BISCO.bmp"
+
     img_src = cv2.imread(font_bmp_path, 0)
 
-    script = "와시즈"
+    script = "히에이산"
     font_table_kor = FontTable(Path("font_table/font_table-kor-jin.json"))
     codes = font_table_kor.get_codes(script)
 
@@ -46,6 +54,10 @@ def main():
         # crop = img_src[ypos : ypos + 16, xpos : xpos + 16]
 
         canvas[:, 16 * i : 16 * (i + 1)] = img_src[roi[0] : roi[1], roi[2] : roi[3]]
+
+    img_pil = Image.fromarray(canvas).convert("1")
+    img_pil.save(f"{font_out_dir}/{script}.bmp")
+    return
 
     h, w = canvas.shape
     nh = h * 8

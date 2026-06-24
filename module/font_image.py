@@ -90,6 +90,16 @@ def imread_korean(path):
     return img
 
 
+def imwrite_korean(path, img, params=None):
+    extension = path.split(".")[-1]
+    res, img_encode = cv2.imencode(f".{extension}", img, params)
+    if res:
+        with open(path, "wb") as f:
+            img_encode.tofile(f)
+        return True
+    return False
+
+
 def crop_paste(img_src, img_dst, roi_src, roi_dst):
     img_dst[roi_dst[0] : roi_dst[1], roi_dst[2] : roi_dst[3]] = img_src[
         roi_src[0] : roi_src[1], roi_src[2] : roi_src[3]

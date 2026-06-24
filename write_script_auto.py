@@ -132,7 +132,7 @@ def main():
         # console.print(f"[yellow] End:{src_data_path}[/yellow]")
 
         # Check source script with binary data
-        is_diff = src_script.validate_with_binary(font_table=src_font_table, binary_path=src_data_path)
+        is_diff = src_script.validate_with_binary(font_table=src_font_table, binary_data=data.copy())
         if is_diff:
             console.print(f"[yellow] json and data doesn't match.[/yellow] [green]{src_data_path}[/green]")
         else:

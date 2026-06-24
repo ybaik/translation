@@ -7,10 +7,10 @@ from module.decoding import decode
 
 
 def main():
-    ws_num = 3
+    ws_num = 6
     workspace = f"workspace{ws_num}"
     platform = "pc98"
-    bin_dir = Path(f"../{workspace}/jpn-{platform}")
+    bin_dir = Path(f"../{workspace}/jpn-{platform}-decoded")
     font_table_path = Path("font_table/font_table-jpn-full.json")
     extended_word = "_jpn"
     script_init_dir = Path(f"../{workspace}/script_init-{platform}")
@@ -26,7 +26,8 @@ def main():
     check_ascii_restriction = False  # If True, the first ASCII code needs to be x20
 
     decoding_enable = False
-    decoding_info = "xor:0x83"
+    # decoding_info = "xor:0x83"
+    decoding_info = "lzss:gss2"
     decoding_base_path = f"../{workspace}/jpn-{platform}-decoded"
     # =================================================================
 
@@ -40,8 +41,8 @@ def main():
         # if "SCEDATA" not in file.name:
         #     continue
 
-        # if file.suffix not in [".COM", ".EXE"]:
-        #     continue
+        if file.suffix not in [".TBZ"]:
+            continue
 
         if not os.path.isfile(src_data_path):
             continue
