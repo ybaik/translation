@@ -2,7 +2,7 @@ import json
 import numpy as np
 from PIL import Image
 from pathlib import Path
-from module.font_image import imread_korean, return_img_roi, crop_paste
+from module.font_image import imread_korean, return_img_roi
 
 
 def main():
@@ -20,7 +20,7 @@ def main():
 
     font_image = imread_korean(str(font_image_path))
 
-    custom_word_path = script_base_dir / "custom_word.json"
+    custom_word_path = script_base_dir / "custom_word_kor.json"
     custom_words = {}
     if custom_word_path.exists():
         with open(custom_word_path, "r", encoding="utf-8") as f:

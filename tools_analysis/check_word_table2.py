@@ -34,7 +34,7 @@ def main() -> None:
         base_dir = Path(f"/mnt/c/work_han/workspace{ws_num}")
     script_base_dir = base_dir / f"script-{platform}"
 
-    custom_word_path = script_base_dir / "custom_word.json"
+    custom_word_path = script_base_dir / "custom_word_kor.json"
     with custom_word_path.open("r", encoding="utf-8") as f:
         custom_words = json.load(f)
 

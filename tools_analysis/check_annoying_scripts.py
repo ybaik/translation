@@ -30,13 +30,17 @@ def main():
     # Read a pair of scripts
     for script_dir in script_dirs:
         src_font_table = get_cached_font_table(
-            file_path=Path("./font_table/font_table-jpn-full.json"), base_dir=base_dir, custom_char_dir=script_dir
+            file_path=Path("./font_table/font_table-jpn-full.json"),
+            base_dir=base_dir,
+            custom_char_path=script_dir / "custom_char_jpn.json",
         )
         dst_font_table = get_cached_font_table(
-            file_path=Path("./font_table/font_table-kor-jin.json"), base_dir=base_dir, custom_char_dir=script_dir
+            file_path=Path("./font_table/font_table-kor-jin.json"),
+            base_dir=base_dir,
+            custom_char_path=script_dir / "custom_char_kor.json",
         )
 
-        custom_word_path = script_dir / "custom_word.json"
+        custom_word_path = script_dir / "custom_word_kor.json"
         custom_words = {}
         if custom_word_path.exists():
             with open(custom_word_path, "r", encoding="utf-8") as f:
@@ -70,7 +74,7 @@ def main():
                     continue
 
                 length_from_src_sentence = src_font_table.check_length_from_sentence(
-                    sentence=src_sentence, custom_words=custom_words
+                    sentence=src_sentence
                 )
                 # length_from_src_sentence = src_font_table.verify_sentence(src_sentence)
                 dst_sentence = dst[address]

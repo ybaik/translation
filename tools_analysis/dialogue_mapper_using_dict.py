@@ -23,7 +23,7 @@ def main():
         dictionary = json.load(f)
 
     # Read a custom word dictionary
-    custom_word_path = script_base_dir / "custom_word.json"
+    custom_word_path = script_base_dir / "custom_word_kor.json"
     custom_words = {}
     if custom_word_path.exists():
         with open(custom_word_path, "r", encoding="utf-8") as f:
@@ -46,10 +46,12 @@ def main():
         dst_script = Script(str(dst_path))
 
         src_font_table = FontTable(
-            file_path=Path("./font_table/font_table-jpn-full.json"), custom_char_dir=script_base_dir
+            file_path=Path("./font_table/font_table-jpn-full.json"),
+            custom_char_path=script_base_dir / "custom_char_jpn.json",
         )
         dst_font_table = FontTable(
-            file_path=Path("./font_table/font_table-kor-jin.json"), custom_char_dir=script_base_dir
+            file_path=Path("./font_table/font_table-kor-jin.json"),
+            custom_char_path=script_base_dir / "custom_char_kor.json",
         )
 
         # Check addresses in the source script
@@ -66,7 +68,7 @@ def main():
             dst_sentence = dst_script.script[address]
             # length = src_font_table.check_length_from_address(address)
             len_src_sentence = src_font_table.check_length_from_sentence(
-                sentence=src_sentence, custom_words=custom_words
+                sentence=src_sentence
             )
             len_dst_sentence = dst_font_table.check_length_from_sentence(
                 sentence=dst_sentence, custom_words=custom_words

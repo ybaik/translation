@@ -43,6 +43,14 @@ Inject the translated script back into the binary:
 python write_script_auto.py
 ```
 
+### Script-specific Tables
+
+Place script-specific tables next to the `_jpn.json` and `_kor.json` files:
+
+- `custom_char_jpn.json`: Japanese source character-code overrides.
+- `custom_char_kor.json`: Korean destination character-code overrides.
+- `custom_word_kor.json`: Korean custom-word substitutions.
+
 ## Project Structure
 - `module/`: Core library (Script, FontTable, etc.)
 - `tools/`: Utility scripts for translation and conversion.

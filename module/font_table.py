@@ -1,7 +1,8 @@
 from __future__ import annotations
+import hashlib
 import json
-import pickle
 import logging
+import pickle
 from copy import deepcopy
 from pathlib import Path
 from typing import Optional, Any, cast
@@ -10,14 +11,25 @@ from .jisx0201 import jisx0201_table
 logger = logging.getLogger(__name__)
 
 
-def get_cached_font_table(file_path: Path, base_dir: Path, custom_char_dir: Path) -> FontTable:
-    cache_path = base_dir / file_path.name.replace(".json", ".pkl")
-    custom_char_path = custom_char_dir / "custom_char.json"
+def get_cached_font_table(
+    file_path: Path,
+    base_dir: Path,
+    custom_char_path: Optional[Path] = None,
+) -> FontTable:
+    """Load a font table from cache, rebuilding it when its source or custom table changes."""
+    custom_path_key = str(custom_char_path.resolve()) if custom_char_path is not None else "no-custom-char"
+    custom_path_hash = hashlib.sha256(custom_path_key.encode("utf-8")).hexdigest()[:12]
+    custom_path_name = custom_char_path.stem if custom_char_path is not None else "no-custom-char"
+    cache_path = base_dir / f"{file_path.stem}-{custom_path_name}-{custom_path_hash}.pkl"
 
     if cache_path.exists():
         mtime_cache = cache_path.stat().st_mtime
         mtime_font = file_path.stat().st_mtime
-        mtime_custom = custom_char_path.stat().st_mtime if custom_char_path.exists() else 0
+        mtime_custom = (
+            custom_char_path.stat().st_mtime
+            if custom_char_path is not None and custom_char_path.exists()
+            else 0
+        )
 
         if mtime_cache > mtime_font and mtime_cache > mtime_custom:
             try:
@@ -27,7 +39,7 @@ def get_cached_font_table(file_path: Path, base_dir: Path, custom_char_dir: Path
                 pass  # Create a new cache file when loading fails
 
     # Create a new cache file and save it
-    font_table = FontTable(file_path=file_path, custom_char_dir=custom_char_dir)
+    font_table = FontTable(file_path=file_path, custom_char_path=custom_char_path)
     try:
         with open(cache_path, "wb") as f:
             pickle.dump(font_table, f)
@@ -38,7 +50,11 @@ def get_cached_font_table(file_path: Path, base_dir: Path, custom_char_dir: Path
 
 
 class FontTable:
-    def __init__(self, file_path: Path, custom_char_dir: Optional[Path] = None) -> None:
+    def __init__(
+        self,
+        file_path: Path,
+        custom_char_path: Optional[Path] = None,
+    ) -> None:
         # Initialize
         self.code2char: dict[str, str] = dict()
         self.char2code: dict[str, str] = dict()
@@ -56,9 +72,9 @@ class FontTable:
         # Read font table
         self.read_font_table(file_path)
 
-        # Check if custom chars exist
-        if custom_char_dir is not None and (custom_char_dir / "custom_char.json").exists():
-            with open(custom_char_dir / "custom_char.json", "r", encoding="utf-8") as f:
+        # Apply a language-specific custom character table when present.
+        if custom_char_path is not None and custom_char_path.exists():
+            with open(custom_char_path, "r", encoding="utf-8") as f:
                 custom_chars = json.load(f)
             self.set_custom_char(custom_chars)
 
