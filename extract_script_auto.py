@@ -12,6 +12,7 @@ def main():
     platform = "pc98"
     bin_dir = Path(f"../{workspace}/jpn-{platform}-decoded")
     font_table_path = Path("font_table/font_table-jpn-full.json")
+    custom_char_path = Path(f"../{workspace}/script-{platform}/custom_char.json")
     extended_word = "_jpn"
     script_init_dir = Path(f"../{workspace}/script_init-{platform}")
 
@@ -49,7 +50,7 @@ def main():
 
         print(f"{file} ===========================================")
         # Read a font table
-        font_table = FontTable(font_table_path)
+        font_table = FontTable(font_table_path, custom_char_path=custom_char_path)
 
         # Read a target binary data
         with open(src_data_path, "rb") as f:

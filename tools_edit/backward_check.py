@@ -138,7 +138,7 @@ def main():
     console = Console()
     font_table = FontTable(
         file_path=Path("./font_table/font_table-jpn-full.json"),
-        custom_char_path=script_dir / "custom_char_jpn.json",
+        custom_char_path=script_dir / "custom_char.json",
     )
     consider_1byte = True
     overwrite = False

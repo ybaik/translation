@@ -47,9 +47,8 @@ python write_script_auto.py
 
 Place script-specific tables next to the `_jpn.json` and `_kor.json` files:
 
-- `custom_char_jpn.json`: Japanese source character-code overrides.
-- `custom_char_kor.json`: Korean destination character-code overrides.
-- `custom_word_kor.json`: Korean custom-word substitutions.
+- `custom_char.json`: Character-code overrides shared by Japanese source and Korean output tables.
+- `custom_word.json`: Korean output byte substitutions, including custom 1-byte characters.
 
 ## Project Structure
 - `module/`: Core library (Script, FontTable, etc.)

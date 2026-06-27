@@ -363,7 +363,7 @@ def main():
     pil_img = Image.fromarray(src_font_canvas)
     one_bit_img = pil_img.convert("1")
     one_bit_img.save(dst_font_canvas_path)
-    with open(base_dir / "custom_word_kor.json", "w", encoding="utf-8") as f:
+    with open(base_dir / "custom_word.json", "w", encoding="utf-8") as f:
         json.dump(ret_code_dict, f, ensure_ascii=False, indent=4)
 
 

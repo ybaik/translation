@@ -20,7 +20,7 @@ def main():
 
     font_image = imread_korean(str(font_image_path))
 
-    custom_word_path = script_base_dir / "custom_word_kor.json"
+    custom_word_path = script_base_dir / "custom_word.json"
     custom_words = {}
     if custom_word_path.exists():
         with open(custom_word_path, "r", encoding="utf-8") as f:

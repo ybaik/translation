@@ -49,7 +49,7 @@ def main():
     #         skip_list += f.read().splitlines()
     #         skip_list = list(set(skip_list))
 
-    custom_word_path = script_base_dir / "custom_word_kor.json"
+    custom_word_path = script_base_dir / "custom_word.json"
     custom_words = {}
     if custom_word_path.exists():
         with open(custom_word_path, "r", encoding="utf-8") as f:
@@ -95,12 +95,12 @@ def main():
         src_font_table = get_cached_font_table(
             file_path=src_font_table_path,
             base_dir=base_dir,
-            custom_char_path=script_base_dir / "custom_char_jpn.json",
+            custom_char_path=script_base_dir / "custom_char.json",
         )
         dst_font_table = get_cached_font_table(
             file_path=dst_font_table_path,
             base_dir=base_dir,
-            custom_char_path=script_base_dir / "custom_char_kor.json",
+            custom_char_path=script_base_dir / "custom_char.json",
         )
 
         # Read source and destination script

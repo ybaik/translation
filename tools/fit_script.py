@@ -14,7 +14,7 @@ def main():
     script_path = base_script_dir / "MESSAGE.DAT_kor.json"
     script_path = base_script_dir / "DATA/ITEMDOC.TBZ_kor.json"
 
-    custom_word_path = base_script_dir / "custom_word_kor.json"
+    custom_word_path = base_script_dir / "custom_word.json"
     custom_words = {}
     if custom_word_path.exists():
         with open(custom_word_path, "r", encoding="utf-8") as f:
@@ -23,7 +23,7 @@ def main():
     dst_font_table = get_cached_font_table(
         file_path=Path("./font_table/font_table-kor-jin.json"),
         base_dir=base_dir,
-        custom_char_path=base_script_dir / "custom_char_kor.json",
+        custom_char_path=base_script_dir / "custom_char.json",
     )
 
     # … ␀ ␁
