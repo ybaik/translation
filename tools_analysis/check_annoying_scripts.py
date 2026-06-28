@@ -7,7 +7,7 @@ from module.font_table import get_cached_font_table
 def main():
     console = Console()
 
-    ws_num = 1
+    ws_num = 0
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
     script_dirs = [
         base_dir / "script-dos",
@@ -73,9 +73,7 @@ def main():
                 if address not in dst:
                     continue
 
-                length_from_src_sentence = src_font_table.check_length_from_sentence(
-                    sentence=src_sentence
-                )
+                length_from_src_sentence = src_font_table.check_length_from_sentence(sentence=src_sentence)
                 # length_from_src_sentence = src_font_table.verify_sentence(src_sentence)
                 dst_sentence = dst[address]
                 length_from_dst_sentence = dst_font_table.check_length_from_sentence(
