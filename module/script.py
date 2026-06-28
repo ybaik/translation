@@ -6,89 +6,6 @@ from module.font_table import FontTable
 from module.decoding import decode, encode
 
 
-def extract_script(
-    data: bytearray,
-    font_table: FontTable,
-    length_threshold: int,
-    check_ascii: bool = False,
-    check_ascii_restriction: bool = False,
-    check_range: bool = False,
-) -> Tuple[Dict, Dict]:
-    i = 0
-    length = 0  # Sentence length in bytes
-    sentence = ""
-    sentence_log = ""
-    script = dict()
-    script_log = dict()
-
-    while i < len(data) - 1:
-        # Extract a 2-byte code
-        code_int = (data[i] << 8) + data[i + 1]
-        code_hex = f"{code_int:X}"
-
-        need_to_stop = True
-
-        character = font_table.get_char(code_hex)
-        if character is not None:
-            need_to_stop = False
-
-        if check_range and font_table.range(code_int):
-            need_to_stop = False
-
-        if not need_to_stop:
-            # Find a character in the font table
-            character = font_table.get_char(code_hex)
-
-            if character:  # Character is in the font table
-                sentence += character
-                if character == "■":
-                    sentence_log += f":{code_hex}" if sentence_log else f"{code_hex}"
-                length += 2
-                i += 2
-            else:
-                sentence += "@"
-                sentence_log += f":@{code_hex}" if sentence_log else f"@{code_hex}"
-                length += 2
-                i += 2
-        else:
-            if check_ascii:
-                code_int = data[i]
-                code_hex = f"{code_int:02X}"
-                character = font_table.get_char_ascii(code_hex)
-
-                if check_ascii_restriction and character != "_" and length == 0:
-                    need_to_stop = True
-                elif character is not None:
-                    sentence += "|" + character
-                    length += 1
-                    need_to_stop = False
-
-            # Check sentence length and save
-            if need_to_stop:
-                if length >= length_threshold:
-                    if "�" not in sentence:  # Need to check this later
-                        address = f"{i - length:05X}={i - 1:05X}"
-                        script[address] = sentence
-                        if sentence_log:
-                            script_log[address] = sentence_log
-                sentence = ""
-                sentence_log = ""
-                length = 0
-            i += 1
-
-    # Check a result of the end of data
-    if length >= length_threshold:
-        address = f"{i - length * 2:05X}={i - 1:05X}"
-        script[address] = sentence
-        if sentence_log:
-            script_log[address] = sentence_log
-        sentence = ""
-        sentence_log = ""
-        length = 0
-
-    return script, script_log
-
-
 def write_code(data: bytearray, hex_start: str, hex_end: str, code_hex: str, count: int) -> bytearray:
     spos = int(hex_start, 16)
     epos = int(hex_end, 16)
@@ -738,7 +655,7 @@ class Script:
 
         # Check a result of the end of data
         if length >= length_threshold:
-            address = f"{i - length * 2:05X}={i - 1:05X}"
+            address = f"{i - length:05X}={i - 1:05X}"
             self.script[address] = sentence
             if sentence_log:
                 script_log[address] = sentence_log

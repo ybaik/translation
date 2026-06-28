@@ -1,16 +1,15 @@
 import os
-import json
 from pathlib import Path
 from module.font_table import FontTable
-from module.script import extract_script
+from module.script import Script
 from module.decoding import decode
 
 
 def main():
-    ws_num = 6
+    ws_num = 0
     workspace = f"workspace{ws_num}"
     platform = "pc98"
-    bin_dir = Path(f"../{workspace}/jpn-{platform}-decoded")
+    bin_dir = Path(f"../{workspace}/jpn-{platform}")
     font_table_path = Path("font_table/font_table-jpn-full.json")
     custom_char_path = Path(f"../{workspace}/script-{platform}/custom_char.json")
     extended_word = "_jpn"
@@ -42,8 +41,8 @@ def main():
         # if "SCEDATA" not in file.name:
         #     continue
 
-        if file.suffix not in [".TBZ"]:
-            continue
+        # if file.suffix not in [".TBZ"]:
+        #     continue
 
         if not os.path.isfile(src_data_path):
             continue
@@ -68,7 +67,8 @@ def main():
         print(f"Data size: {src_data_path}({len(data):,} bytes)")
 
         # Extract a script from the binary data
-        script, _ = extract_script(
+        script = Script()
+        script.extract_script(
             data=data,
             font_table=font_table,
             length_threshold=length_threshold_in_bytes,
@@ -77,8 +77,7 @@ def main():
         )
 
         # Save the extracted script to a file in the script directory
-        with open(dst_script_path, "w", encoding="utf-8") as f:
-            json.dump(script, f, ensure_ascii=False, indent=4)
+        script.save(dst_script_path)
 
 
 if __name__ == "__main__":
