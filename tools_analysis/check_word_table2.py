@@ -16,18 +16,35 @@ def iter_strings(value: Any) -> Iterator[str]:
             yield from iter_strings(child)
 
 
-def is_left_only_key(key: str, all_keys: set[str]) -> bool:
-    """_* 키 중 같은 *가 *_ 키로도 쓰이는 경우는 제외한다."""
-    if not key.startswith("_") or len(key) <= 1:
+def is_target_key(
+    key: str,
+    all_keys: set[str],
+    check_left_only: bool,
+    check_opposite_key: bool,
+) -> bool:
+    """선택한 형태와 상대 키 검사 조건에 맞는지 확인한다."""
+    if len(key) <= 1:
         return False
 
-    word = key[1:]
-    return f"{word}_" not in all_keys
+    if check_left_only:
+        if not key.startswith("_"):
+            return False
+        word = key[1:]
+        opposite_key = f"{word}_"
+    else:
+        if not key.endswith("_"):
+            return False
+        word = key[:-1]
+        opposite_key = f"_{word}"
+
+    return not check_opposite_key or opposite_key not in all_keys
 
 
 def main() -> None:
-    ws_num = 4
+    ws_num = 1
     platform = "pc98"
+    check_left_only = False  # True: _*, False: *_
+    check_opposite_key = False  # True: 상대 키가 없는 항목만, False: 모두
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
     if not base_dir.exists():
         # WSL에서 실행할 때의 C: 드라이브 경로
@@ -42,7 +59,7 @@ def main() -> None:
         raise ValueError(f"{custom_word_path}의 최상위 값은 객체여야 합니다.")
 
     all_keys = set(custom_words)
-    target_keys = [key for key in custom_words if is_left_only_key(key, all_keys)]
+    target_keys = [key for key in custom_words if is_target_key(key, all_keys, check_left_only, check_opposite_key)]
 
     occurrence_counts: Counter[str] = Counter()
     sentence_counts: Counter[str] = Counter()
@@ -73,10 +90,15 @@ def main() -> None:
 
     print(f"대상 파일: {len(kor_files)}개")
     print(f"custom_word 키: {len(custom_words)}개")
-    print(f'체크 대상 "_*" 키: {len(target_keys)}개')
+    key_pattern = "_*" if check_left_only else "*_"
+    print(f'체크 대상 "{key_pattern}" 키: {len(target_keys)}개')
     print("키\t등장 횟수\t문장 수\t파일 수")
     for key in sorted_keys:
         print(f"{key}\t{occurrence_counts[key]}\t{sentence_counts[key]}\t{file_counts[key]}")
+
+    alphabetical_keys = sorted(target_keys, key=lambda key: key.strip("_"))
+    print("가나다순 키")
+    print("".join(f"|{key}" for key in alphabetical_keys))
 
 
 if __name__ == "__main__":

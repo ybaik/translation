@@ -5,6 +5,7 @@ from typing import Any
 
 
 WORD_PATTERN = re.compile(r"\{([^{}]+)\}")
+SPACE_BEFORE_NULL_PATTERN = re.compile(r"\|_(?=(?:\|)?␀)")
 
 
 def rewrite_word(word: str, custom_words: dict[str, str]) -> str | None:
@@ -51,10 +52,20 @@ def rewrite_sentence(sentence: str, custom_words: dict[str, str]) -> tuple[str, 
         rewritten = rewrite_word(word, custom_words)
         if rewritten is None or rewritten == match.group(0):
             return match.group(0)
+        if (
+            word.endswith("_")
+            and match.end() == len(sentence)
+            and rewritten.endswith("|_")
+        ):
+            rewritten = rewritten[:-2] + "|␀"
         changes += 1
         return rewritten
 
     rewritten_sentence = WORD_PATTERN.sub(replace, sentence)
+    rewritten_sentence, null_changes = SPACE_BEFORE_NULL_PATTERN.subn(
+        "|␀", rewritten_sentence
+    )
+    changes += null_changes
     return rewritten_sentence, changes
 
 
@@ -82,7 +93,7 @@ def walk_and_rewrite(value: Any, custom_words: dict[str, str]) -> tuple[Any, int
 
 
 def main() -> None:
-    ws_num = 4
+    ws_num = 1
     platform = "pc98"
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
     if not base_dir.exists():
@@ -114,7 +125,7 @@ def main() -> None:
 
     print(f"대상 파일: {len(kor_files)}개")
     print(f"수정된 파일: {changed_files}개")
-    print(f"치환된 {{...}} 블록: {changed_words}개")
+    print(f"치환된 블록/공백: {changed_words}개")
 
 
 if __name__ == "__main__":

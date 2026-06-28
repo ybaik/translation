@@ -96,7 +96,7 @@ def split_and_pair(text: str, pairs: set) -> bool:
 
 def main():
     base_dir = Path("c:/work_han/font_update_db")
-    font_name = "둥근모"  # "둥근모", "비스코"
+    font_name = "비스코"  # "둥근모", "비스코"
     if font_name == "둥근모":
         font_file = "ThinDungGeunMo.bmp"
     if font_name == "비스코":
@@ -108,23 +108,23 @@ def main():
 
     # 1byte font
     input_cand_1byte = []
-    input_cand_1byte += ["|가", "|간", "|게", "|겐", "|고", "|기"]
-    input_cand_1byte += ["|나", "|노", "|누", "|니"]
+    input_cand_1byte += ["|가", "|게", "|고", "|기"]
+    input_cand_1byte += ["|나", "|노", "|니"]
     input_cand_1byte += ["|다", "|도"]
-    input_cand_1byte += ["|라", "|란", "|로", "|리"]
-    input_cand_1byte += ["|마", "|무", "|미"]
-    input_cand_1byte += ["|바", "|반", "|보", "|부"]
-    input_cand_1byte += ["|사", "|세", "|소", "|쇼", "|슈", "|시", "|신"]
-    input_cand_1byte += ["|아", "|야", "|에", "|오", "|와", "|우", "|유", "|이", "|인", "|잇"]
-    input_cand_1byte += ["|조", "|죠", "|쥬", "|쥰", "|즈", "|지", "|츠", "|치"]
-    input_cand_1byte += ["|카", "|칸", "|케", "|코", "|쿠", "|타", "|테", "|토"]
-    input_cand_1byte += ["|한", "|호"]
+    input_cand_1byte += ["|라", "|로", "|리"]
+    input_cand_1byte += ["|마", "|만", "|모", "|미"]
+    input_cand_1byte += ["|바", "|반", "|베", "|보", "|부"]
+    input_cand_1byte += ["|사", "|세", "|슈", "|시"]
+    input_cand_1byte += ["|야", "|에", "|오", "|와", "|이", "|인"]
+    input_cand_1byte += ["|조", "|즈", "|지", "|츠", "|치"]
+    input_cand_1byte += ["|카", "|케", "|쿠", "|키", "|타", "|테", "|토"]
+    input_cand_1byte += ["|호"]
     input_cand_1byte.sort()
     if len(input_cand_1byte) > 58:
         print(len(input_cand_1byte))
         return
 
-    input_cand_1byte = []  # Remove 1byte code due to taikou1 font issue
+    # input_cand_1byte = []  # Remove 1byte code due to taikou1 font issue
 
     start_code_int = 0xA6
     ret_code_dict = {letter: f"{start_code_int + i:02X}" for i, letter in enumerate(input_cand_1byte)}

@@ -21,6 +21,84 @@ def align_length(jpn: str, kor: str, jpn_len: int, kor_len: int):
     return length, jpn, kor
 
 
+def pair_korean(text: str) -> str:
+    return "".join(
+        "{" + text[i : i + 2] + "}" for i in range(0, len(text), 2)
+    )
+
+
+def format_korean_name_mixed_space(fn_kor: str, gn_kor: str):
+    """기존 공백 배치 방식을 보관한다."""
+    space_added = False
+    if len(fn_kor) % 2:
+        fn_kor += "_"
+        space_added = True
+    if len(gn_kor) % 2:
+        gn_kor = "_" + gn_kor
+        space_added = True
+
+    fn_kor_len = len(fn_kor)
+    gn_kor_len = len(gn_kor)
+    fn_kor = pair_korean(fn_kor)
+    gn_kor = pair_korean(gn_kor)
+
+    if not space_added:
+        if gn_kor_len < 6:
+            gn_kor_len += 1
+            gn_kor = "|_" + gn_kor
+        elif fn_kor_len < 6:
+            fn_kor_len += 1
+            fn_kor += "|_"
+        else:
+            raise ValueError("Name length is too long.")
+
+    return fn_kor, gn_kor, fn_kor_len, gn_kor_len
+
+
+def format_korean_name_prefer_given_leading_space(
+    fn_kor: str, gn_kor: str, max_length: int = 6
+):
+    """이름 앞 공간을 우선하면서 모든 한글을 2바이트 묶음 문자로 변환한다."""
+    full_name = f"{fn_kor} {gn_kor}"
+
+    if len(fn_kor) % 2:
+        fn_kor += "_"
+    fn_len = len(fn_kor)
+    fn_code = pair_korean(fn_kor)
+
+    if len(gn_kor) % 2:
+        gn_kor = "_" + gn_kor
+        gn_len = len(gn_kor)
+        gn_code = pair_korean(gn_kor)
+        given_has_leading_space = True
+    elif len(gn_kor) + 1 <= max_length:
+        gn_len = len(gn_kor) + 1
+        gn_code = "|_" + pair_korean(gn_kor)
+        given_has_leading_space = True
+    else:
+        gn_len = len(gn_kor)
+        gn_code = pair_korean(gn_kor)
+        given_has_leading_space = False
+
+    if not given_has_leading_space:
+        if not fn_kor.endswith("_") and fn_len + 1 <= max_length:
+            fn_code += "|_"
+            fn_len += 1
+        elif not fn_kor.endswith("_"):
+            raise ValueError(
+                f"Name length is too long: {full_name} "
+                f"({fn_len}/{gn_len} bytes)"
+            )
+
+    if fn_len > max_length or gn_len > max_length:
+        raise ValueError(
+            f"Name length is too long: {full_name} "
+            f"({fn_len}/{gn_len} bytes)"
+        )
+
+    return fn_code, gn_code, fn_len, gn_len
+
+
 def main():
     name_db = NameDB()
     game = "taiko1"
@@ -70,31 +148,13 @@ def main():
 
             fn_kor, gn_kor = name_db.full_name_db[full_name_jpn_clean]["kor"].split(" ")
 
-            space_added = False
-            if len(fn_kor) % 2:
-                fn_kor += "_"
-                space_added = True
-            if len(gn_kor) % 2:
-                gn_kor = "_" + gn_kor
-                space_added = True
-
             fn_jpn_len = len(fn_jpn) * 2
-            fn_kor_len = len(fn_kor)
             gn_jpn_len = len(gn_jpn) * 2
-            gn_kor_len = len(gn_kor)
-
-            fn_kor = "".join("{" + fn_kor[i : i + 2] + "}" for i in range(0, len(fn_kor), 2))
-            gn_kor = "".join("{" + gn_kor[i : i + 2] + "}" for i in range(0, len(gn_kor), 2))
-
-            if not space_added:
-                if gn_kor_len < 6:
-                    gn_kor_len += 1
-                    gn_kor = "|_" + gn_kor
-                elif fn_kor_len < 6:
-                    fn_kor_len += 1
-                    fn_kor += "|_"
-                else:
-                    assert 0, f"Name length is too long: {full_name_jpn_clean}"
+            fn_kor, gn_kor, fn_kor_len, gn_kor_len = (
+                format_korean_name_prefer_given_leading_space(
+                    fn_kor, gn_kor
+                )
+            )
 
             # Compare length of jpn and kor
             fn_length, fn_jpn, fn_kor = align_length(fn_jpn, fn_kor, fn_jpn_len, fn_kor_len)
