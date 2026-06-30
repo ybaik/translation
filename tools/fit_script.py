@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from rich.console import Console
+from module.content import Content
 from module.font_table import get_cached_font_table
 
 
@@ -61,7 +62,12 @@ def main():
             src_script = json.load(f)
 
         for script_range, dialogue in dialogue_array.items():
-            src_script[script_range] = dialogue
+            if script_range in src_script:
+                content = Content.parse(src_script[script_range])
+                content.text = dialogue
+            else:
+                content = Content(text=dialogue)
+            src_script[script_range] = content.serialize()
 
         console.print("Saved", style="green")
         with open(script_path, "w", encoding="utf-8") as f:

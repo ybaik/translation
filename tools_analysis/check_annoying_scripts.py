@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from rich.console import Console
+from module.content import Content
 from module.font_table import get_cached_font_table
 
 
@@ -67,6 +68,7 @@ def main():
             for address, src_sentence in src.items():
                 if "=" not in address:
                     continue
+                src_sentence = Content.parse(src_sentence).text
                 if src_sentence not in annoying:
                     continue
 
@@ -75,7 +77,8 @@ def main():
 
                 length_from_src_sentence = src_font_table.check_length_from_sentence(sentence=src_sentence)
                 # length_from_src_sentence = src_font_table.verify_sentence(src_sentence)
-                dst_sentence = dst[address]
+                dst_content = Content.parse(dst[address])
+                dst_sentence = dst_content.text
                 length_from_dst_sentence = dst_font_table.check_length_from_sentence(
                     sentence=dst_sentence, custom_words=custom_words
                 )
@@ -101,7 +104,8 @@ def main():
                     idx = annoying[src_sentence]["s"]
                     new_sentence = annoying[src_sentence]["translated"][idx]
                     if new_sentence != dst_sentence:
-                        dst[address] = new_sentence
+                        dst_content.text = new_sentence
+                        dst[address] = dst_content.serialize()
                         console.print(f"{address},{file_tag}", style=color)
                         print(new_sentence)
                         modified = True

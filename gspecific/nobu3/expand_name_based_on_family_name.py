@@ -81,7 +81,8 @@ def main():
         mod_list_jpn = []
         mod_list_kor = []
 
-        for address, jpn_sentence in jpn_script.script.items():
+        for address, jpn_content in jpn_script.script.items():
+            jpn_sentence = jpn_content.text
             start, end = address.split("=")
             start = int(start, 16)
             end = int(end, 16)
@@ -116,7 +117,7 @@ def main():
             else:
                 continue
 
-            kor_sentence = kor_script.script[address]
+            kor_sentence = kor_script.script[address].text
 
             # Check 1-byte null count
             jpn_byte_add = jpn_sentence.count("|␀")
@@ -158,7 +159,7 @@ def main():
                     kor_sentence_new += "␀" * (diff // 2)
                 if diff % 2:
                     kor_sentence_new += "|␀"
-                kor_script.script[address] = kor_sentence_new
+                kor_script.script[address].text = kor_sentence_new
 
             elif diff < 0:
                 # Need to check binary in jpn

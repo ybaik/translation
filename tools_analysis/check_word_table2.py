@@ -1,19 +1,16 @@
 import json
 from collections import Counter
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Iterator
+from module.content import Content
 
 
-def iter_strings(value: Any) -> Iterator[str]:
-    """JSON 값에서 모든 문자열을 재귀적으로 꺼낸다."""
-    if isinstance(value, str):
-        yield value
-    elif isinstance(value, dict):
-        for child in value.values():
-            yield from iter_strings(child)
-    elif isinstance(value, list):
-        for child in value:
-            yield from iter_strings(child)
+def iter_sentences(script: dict) -> Iterator[str]:
+    """메타데이터와 description을 제외한 대사 본문을 꺼낸다."""
+    for address, sentence in script.items():
+        if "=" not in address or not isinstance(sentence, str):
+            continue
+        yield Content.parse(sentence).text
 
 
 def is_target_key(
@@ -68,7 +65,7 @@ def main() -> None:
     kor_files = sorted(script_base_dir.glob("*_kor.json"))
     for kor_path in kor_files:
         with kor_path.open("r", encoding="utf-8") as f:
-            sentences = list(iter_strings(json.load(f)))
+            sentences = list(iter_sentences(json.load(f)))
 
         keys_used_in_file: set[str] = set()
         for sentence in sentences:

@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from rich.console import Console
+from module.content import Content
 from module.font_table import FontTable
 
 control_codes = [
@@ -46,6 +47,9 @@ def main():
 
             # check address
             for address, dst_sentence in dst.items():
+                if "=" not in address or not isinstance(dst_sentence, str):
+                    continue
+                dst_sentence = Content.parse(dst_sentence).text
                 # Remove control codes
                 for control_code in control_codes:
                     dst_sentence = dst_sentence.replace(control_code, "")

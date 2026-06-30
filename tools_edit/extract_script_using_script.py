@@ -34,7 +34,8 @@ def main():
     # src_font_table = FontTable(src_font_table_path, script_base_dir)
 
     pos = 0
-    for address, sentence_jpn in src_jpn_script.script.items():
+    for address, content_jpn in src_jpn_script.script.items():
+        sentence_jpn = content_jpn.text
         start, end = address.split("=")
         start = int(start, 16)
         end = int(end, 16)
@@ -70,8 +71,8 @@ def main():
 
         # Check if it is already found
         if address_new not in dst_jpn_script.script:
-            dst_jpn_script.script[address_new] = sentence_jpn
-            dst_kor_script.script[address_new] = src_kor_script.script[address]
+            dst_jpn_script.script[address_new] = content_jpn.copy()
+            dst_kor_script.script[address_new] = src_kor_script.script[address].copy()
         pos = end_new + 1
 
     dst_jpn_script.save(dst_jpn_script_path)

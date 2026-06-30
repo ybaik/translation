@@ -31,7 +31,8 @@ def main():
         # Search for target sentences in the script
         src_script = Script(str(file))
         pairs = list()
-        for address, sentence in src_script.script.items():
+        for address, content in src_script.script.items():
+            sentence = content.text
             if sentence not in dictionary:
                 continue
             pairs.append((address, sentence))

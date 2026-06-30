@@ -24,7 +24,8 @@ def main():
 
     mod_list = []
 
-    for address, sentence in script_jpn.script.items():
+    for address, content in script_jpn.script.items():
+        sentence = content.text
         start, end = address.split("=")
         start = int(start, 16)
         end = int(end, 16)
@@ -47,13 +48,13 @@ def main():
 
         if len(fn_jpn) == 0:
             fn_jpn = sentence
-            fn_kor = script_kor.script[address]
+            fn_kor = script_kor.script[address].text
             prev_address = address
             continue
 
         if len(gn_jpn) == 0:
             gn_jpn = sentence
-            gn_kor = script_kor.script[address]
+            gn_kor = script_kor.script[address].text
 
         fn_jpn = fn_jpn.replace("␀", "")
         gn_jpn = gn_jpn.replace("␀", "")

@@ -9,9 +9,10 @@ def check_length_from_address(address: str) -> int:
 
 
 def check_length_from_sentence(sentence: str) -> int:
+    sentence = sentence.split("#")[0]
     # Check if the sentence is hex-only
     if "0x:" == sentence[:3]:
-        sentence = sentence[3:].split("#")[0]  # Remove the hex-only code and the comment
+        sentence = sentence[3:]  # Remove the hex-only code prefix
         return len(sentence) // 2
 
     total_length = 0

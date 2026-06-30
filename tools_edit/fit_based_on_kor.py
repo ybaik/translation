@@ -5,9 +5,10 @@ from module.script import Script
 
 
 def check_length_from_sentence(sentence: str) -> int:
+    sentence = sentence.split("#")[0]
     # Check if the sentence is hex-only
     if "0x:" == sentence[:3]:
-        sentence = sentence[3:].split("#")[0]  # Remove the hex-only code and the comment
+        sentence = sentence[3:]  # Remove the hex-only code prefix
         return len(sentence) // 2
 
     num_one_byte = sentence.count("|")
@@ -25,7 +26,8 @@ def main():
     kor_script = Script(str(kor_script_path))
 
     count = 0
-    for kor_address, kor_sentence in kor_script.script.items():
+    for kor_address, kor_content in kor_script.script.items():
+        kor_sentence = kor_content.text
         start, end = kor_address.split("=")
         start = int(start, 16)
         end = int(end, 16)
@@ -36,7 +38,8 @@ def main():
         if start > 0x442F5:
             continue
 
-        for jpn_address, jpn_sentence in jpn_script.script.items():
+        for jpn_address, jpn_content in jpn_script.script.items():
+            jpn_sentence = jpn_content.text
             start_jpn, end_jpn = jpn_address.split("=")
             start_jpn = int(start_jpn, 16)
             end_jpn = int(end_jpn, 16)

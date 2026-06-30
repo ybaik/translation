@@ -1,7 +1,7 @@
 import json
 import re
 from pathlib import Path
-from typing import Any
+from module.content import Content
 
 
 WORD_PATTERN = re.compile(r"\{([^{}]+)\}")
@@ -63,27 +63,20 @@ def rewrite_sentence(sentence: str, custom_words: dict[str, str]) -> tuple[str, 
     return rewritten_sentence, changes
 
 
-def walk_and_rewrite(value: Any, custom_words: dict[str, str]) -> tuple[Any, int]:
-    """JSON 구조를 유지한 채 문자열만 재작성한다."""
+def rewrite_script(script: dict, custom_words: dict[str, str]) -> tuple[dict, int]:
+    """메타데이터와 description을 보존하면서 대사 본문만 재작성한다."""
+    rewritten_script = dict(script)
     changes = 0
-    if isinstance(value, str):
-        rewritten, count = rewrite_sentence(value, custom_words)
-        return rewritten, count
-    if isinstance(value, list):
-        rewritten_list = []
-        for item in value:
-            rewritten_item, count = walk_and_rewrite(item, custom_words)
-            rewritten_list.append(rewritten_item)
-            changes += count
-        return rewritten_list, changes
-    if isinstance(value, dict):
-        rewritten_dict = {}
-        for key, item in value.items():
-            rewritten_item, count = walk_and_rewrite(item, custom_words)
-            rewritten_dict[key] = rewritten_item
-            changes += count
-        return rewritten_dict, changes
-    return value, 0
+    for address, sentence in script.items():
+        if "=" not in address or not isinstance(sentence, str):
+            continue
+
+        content = Content.parse(sentence)
+        content.text, count = rewrite_sentence(content.text, custom_words)
+        rewritten_script[address] = content.serialize()
+        changes += count
+
+    return rewritten_script, changes
 
 
 def main() -> None:
@@ -110,7 +103,7 @@ def main() -> None:
         with kor_path.open("r", encoding="utf-8") as f:
             data = json.load(f)
 
-        rewritten_data, changes = walk_and_rewrite(data, custom_words)
+        rewritten_data, changes = rewrite_script(data, custom_words)
         if changes:
             changed_files += 1
             changed_words += changes

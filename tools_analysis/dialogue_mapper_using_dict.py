@@ -56,16 +56,17 @@ def main():
 
         # Check addresses in the source script
         modified = False
-        for address, src_sentence in src_script.script.items():
+        for address, src_content in src_script.script.items():
             if "=" not in address:
                 continue
+            src_sentence = src_content.text
 
             if src_sentence not in dictionary:
                 continue
             if address not in dst_script.script:
                 continue
 
-            dst_sentence = dst_script.script[address]
+            dst_sentence = dst_script.script[address].text
             # length = src_font_table.check_length_from_address(address)
             len_src_sentence = src_font_table.check_length_from_sentence(
                 sentence=src_sentence
@@ -91,8 +92,8 @@ def main():
                 #     console.print(f"Length mismatch: {address},{file_tag}", style="red")
                 #     continue
 
-                if dst_script.script[address] != translated[0]:
-                    dst_script.script[address] = translated[0]
+                if dst_script.script[address].text != translated[0]:
+                    dst_script.script[address].text = translated[0]
                     modified = True
 
                     console.print(f"{address},{file_tag}", style=color)

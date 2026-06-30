@@ -54,7 +54,8 @@ def main():
 
         mod_list_jpn = []
         mod_list_kor = []
-        for address, sentence in jpn_script.script.items():
+        for address, content in jpn_script.script.items():
+            sentence = content.text
             start, end = address.split("=")
             start = int(start, 16)
             end = int(end, 16)
@@ -86,7 +87,7 @@ def main():
 
             if len(sentence) == code_len:
                 # kor_script.script[address] = f"0x:{code}# {kor}"
-                kor_script.script[address] = f"{{{kor}}}"
+                kor_script.script[address].text = f"{{{kor}}}"
                 continue
 
             if len(sentence) > code_len:

@@ -35,7 +35,8 @@ def main():
         mod_list_jpn = []
         mod_list_kor = []
 
-        for address, sentence in jpn_script.script.items():
+        for address, content in jpn_script.script.items():
+            sentence = content.text
             start, end = address.split("=")
             start = int(start, 16)
             end = int(end, 16)
@@ -58,7 +59,7 @@ def main():
 
             if jpn_byte >= kor_byte:
                 kor += "|␀" * (jpn_byte - kor_byte)
-                kor_script.script[address] = kor
+                kor_script.script[address].text = kor
             else:
                 jpn += "|␀" * (kor_byte - jpn_byte)
                 end += kor_byte - jpn_byte

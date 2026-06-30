@@ -46,8 +46,8 @@ def main():
                 sentence_jpn = address
                 sentence_kor = address
             else:
-                sentence_jpn = src_script.script[address]
-                sentence_kor = dst_script.script[address]
+                sentence_jpn = src_script.script[address].text
+                sentence_kor = dst_script.script[address].text
 
             if address in inputs:
                 idx = inputs.index(address) % 4

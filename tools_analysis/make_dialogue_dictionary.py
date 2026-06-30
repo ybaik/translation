@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from rich.console import Console
+from module.content import Content
 from module.font_table import get_cached_font_table
 
 
@@ -69,6 +70,7 @@ def main():
                 # Check if the address is in the destination script
                 if address not in dst:
                     continue
+                src_sentence = Content.parse(src_sentence).text
 
                 # Check if the src and dst sentences are valid
                 length = src_font_table.check_length_from_address(address)
@@ -82,7 +84,7 @@ def main():
                     continue
 
                 # Check if the src and dst sentences are valid
-                dst_sentence = dst[address]
+                dst_sentence = Content.parse(dst[address]).text
                 length_from_dst_sentence = dst_font_table.check_length_from_sentence(
                     sentence=dst_sentence, custom_words=custom_words
                 )

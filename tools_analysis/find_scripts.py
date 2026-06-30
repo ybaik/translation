@@ -41,7 +41,8 @@ def main():
         buf_dst_sentence = ""
 
         if not find_source:
-            for address, dst_sentence in dst_script.script.items():
+            for address, dst_content in dst_script.script.items():
+                dst_sentence = dst_content.text
                 found = False
                 if restriction:
                     if sentence_kor == dst_sentence:
@@ -53,7 +54,7 @@ def main():
                     # if sentence_kor != dst_sentence:
                     buf_address = address
                     buf_dst_sentence = dst_sentence
-                    buf_src_sentence = src_script.script[address]
+                    buf_src_sentence = src_script.script[address].text
                     continue
 
                 print("=============================")
@@ -61,11 +62,12 @@ def main():
                 # print(buf_src_sentence)
                 # print(buf_dst_sentence)
                 console.print(f"{address} {file_tag}", style="green")
-                print(src_script.script[address])
+                print(src_script.script[address].text)
                 print(dst_sentence)
                 print("=============================")
         else:
-            for address, src_sentence in src_script.script.items():
+            for address, src_content in src_script.script.items():
+                src_sentence = src_content.text
                 found = False
                 if restriction:
                     if sentence == src_sentence:
@@ -97,7 +99,7 @@ def main():
                 # print(buf_dst_sentence)
                 console.print(f"{address} {file_tag}", style="green")
                 print(src_sentence)
-                print(dst_script.script[address])
+                print(dst_script.script[address].text)
                 print("=============================")
 
 

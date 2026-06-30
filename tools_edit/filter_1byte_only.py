@@ -20,7 +20,8 @@ def main():
         script = Script(str(file))
 
         list_to_delete = []
-        for address, sentence in script.script.items():
+        for address, content in script.script.items():
+            sentence = content.text
             if "0x:" in sentence:
                 continue
             length = len(sentence)

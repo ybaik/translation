@@ -144,12 +144,12 @@ def read_name_arrays(script_jpn: Script, file_name: str):
     config = FILE_CONFIG[file_name]
     entries = []
 
-    for address, sentence in script_jpn.script.items():
+    for address, content in script_jpn.script.items():
         if "=" not in address:
             continue
         start = int(address.split("=", 1)[0], 16)
         if config["start"] <= start <= config["end"]:
-            entries.append((address, sentence))
+            entries.append((address, content.text))
 
     entries.sort(key=lambda item: int(item[0].split("=", 1)[0], 16))
 

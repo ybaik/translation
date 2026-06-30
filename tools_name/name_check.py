@@ -19,7 +19,8 @@ def main():
     gn_jpn = ""
     prev_address = ""
 
-    for address, sentence in script_jpn.script.items():
+    for address, content in script_jpn.script.items():
+        sentence = content.text
         start, end = address.split("=")
         start = int(start, 16)
         end = int(end, 16)

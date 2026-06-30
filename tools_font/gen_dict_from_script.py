@@ -31,13 +31,12 @@ def main():
         # Read a script
         script = Script(str(file))
 
-        for address, sentence in script.script.items():
-            if "0x:" not in sentence:
+        for address, content in script.script.items():
+            if not content.is_hex or content.description is None:
                 continue
 
-            code, desc = sentence[3:].split("#")
-            code = code.strip()
-            desc = desc.strip()
+            code = content.hex_codes.strip()
+            desc = content.description.strip()
             desc = desc.replace(" ", "_")
 
             if work == "gen_dict":
@@ -49,7 +48,7 @@ def main():
                     new_desc = f"{{{desc}}}"
                     # new_desc = new_desc.replace("|_", "_")
                     # new_desc = new_desc.replace("|␀", "")
-                    script.script[address] = new_desc
+                    content.text = new_desc
 
         if work == "update_sentence":
             script.save(file)

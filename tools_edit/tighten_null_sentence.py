@@ -27,7 +27,8 @@ def main():
 
         mod_list_jpn = []
         mod_list_kor = []
-        for address, jpn_sentence in jpn_script.script.items():
+        for address, jpn_content in jpn_script.script.items():
+            jpn_sentence = jpn_content.text
             start, end = address.split("=")
             start = int(start, 16)
             end = int(end, 16)
@@ -35,7 +36,7 @@ def main():
             if "␀" not in jpn_sentence:
                 continue
 
-            kor_sentence = kor_script.script[address]
+            kor_sentence = kor_script.script[address].text
 
             # Check if there is 2-byte null character in the end of sentence
             if (not "|␀" == jpn_sentence[-2:]) and "␀" == jpn_sentence[-1]:

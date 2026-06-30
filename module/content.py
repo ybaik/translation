@@ -1,17 +1,39 @@
-class Content:
-    def __init__(self, address: str = None, sentence: str = None, text="", desc="") -> None:
-        if address is not None:
-            start, end = address.split("=")
-            self.addr_start = int(start, 16)
-            self.addr_end = int(end, 16)
+from __future__ import annotations
 
-        if sentence is not None:
-            parts = sentence.split("#", 1)
-            self.text = parts[0].strip()
-            self.desc = parts[1].strip() if len(parts) > 1 else ""
-        else:
-            self.text = text
-            self.desc = desc
+from dataclasses import dataclass
+from typing import Optional, Union
+
+
+@dataclass
+class Content:
+    text: str
+    description: Optional[str] = None
+
+    @classmethod
+    def parse(cls, sentence: Union[str, Content]) -> Content:
+        if isinstance(sentence, cls):
+            return sentence
+
+        text, separator, description = sentence.partition("#")
+        return cls(text=text, description=description if separator else None)
+
+    @property
+    def is_hex(self) -> bool:
+        return self.text.startswith("0x:")
+
+    @property
+    def hex_codes(self) -> str:
+        if not self.is_hex:
+            raise ValueError("Content is not hex-only.")
+        return self.text[3:]
+
+    def serialize(self) -> str:
+        if self.description is None:
+            return self.text
+        return f"{self.text}#{self.description}"
+
+    def copy(self) -> Content:
+        return Content(text=self.text, description=self.description)
 
     def __str__(self) -> str:
-        return self.text + ("" if not self.desc else "#" + self.desc)
+        return self.serialize()
