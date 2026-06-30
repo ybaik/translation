@@ -107,6 +107,35 @@ def format_korean_name_prefer_given_leading_space(fn_kor: str, gn_kor: str, max_
     return fn_code, gn_code, fn_len, gn_len
 
 
+def format_korean_name_without_added_space(
+    fn_kor: str,
+    gn_kor: str,
+    family_max_length: int = 6,
+    given_max_length: int = 4,
+):
+    """성과 이름에 공백을 덧붙이지 않고 2글자 묶음 문자로 변환한다."""
+    full_name = f"{fn_kor} {gn_kor}"
+
+    fn_pair_length = len(fn_kor) - len(fn_kor) % 2
+    fn_code = pair_korean(fn_kor[:fn_pair_length])
+    fn_len = fn_pair_length
+    if fn_pair_length < len(fn_kor):
+        fn_code += fn_kor[-1]
+        fn_len += 2
+
+    gn_pair_length = len(gn_kor) - len(gn_kor) % 2
+    gn_code = pair_korean(gn_kor[:gn_pair_length])
+    gn_len = gn_pair_length
+    if gn_pair_length < len(gn_kor):
+        gn_code += gn_kor[-1]
+        gn_len += 2
+
+    if fn_len > family_max_length or gn_len > given_max_length:
+        raise ValueError(f"Name length is too long: {full_name} ({fn_len}/{gn_len} bytes)")
+
+    return fn_code, gn_code, fn_len, gn_len
+
+
 def clean_japanese_name(name: str) -> str:
     return name.replace("|_", "").replace("|␀", "").replace("␀", "")
 
@@ -160,7 +189,7 @@ def calculate_modifications(script_jpn: Script, file_name: str, name_db: NameDB,
         fn_kor, gn_kor = name_info["kor"].split(" ")
         fn_jpn_len = len(fn_jpn) * 2
         gn_jpn_len = len(gn_jpn) * 2
-        fn_kor, gn_kor, fn_kor_len, gn_kor_len = format_korean_name_prefer_given_leading_space(fn_kor, gn_kor)
+        fn_kor, gn_kor, fn_kor_len, gn_kor_len = format_korean_name_without_added_space(fn_kor, gn_kor)
 
         fn_length, fn_jpn, fn_kor = align_length(fn_jpn, fn_kor, fn_jpn_len, fn_kor_len)
         gn_length, gn_jpn, gn_kor = align_length(gn_jpn, gn_kor, gn_jpn_len, gn_kor_len)

@@ -52,19 +52,13 @@ def rewrite_sentence(sentence: str, custom_words: dict[str, str]) -> tuple[str, 
         rewritten = rewrite_word(word, custom_words)
         if rewritten is None or rewritten == match.group(0):
             return match.group(0)
-        if (
-            word.endswith("_")
-            and match.end() == len(sentence)
-            and rewritten.endswith("|_")
-        ):
+        if word.endswith("_") and match.end() == len(sentence) and rewritten.endswith("|_"):
             rewritten = rewritten[:-2] + "|␀"
         changes += 1
         return rewritten
 
     rewritten_sentence = WORD_PATTERN.sub(replace, sentence)
-    rewritten_sentence, null_changes = SPACE_BEFORE_NULL_PATTERN.subn(
-        "|␀", rewritten_sentence
-    )
+    rewritten_sentence, null_changes = SPACE_BEFORE_NULL_PATTERN.subn("|␀", rewritten_sentence)
     changes += null_changes
     return rewritten_sentence, changes
 
@@ -93,7 +87,7 @@ def walk_and_rewrite(value: Any, custom_words: dict[str, str]) -> tuple[Any, int
 
 
 def main() -> None:
-    ws_num = 1
+    ws_num = 0
     platform = "pc98"
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
     if not base_dir.exists():
