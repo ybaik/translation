@@ -27,6 +27,7 @@ DB 파일에 실제로 반영하려면 해당 함수 끝의 name_db.save_db() �
 """
 
 from module.name_db import NameDB
+from module.name_codec import NamePair
 
 
 def main_half():
@@ -60,18 +61,11 @@ def main_half():
         full_name_jpn = f"{family_name_jpn} {given_name_jpn}"
         full_name_kor = f"{family_name_kor} {given_name_kor}"
 
-        if name_db.check_full_name_exist(full_name_jpn):
+        name_info = name_db.get_full_name(full_name_jpn)
+        if name_info is not None:
             print(full_name_jpn)
-            if full_name_kor != name_db.full_name_db[full_name_jpn]["kor"]:
-                print(full_name_kor, name_db.full_name_db[full_name_jpn]["kor"])
-        if name_db.check_family_name_exist(family_name_jpn):
-            print(family_name_jpn)
-            if family_name_kor not in name_db.family_name_db[family_name_jpn]:
-                print(family_name_kor, name_db.family_name_db[family_name_jpn])
-        if name_db.check_given_name_exist(given_name_jpn):
-            print(given_name_jpn)
-            if given_name_kor not in name_db.given_name_db[given_name_jpn]:
-                print(given_name_kor, name_db.given_name_db[given_name_jpn])
+            if full_name_kor != name_info["kor"]:
+                print(full_name_kor, name_info["kor"])
 
         name_db.add_full_name(full_name_jpn, full_name_kor, game)
 
@@ -99,25 +93,15 @@ def main_full():
         if "?" in full_name_kor:
             continue
 
-        family_name_jpn, given_name_jpn = full_name_jpn.split(" ")
-        family_name_kor, given_name_kor = full_name_kor.split(" ")
-        if name_db.check_full_name_exist(full_name_jpn):
+        NamePair.parse(full_name_jpn)
+        NamePair.parse(full_name_kor)
+        name_info = name_db.get_full_name(full_name_jpn)
+        if name_info is not None:
             print(full_name_jpn)
-            if full_name_kor != name_db.full_name_db[full_name_jpn]["kor"]:
-                print(full_name_kor, name_db.full_name_db[full_name_jpn]["kor"])
-        if name_db.check_family_name_exist(family_name_jpn):
-            print(family_name_jpn)
-            if family_name_kor not in name_db.family_name_db[family_name_jpn]:
-                print(family_name_kor, name_db.family_name_db[family_name_jpn])
-        if name_db.check_given_name_exist(given_name_jpn):
-            print(given_name_jpn)
-            if given_name_kor not in name_db.given_name_db[given_name_jpn]:
-                print(given_name_kor, name_db.given_name_db[given_name_jpn])
+            if full_name_kor != name_info["kor"]:
+                print(full_name_kor, name_info["kor"])
 
         name_db.add_full_name(full_name_jpn, full_name_kor, game)
-
-        family_name_jpn = ""
-        given_name_jpn = ""
 
     # name_db.save_db()
 

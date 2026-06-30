@@ -133,18 +133,10 @@ def main():
 
     # Name
     db = NameDB()
-    for jpn, data in db.full_name_db.items():
-        if "game" not in data:
-            assert 0, f"Game tag is not in the name database - {jpn}."
-        if "kor" not in data:
-            assert 0, f"Kor tag is not in the name database - {jpn}."
-        if "nb2" not in data["game"]:
-            continue
-        kors = data["kor"]
-
-        family_name, given_name = kors.split(" ")
+    for _, korean_name, _ in db.iter_name_pairs("nb2"):
+        family_name, given_name = korean_name.family, korean_name.given
         if len(family_name) > 6 or len(given_name) > 4:
-            print(kors)
+            print(korean_name)
             continue
 
         add_complete_name_pairs(family_name, letter_2byte)

@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from typing import List, Dict, Tuple
+from typing import List, Dict, Set, Tuple
 
 
 # Font image info
@@ -105,6 +105,18 @@ def crop_paste(img_src, img_dst, roi_src, roi_dst):
         roi_src[0] : roi_src[1], roi_src[2] : roi_src[3]
     ]
     return img_dst
+
+
+def add_text_pairs(text: str, pairs: Set[str]) -> bool:
+    contains_space = False
+    for i in range(0, len(text), 2):
+        pair = text[i : i + 2]
+        if " " in pair:
+            contains_space = True
+        if len(pair) == 1:
+            pair += "_"
+        pairs.add(pair)
+    return contains_space
 
 
 def draw_letters_on_canvas(

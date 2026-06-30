@@ -5,7 +5,7 @@ from PIL import Image
 from pathlib import Path
 from module.name_db import NameDB
 from module.font_table import FontTable
-from module.font_image import draw_letters_on_canvas, return_img_roi_1byte, imread_korean
+from module.font_image import add_text_pairs, draw_letters_on_canvas, return_img_roi_1byte, imread_korean
 
 
 def set_font(
@@ -79,21 +79,6 @@ def set_2byte_merge(base_dir: Path, input_cand_2byte: list, font_table: FontTabl
     return ret_dict_code
 
 
-def split_and_pair(text: str, pairs: set) -> bool:
-    space = False
-    for i in range(0, len(text), 2):
-        pair = text[i : i + 2]
-
-        if " " in pair:
-            space = True
-
-        # 길이가 1이면 뒤에 "_" 추가
-        if len(pair) == 1:
-            pair += "_"
-        pairs.add(pair)
-    return space
-
-
 def main():
     base_dir = Path("c:/work_han/font_update_db")
     font_name = "비스코"  # "둥근모", "비스코"
@@ -142,18 +127,10 @@ def main():
 
     # Name
     db = NameDB()
-    for jpn, data in db.full_name_db.items():
-        if "game" not in data:
-            assert 0, f"Game tag is not in the name database - {jpn}."
-        if "kor" not in data:
-            assert 0, f"Kor tag is not in the name database - {jpn}."
-        if "taiko1" not in data["game"]:
-            continue
-        kors = data["kor"]
-
-        family_name, given_name = kors.split(" ")
+    for _, korean_name, _ in db.iter_name_pairs("taiko1"):
+        family_name, given_name = korean_name.family, korean_name.given
         if len(family_name) > 6 or len(given_name) > 6:
-            print(kors)
+            print(korean_name)
             continue
 
         if len(family_name) % 2:
@@ -161,8 +138,8 @@ def main():
         if len(given_name) % 2:
             given_name = "_" + given_name
 
-        split_and_pair(family_name, letter_2byte)
-        split_and_pair(given_name, letter_2byte)
+        add_text_pairs(family_name, letter_2byte)
+        add_text_pairs(given_name, letter_2byte)
 
     # Add
     letter_2byte.add("_마")

@@ -37,15 +37,8 @@ def main():
 
     # Name
     db = NameDB()
-    for jpn, data in db.full_name_db.items():
-        if "game" not in data:
-            assert 0, f"Game tag is not in the name database - {jpn}."
-        if "kor" not in data:
-            assert 0, f"Kor tag is not in the name database - {jpn}."
-        if "nb4" not in data["game"]:
-            continue
-        kor = data["kor"]
-        draw_and_save(base_dir / "byte1", save_dir, kor)
+    for _, korean_name, _ in db.iter_name_pairs("nb4"):
+        draw_and_save(base_dir / "byte1", save_dir, str(korean_name))
 
     # Region
     with open(db_dir / "region_db.json", "r", encoding="utf-8") as f:

@@ -1,4 +1,9 @@
 from module.name_db import NameDB
+from module.name_codec import (
+    align_encoded_length,
+    clean_script_name,
+    format_korean_name_without_added_space,
+)
 from module.script import Script
 
 
@@ -19,125 +24,6 @@ FILE_CONFIG = {
         "name_count": 53,
     },
 }
-
-
-def align_length(jpn: str, kor: str, jpn_len: int, kor_len: int):
-    length = jpn_len
-    diff = kor_len - jpn_len
-    if diff > 0:  # Kor이 더 크다
-        if diff // 2:
-            jpn += "␀" * (diff // 2)
-        if diff % 2:
-            jpn += "|␀"
-        length = kor_len
-    elif diff < 0:  # Jpn이 더 크다
-        diff *= -1
-        if diff // 2:
-            kor += "␀" * (diff // 2)
-        if diff % 2:
-            kor += "|␀"
-    return length, jpn, kor
-
-
-def pair_korean(text: str) -> str:
-    return "".join("{" + text[i : i + 2] + "}" for i in range(0, len(text), 2))
-
-
-def format_korean_name_mixed_space(fn_kor: str, gn_kor: str):
-    """기존 공백 배치 방식을 보관한다."""
-    space_added = False
-    if len(fn_kor) % 2:
-        fn_kor += "_"
-        space_added = True
-    if len(gn_kor) % 2:
-        gn_kor = "_" + gn_kor
-        space_added = True
-
-    fn_kor_len = len(fn_kor)
-    gn_kor_len = len(gn_kor)
-    fn_kor = pair_korean(fn_kor)
-    gn_kor = pair_korean(gn_kor)
-
-    if not space_added:
-        if gn_kor_len < 6:
-            gn_kor_len += 1
-            gn_kor = "|_" + gn_kor
-        elif fn_kor_len < 6:
-            fn_kor_len += 1
-            fn_kor += "|_"
-        else:
-            raise ValueError("Name length is too long.")
-
-    return fn_kor, gn_kor, fn_kor_len, gn_kor_len
-
-
-def format_korean_name_prefer_given_leading_space(fn_kor: str, gn_kor: str, max_length: int = 6):
-    """이름 앞 공간을 우선하면서 모든 한글을 2바이트 묶음 문자로 변환한다."""
-    full_name = f"{fn_kor} {gn_kor}"
-
-    if len(fn_kor) % 2:
-        fn_kor += "_"
-    fn_len = len(fn_kor)
-    fn_code = pair_korean(fn_kor)
-
-    if len(gn_kor) % 2:
-        gn_kor = "_" + gn_kor
-        gn_len = len(gn_kor)
-        gn_code = pair_korean(gn_kor)
-        given_has_leading_space = True
-    elif len(gn_kor) + 1 <= max_length:
-        gn_len = len(gn_kor) + 1
-        gn_code = "|_" + pair_korean(gn_kor)
-        given_has_leading_space = True
-    else:
-        gn_len = len(gn_kor)
-        gn_code = pair_korean(gn_kor)
-        given_has_leading_space = False
-
-    if not given_has_leading_space:
-        if not fn_kor.endswith("_") and fn_len + 1 <= max_length:
-            fn_code += "|_"
-            fn_len += 1
-        elif not fn_kor.endswith("_"):
-            raise ValueError(f"Name length is too long: {full_name} ({fn_len}/{gn_len} bytes)")
-
-    if fn_len > max_length or gn_len > max_length:
-        raise ValueError(f"Name length is too long: {full_name} ({fn_len}/{gn_len} bytes)")
-
-    return fn_code, gn_code, fn_len, gn_len
-
-
-def format_korean_name_without_added_space(
-    fn_kor: str,
-    gn_kor: str,
-    family_max_length: int = 6,
-    given_max_length: int = 4,
-):
-    """성과 이름에 공백을 덧붙이지 않고 2글자 묶음 문자로 변환한다."""
-    full_name = f"{fn_kor} {gn_kor}"
-
-    fn_pair_length = len(fn_kor) - len(fn_kor) % 2
-    fn_code = pair_korean(fn_kor[:fn_pair_length])
-    fn_len = fn_pair_length
-    if fn_pair_length < len(fn_kor):
-        fn_code += fn_kor[-1]
-        fn_len += 2
-
-    gn_pair_length = len(gn_kor) - len(gn_kor) % 2
-    gn_code = pair_korean(gn_kor[:gn_pair_length])
-    gn_len = gn_pair_length
-    if gn_pair_length < len(gn_kor):
-        gn_code += gn_kor[-1]
-        gn_len += 2
-
-    if fn_len > family_max_length or gn_len > given_max_length:
-        raise ValueError(f"Name length is too long: {full_name} ({fn_len}/{gn_len} bytes)")
-
-    return fn_code, gn_code, fn_len, gn_len
-
-
-def clean_japanese_name(name: str) -> str:
-    return name.replace("|_", "").replace("|␀", "").replace("␀", "")
 
 
 def read_name_arrays(script_jpn: Script, file_name: str):
@@ -177,22 +63,22 @@ def calculate_modifications(script_jpn: Script, file_name: str, name_db: NameDB,
     unknown_names = []
 
     for (fn_address, fn_jpn_raw), (gn_address, gn_jpn_raw) in zip(family_names, given_names):
-        fn_jpn = clean_japanese_name(fn_jpn_raw)
-        gn_jpn = clean_japanese_name(gn_jpn_raw)
+        fn_jpn = clean_script_name(fn_jpn_raw)
+        gn_jpn = clean_script_name(gn_jpn_raw)
         full_name_jpn = f"{fn_jpn} {gn_jpn}"
 
-        name_info = name_db.full_name_db.get(full_name_jpn)
-        if name_info is None or game not in name_info.get("game", []):
+        korean_name = name_db.get_korean_name(full_name_jpn, game)
+        if korean_name is None:
             unknown_names.append(full_name_jpn)
             continue
 
-        fn_kor, gn_kor = name_info["kor"].split(" ")
+        fn_kor, gn_kor = korean_name.family, korean_name.given
         fn_jpn_len = len(fn_jpn) * 2
         gn_jpn_len = len(gn_jpn) * 2
         fn_kor, gn_kor, fn_kor_len, gn_kor_len = format_korean_name_without_added_space(fn_kor, gn_kor)
 
-        fn_length, fn_jpn, fn_kor = align_length(fn_jpn, fn_kor, fn_jpn_len, fn_kor_len)
-        gn_length, gn_jpn, gn_kor = align_length(gn_jpn, gn_kor, gn_jpn_len, gn_kor_len)
+        fn_length, fn_jpn, fn_kor = align_encoded_length(fn_jpn, fn_kor, fn_jpn_len, fn_kor_len)
+        gn_length, gn_jpn, gn_kor = align_encoded_length(gn_jpn, gn_kor, gn_jpn_len, gn_kor_len)
 
         mod_list_jpn.append(make_modification(fn_address, fn_length, fn_jpn))
         mod_list_kor.append(make_modification(fn_address, fn_length, fn_kor))

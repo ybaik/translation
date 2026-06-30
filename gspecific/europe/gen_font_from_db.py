@@ -88,21 +88,6 @@ def set_2byte(
     return code_dict, end_code
 
 
-def split_and_pair(text: str, pairs: set) -> None:
-    space = False
-    for i in range(0, len(text), 2):
-        pair = text[i : i + 2]
-
-        if " " in pair:
-            space = True
-
-        # 길이가 1이면 뒤에 "_" 추가
-        if len(pair) == 1:
-            pair += "_"
-        pairs.add(pair)
-    return space
-
-
 def set_10byte(base_dir: Path, start_code: str, font_name: str, font_table: FontTable, src_font_canvas: np.ndarray):
     input_cand_10byte = []
 

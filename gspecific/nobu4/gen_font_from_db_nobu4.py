@@ -5,7 +5,7 @@ from PIL import Image
 from pathlib import Path
 from module.name_db import NameDB
 from module.font_table import FontTable
-from module.font_image import draw_letters_on_canvas, return_img_roi_1byte, imread_korean
+from module.font_image import add_text_pairs, draw_letters_on_canvas, return_img_roi_1byte, imread_korean
 
 
 REGIONS = [
@@ -103,21 +103,6 @@ def set_2byte_merge(base_dir: Path, input_cand_2byte: list, font_table: FontTabl
     return ret_dict_code
 
 
-def split_and_pair(text: str, pairs: set) -> bool:
-    space = False
-    for i in range(0, len(text), 2):
-        pair = text[i : i + 2]
-
-        if " " in pair:
-            space = True
-
-        # 길이가 1이면 뒤에 "_" 추가
-        if len(pair) == 1:
-            pair += "_"
-        pairs.add(pair)
-    return space
-
-
 def main():
     base_dir = Path("c:/work_han/font_update_db")
     db_dir = Path("C:/work_han/translation/name_db")
@@ -162,18 +147,10 @@ def main():
 
     # Name
     db = NameDB()
-    for jpn, data in db.full_name_db.items():
-        if "game" not in data:
-            assert 0, f"Game tag is not in the name database - {jpn}."
-        if "kor" not in data:
-            assert 0, f"Kor tag is not in the name database - {jpn}."
-        if "nb4" not in data["game"]:
-            continue
-        kors = data["kor"]
-
-        family_name, given_name = kors.split(" ")
+    for _, korean_name, _ in db.iter_name_pairs("nb4"):
+        family_name, given_name = korean_name.family, korean_name.given
         if len(family_name) > 6 or len(given_name) > 6:
-            print(kors)
+            print(korean_name)
             continue
 
         if len(family_name) % 2:
@@ -181,8 +158,8 @@ def main():
         if len(given_name) % 2:
             given_name = "_" + given_name
 
-        split_and_pair(family_name, letter_2byte)
-        split_and_pair(given_name, letter_2byte)
+        add_text_pairs(family_name, letter_2byte)
+        add_text_pairs(given_name, letter_2byte)
 
     # Region
     with open(db_dir / "region_db.json", "r", encoding="utf-8") as f:
@@ -190,7 +167,7 @@ def main():
         for v in region_db.values():
             if v in REGIONS:
                 continue
-            space = split_and_pair(v, letter_2byte)
+            space = add_text_pairs(v, letter_2byte)
             if space:
                 print(1)
 
@@ -204,7 +181,7 @@ def main():
             if text[-1] in ["산", "성"]:
                 text = text[:-1]
 
-            space = split_and_pair(text, letter_2byte)
+            space = add_text_pairs(text, letter_2byte)
             if space:
                 print(1)
 
@@ -213,7 +190,7 @@ def main():
         san_db = json.load(f)
         for k, v in san_db.items():
             kor = v["kor"].replace(" ", "")
-            space = split_and_pair(kor, letter_2byte)
+            space = add_text_pairs(kor, letter_2byte)
             if space:
                 print(1)
 

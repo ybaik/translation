@@ -56,7 +56,8 @@ def main():
 
         full_name_jpn_clean = f"{fn_jpn} {gn_jpn}"
 
-        if not name_db.check_full_name_exist(full_name_jpn_clean):
+        name_info = name_db.get_full_name(full_name_jpn_clean)
+        if name_info is None:
             db = name_db.family_name_db.get(fn_jpn)
             db_fn_kor = "?" if db is None else db.get("kor", "?")
             db = name_db.given_name_db.get(gn_jpn)
@@ -84,11 +85,11 @@ def main():
             gn_jpn = ""
             continue
         else:
-            if game not in name_db.full_name_db[full_name_jpn_clean]["game"]:
+            if name_db.add_game(full_name_jpn_clean, game):
                 print(full_name_jpn_clean)
-                name_db.full_name_db[full_name_jpn_clean]["game"].append(game)
 
-        db_fn_kor, db_gn_kor = name_db.full_name_db[full_name_jpn_clean]["kor"].split(" ")
+        korean_name = name_db.get_korean_name(full_name_jpn_clean)
+        db_fn_kor, db_gn_kor = korean_name.family, korean_name.given
         fn_jpn = ""
         gn_jpn = ""
 

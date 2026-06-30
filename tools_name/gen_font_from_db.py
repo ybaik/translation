@@ -53,10 +53,8 @@ def set_6byte(base_dir: Path, base_name_db_dir: Path, font_table: FontTable, src
     input_cand_6byte = []
 
     # Select regions that has more than 4 Korean letters
-    for db in name_db.full_name_db.values():
-        if game not in db["game"]:
-            continue
-        fname, gname = db["kor"].split(" ")
+    for _, korean_name, _ in name_db.iter_name_pairs(game):
+        fname, gname = korean_name.family, korean_name.given
         if len(fname) >= 4 and fname not in input_cand_6byte:
             input_cand_6byte.append(fname)
         if len(gname) >= 4 and gname not in input_cand_6byte:

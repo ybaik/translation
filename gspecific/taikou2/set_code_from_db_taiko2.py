@@ -1,24 +1,7 @@
 from module.name_db import NameDB
+from module.name_codec import align_encoded_length
 from module.script import Script
 from rich.console import Console
-
-
-def align_length(jpn: str, kor: str, jpn_len: int, kor_len: int):
-    length = jpn_len
-    diff = kor_len - jpn_len
-    if diff > 0:  # Kor이 더 크다
-        if diff // 2:
-            jpn += "␀" * (diff // 2)
-        if diff % 2:
-            jpn += "|␀"
-        length = kor_len
-    elif diff < 0:  # Jpn이 더 크다
-        diff *= -1
-        if diff // 2:
-            kor += "␀" * (diff // 2)
-        if diff % 2:
-            kor += "|␀"
-    return length, jpn, kor
 
 
 def main():
@@ -70,13 +53,14 @@ def main():
 
             full_name_jpn_clean = f"{fn_jpn} {gn_jpn}"
 
-            if not name_db.check_full_name_exist(full_name_jpn_clean):
+            korean_name = name_db.get_korean_name(full_name_jpn_clean)
+            if korean_name is None:
                 print(f"{full_name_jpn_clean} is not in the name DB")
                 fn_jpn_raw = ""
                 gn_jpn_raw = ""
                 continue
 
-            fn_kor, gn_kor = name_db.full_name_db[full_name_jpn_clean]["kor"].split(" ")
+            fn_kor, gn_kor = korean_name.family, korean_name.given
 
             space_added = False
             if len(fn_kor) % 2:
@@ -105,8 +89,8 @@ def main():
                     assert 0, f"Name length is too long: {full_name_jpn_clean}"
 
             # Compare length of jpn and kor
-            fn_length, fn_jpn, fn_kor = align_length(fn_jpn, fn_kor, fn_jpn_len, fn_kor_len)
-            gn_length, gn_jpn, gn_kor = align_length(gn_jpn, gn_kor, gn_jpn_len, gn_kor_len)
+            fn_length, fn_jpn, fn_kor = align_encoded_length(fn_jpn, fn_kor, fn_jpn_len, fn_kor_len)
+            gn_length, gn_jpn, gn_kor = align_encoded_length(gn_jpn, gn_kor, gn_jpn_len, gn_kor_len)
 
             # Set FN
             start, end = fn_address.split("=")

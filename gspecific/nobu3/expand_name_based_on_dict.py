@@ -2,22 +2,7 @@ import json
 from pathlib import Path
 from module.script import Script
 from module.name_db import NameDB
-
-
-def split_and_pair(text: str, pairs: list) -> bool:
-    space_included = False
-    for i in range(0, len(text), 2):
-        pair = text[i : i + 2]
-
-        # 길이가 1이면 뒤에 "_" 추가
-        if len(pair) == 1:
-            pair += "_"
-            space_included = True
-
-        assert " " not in pair, f"Input text include space: {text}"
-
-        pairs.append(pair)
-    return space_included
+from module.name_codec import split_pairs
 
 
 def main():
@@ -41,18 +26,15 @@ def main():
         db = region_db
 
     name_db = NameDB()
-    for k, v in name_db.full_name_db.items():
-        if game not in v["game"]:
-            continue
-
+    for japanese_name, korean_name, _ in name_db.iter_name_pairs(game):
         # given name
-        db[k.split(" ")[-1]] = v["kor"].split(" ")[-1]
+        db[japanese_name.given] = korean_name.given
 
         # family name
-        if k.split(" ")[0] == "北条":
-            db[k.split(" ")[0]] = "호조"
+        if japanese_name.family == "北条":
+            db[japanese_name.family] = "호조"
         else:
-            db[k.split(" ")[0]] = v["kor"].split(" ")[0]
+            db[japanese_name.family] = korean_name.family
 
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         print(file.name)
@@ -108,8 +90,7 @@ def main():
 
             content = db[jpn_sentence_filtered]
             kor_sentence_new = ""
-            pairs = []
-            split_and_pair(content, pairs)
+            pairs, _ = split_pairs(content)
             for pair in pairs:
                 kor_sentence_new += f"{{{pair}}}"
             kor_byte = len(pairs) * 2

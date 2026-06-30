@@ -5,7 +5,7 @@ from PIL import Image
 from pathlib import Path
 from module.name_db import NameDB
 from module.font_table import FontTable
-from module.font_image import draw_letters_on_canvas
+from module.font_image import add_text_pairs, draw_letters_on_canvas
 
 
 def set_4byte(base_dir: Path, font_table: FontTable, src_font_canvas: np.ndarray):
@@ -73,21 +73,6 @@ def set_2byte(base_dir: Path, input_cand_2byte: list, font_table: FontTable, src
     )
 
 
-def split_and_pair(text: str, pairs: set) -> None:
-    space = False
-    for i in range(0, len(text), 2):
-        pair = text[i : i + 2]
-
-        if " " in pair:
-            space = True
-
-        # 길이가 1이면 뒤에 "_" 추가
-        if len(pair) == 1:
-            pair += "_"
-        pairs.add(pair)
-    return space
-
-
 def main():
     base_dir = Path("c:/work_han/font_update_db")
     db_dir = Path("C:/work_han/translation/name_db")
@@ -105,16 +90,9 @@ def main():
 
     # Name
     db = NameDB()
-    for jpn, data in db.full_name_db.items():
-        if "game" not in data:
-            assert 0, f"Game tag is not in the name database - {jpn}."
-        if "kor" not in data:
-            assert 0, f"Kor tag is not in the name database - {jpn}."
-        if "nb3" not in data["game"]:
-            continue
-        kors = data["kor"]
-        for kor in kors.split(" "):
-            space = split_and_pair(kor, letter_2byte)
+    for _, korean_name, _ in db.iter_name_pairs("nb3"):
+        for kor in (korean_name.family, korean_name.given):
+            space = add_text_pairs(kor, letter_2byte)
             if space:
                 print(1)
 
@@ -122,7 +100,7 @@ def main():
     with open(db_dir / "nb3" / "region_db.json", "r", encoding="utf-8") as f:
         region_db = json.load(f)
         for v in region_db.values():
-            space = split_and_pair(v, letter_2byte)
+            space = add_text_pairs(v, letter_2byte)
             if space:
                 print(1)
 

@@ -20,11 +20,11 @@ def main():
         jpn = jpn.strip()
         kor = kor.strip()
 
-        if not name_db.check_full_name_exist(jpn):
+        name_info = name_db.get_full_name(jpn)
+        if name_info is None:
             print(f"{jpn} is not in the name database.")
             continue
 
-        name_info = name_db.full_name_db.get(jpn)
         diff = False
         if isinstance(name_info["kor"], str) and kor != name_info["kor"]:
             diff = True
