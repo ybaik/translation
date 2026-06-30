@@ -1,10 +1,24 @@
-__pycache__
-.idea
-.vscode
-script_log.json
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.pkl
 
 # Distribution / packaging
-*egg-info/
+build/
+dist/
+*.egg-info/
 
-# gemini
+# IDEs and local tooling
+.idea/
+.vscode/
+.agents/
+.codex/
+
+# Node
+node_modules/
 npm-global/
+
+# Generated logs
+script_log.json
