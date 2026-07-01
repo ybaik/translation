@@ -13,7 +13,7 @@ def main():
 
     src_bin_base_dir = base_dir / f"jpn-{platform}"
     dst_bin_base_dir = base_dir / f"jpn-{platform_dst}"
-    src_font_table_path = Path("font_table/font_table-jpn-full.json")
+    src_font_table_path = Path("font_table/font_table-jpn.json")
 
     target = "MAIN.EXE"
 

@@ -7,7 +7,7 @@ from module.font_table import FontTable
 
 def main():
     # font_tbl_path = Path("./font_table/font_table-kor-jin.json")
-    font_tbl_path = Path("./font_table/font_table-jpn-full.json")
+    font_tbl_path = Path("./font_table/font_table-jpn.json")
     font_fnt_path = Path("c:/work_han/font_/ThinDungGeunMo_cp949_full.fnt")
 
     font_table = FontTable(font_tbl_path)

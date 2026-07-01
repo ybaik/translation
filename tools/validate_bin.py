@@ -11,7 +11,7 @@ def main():
     base_dir = Path(f"c:/work_han/workspace{ws_num}")
     script_base_dir = base_dir / f"script-{platform}"
     src_bin_base_dir = base_dir / f"jpn-{platform}"
-    src_font_table_path = Path("font_table/font_table-jpn-full.json")
+    src_font_table_path = Path("font_table/font_table-jpn.json")
     src_font_table = FontTable(src_font_table_path)
 
     console = Console()

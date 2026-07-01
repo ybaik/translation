@@ -20,7 +20,7 @@ def main():
     out_font_fnt_path = Path(f"../workspace2/taikou2-{font_file}.fnt")
 
     # font_tbl_path = Path("./font_table/font_table-kor-jin.json")
-    font_tbl_path = Path("./font_table/font_table-jpn-full.json")
+    font_tbl_path = Path("./font_table/font_table-jpn.json")
 
     code_start = "9540"
     code_end = "98AF"

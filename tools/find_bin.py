@@ -16,7 +16,7 @@ def main():
     check_xor = False
 
     font_table_path = Path("font_table/font_table-kor-jin.json")
-    font_table_path = Path("font_table/font_table-jpn-full.json")
+    font_table_path = Path("font_table/font_table-jpn.json")
     font_table = FontTable(font_table_path)
 
     sentence_to_find = "冥界の魔神"

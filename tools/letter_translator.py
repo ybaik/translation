@@ -11,7 +11,7 @@ from module.jisx0201 import jisx0201_to_unicode
 def main():
     os.system("clear")
     font_table_kor = FontTable(Path("font_table/font_table-kor-jin.json"))
-    font_table_jpn = FontTable(Path("font_table/font_table-jpn-full.json"))
+    font_table_jpn = FontTable(Path("font_table/font_table-jpn.json"))
 
     # Get a code or codes from a letter or letters
     script = "오다"

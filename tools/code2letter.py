@@ -7,7 +7,7 @@ from module.font_table import FontTable
 
 def main():
     # Read a font table
-    font_table_jpn = FontTable(Path("font_table/font_table-jpn-full.json"))
+    font_table_jpn = FontTable(Path("font_table/font_table-jpn.json"))
     # font_table_kor = FontTable(Path("font_table/font_table-kor-jin.json"))
 
     # Get a letter or letters from a code or codes

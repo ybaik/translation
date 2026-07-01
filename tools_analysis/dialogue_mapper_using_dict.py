@@ -46,7 +46,7 @@ def main():
         dst_script = Script(str(dst_path))
 
         src_font_table = FontTable(
-            file_path=Path("./font_table/font_table-jpn-full.json"),
+            file_path=Path("./font_table/font_table-jpn.json"),
             custom_char_path=script_base_dir / "custom_char.json",
         )
         dst_font_table = FontTable(

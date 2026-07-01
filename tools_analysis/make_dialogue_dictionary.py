@@ -50,7 +50,7 @@ def main():
                 dst = json.load(f)
 
             src_font_table = get_cached_font_table(
-                file_path=Path("./font_table/font_table-jpn-full.json"),
+                file_path=Path("./font_table/font_table-jpn.json"),
                 base_dir=base_dir,
                 custom_char_path=script_dir / "custom_char.json",
             )

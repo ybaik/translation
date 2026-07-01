@@ -10,7 +10,7 @@ def main():
     workspace = f"workspace{ws_num}"
     platform = "pc98"
     bin_dir = Path(f"../{workspace}/jpn-{platform}")
-    font_table_path = Path("font_table/font_table-jpn-full.json")
+    font_table_path = Path("font_table/font_table-jpn.json")
     custom_char_path = Path(f"../{workspace}/script-{platform}/custom_char.json")
     extended_word = "_jpn"
     script_init_dir = Path(f"../{workspace}/script_init-{platform}")

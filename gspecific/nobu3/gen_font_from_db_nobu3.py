@@ -11,7 +11,7 @@ def main():
     base_dir = Path("c:/work_han/font_update_db")
     db_dir = Path("C:/work_han/translation/name_db")
 
-    font_table = FontTable(Path("font_table/font_table-jpn-full.json"))
+    font_table = FontTable(Path("font_table/font_table-jpn.json"))
     src_font_canvas_path = base_dir / "BISCO.bmp"
     src_font_canvas = cv2.imread(str(src_font_canvas_path), cv2.IMREAD_GRAYSCALE)
 

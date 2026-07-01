@@ -26,7 +26,7 @@ def main():
     dst_bin_base_dir = base_dir / f"kor-{platform}{tag}"
 
     binary_input_dir = base_dir / f"binary_inputs-{platform}"
-    src_font_table_path = Path("font_table/font_table-jpn-full.json")
+    src_font_table_path = Path("font_table/font_table-jpn.json")
     dst_font_table_path = Path("font_table/font_table-kor-jin.json")
 
     # ===================================================================

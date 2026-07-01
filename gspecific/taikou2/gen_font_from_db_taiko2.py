@@ -15,7 +15,7 @@ def main():
     if font_name == "비스코":
         font_file = "BISCO.bmp"
 
-    font_table = FontTable(Path("font_table/font_table-jpn-full.json"))
+    font_table = FontTable(Path("font_table/font_table-jpn.json"))
     src_font_canvas_path = base_dir / font_file
     src_font_canvas = cv2.imread(str(src_font_canvas_path), cv2.IMREAD_GRAYSCALE)
 

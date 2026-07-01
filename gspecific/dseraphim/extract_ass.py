@@ -218,8 +218,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--font-table",
         type=Path,
-        default=Path("font_table-jpn-full.json"),
-        help="JSON font table (default: font_table-jpn-full.json)",
+        default=Path("font_table-jpn.json"),
+        help="JSON font table (default: font_table-jpn.json)",
     )
     parser.add_argument(
         "--input-dir",

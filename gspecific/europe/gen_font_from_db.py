@@ -8,7 +8,7 @@ from module.font_image import set_2byte_merge, set_font
 
 def main():
     base_dir = Path("c:/work_han/font_update_db")
-    font_table = FontTable(Path("font_table/font_table-jpn-full.json"))
+    font_table = FontTable(Path("font_table/font_table-jpn.json"))
 
     font_name = "비스코"  # "비스코, 둥근모"
 
