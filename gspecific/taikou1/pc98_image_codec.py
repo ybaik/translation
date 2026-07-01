@@ -8,25 +8,18 @@ from pathlib import Path
 
 from PIL import Image
 
+from module.pc98_image.indexed import IndexedImage
+from module.pc98_image.palette import (
+    PC98_PALETTE_3BPP as PALETTE_3BPP,
+    PC98_PALETTE_4BPP as PALETTE_4BPP,
+    nearest_palette_index,
+)
+from module.pc98_image.pillow_adapter import to_pillow
+from module.pc98_image.planar import (
+    decode_interleaved_planar,
+    encode_interleaved_planar,
+)
 
-PALETTE_3BPP = [
-    (0x00, 0x00, 0x00),
-    (0x00, 0x00, 0xFF),
-    (0xFF, 0x00, 0x00),
-    (0xFF, 0x00, 0xFF),
-    (0x00, 0xFF, 0x00),
-    (0x00, 0xFF, 0xFF),
-    (0xFF, 0xFF, 0x00),
-    (0xFF, 0xFF, 0xFF),
-]
-PALETTE_4BPP = [
-    (
-        (0xAA if index & 2 else 0) + (0x55 if index & 8 else 0),
-        (0xAA if index & 4 else 0) + (0x55 if index & 8 else 0),
-        (0xAA if index & 1 else 0) + (0x55 if index & 8 else 0),
-    )
-    for index in range(16)
-]
 RLE_LZ_STRIDE_GROUPS = 0xA0
 
 
@@ -129,21 +122,8 @@ def write_html_report(report, output_dir):
 
 def indexed_image(width, height, pixel_indices, planes=3):
     palette_colors = PALETTE_3BPP if planes == 3 else PALETTE_4BPP
-    image = Image.frombytes("P", (width, height), bytes(pixel_indices))
-    palette = [component for color in palette_colors for component in color]
-    image.putpalette(palette + [0] * (768 - len(palette)))
-    return image
-
-
-def nearest_palette_index(rgb, palette=PALETTE_3BPP):
-    red, green, blue = rgb[:3]
-    return min(
-        range(len(palette)),
-        key=lambda index: (
-            (red - palette[index][0]) ** 2
-            + (green - palette[index][1]) ** 2
-            + (blue - palette[index][2]) ** 2
-        ),
+    return to_pillow(
+        IndexedImage.create(width, height, pixel_indices, palette_colors)
     )
 
 
@@ -281,48 +261,15 @@ def decode_planar(raw, width, height, planes=3):
     """Decode interleaved 3bpp B/R/G or 4bpp B/R/G/I, eight pixels per group."""
     if planes not in (3, 4):
         raise ValueError("planes must be 3 or 4")
-    if width <= 0 or height <= 0 or width % 8:
-        raise ValueError("planar width must be positive and divisible by 8")
-    expected = width * height * planes // 8
-    if len(raw) != expected:
-        raise ValueError(f"planar size mismatch: got {len(raw)}, expected {expected}")
-
-    pixels = bytearray(width * height)
-    groups = width // 8
-    position = 0
-    for y in range(height):
-        for group in range(groups):
-            values = raw[position : position + planes]
-            position += planes
-            for bit in range(8):
-                mask = 1 << (7 - bit)
-                color = 0
-                for plane, value in enumerate(values):
-                    if value & mask:
-                        color |= 1 << plane
-                pixels[y * width + group * 8 + bit] = color
+    pixels = decode_interleaved_planar(raw, width, height, planes)
     return indexed_image(width, height, pixels, planes), bytes(pixels)
 
 
 def encode_planar_indices(pixel_indices, width, height, planes=3):
     """Encode palette indices as interleaved 3bpp B/R/G or 4bpp B/R/G/I bytes."""
-    if len(pixel_indices) != width * height:
-        raise ValueError("pixel index size does not match dimensions")
-    if width % 8:
-        raise ValueError("planar width must be divisible by 8")
-    encoded = bytearray()
-    groups = width // 8
-    for y in range(height):
-        for group in range(groups):
-            plane_bytes = [0] * planes
-            for bit in range(8):
-                color = pixel_indices[y * width + group * 8 + bit]
-                mask = 1 << (7 - bit)
-                for plane in range(planes):
-                    if color & (1 << plane):
-                        plane_bytes[plane] |= mask
-            encoded.extend(plane_bytes)
-    return bytes(encoded)
+    if planes not in (3, 4):
+        raise ValueError("planes must be 3 or 4")
+    return encode_interleaved_planar(pixel_indices, width, height, planes)
 
 
 def decode_rle_lz(raw, offset=0):

@@ -7,13 +7,12 @@ from pathlib import Path
 
 from PIL import Image
 
-from end_dat_to_png import (
-    BYTES_PER_LINE,
+from module.pc98_image.planar import encode_plane_major_row_planar
+
+from gspecific.garyou.end_dat_to_png import (
     HALF_HEIGHT,
-    HALF_SIZE,
     HEIGHT,
     IMAGE_SIZE,
-    PLANE_SIZE,
     WIDTH,
     default_palette_path,
     decode_end_dat,
@@ -54,25 +53,13 @@ def indices_to_planar(indices: bytes) -> bytes:
     if len(indices) != WIDTH * HEIGHT:
         raise ValueError(f"got {len(indices)} pixels, expected {WIDTH * HEIGHT}")
 
-    vram = bytearray(IMAGE_SIZE)
-
-    for y in range(HEIGHT):
-        half = y // HALF_HEIGHT
-        y_in_half = y % HALF_HEIGHT
-        half_base = half * HALF_SIZE
-
-        for x_byte in range(BYTES_PER_LINE):
-            base_pixel = y * WIDTH + x_byte * 8
-            for plane in range(4):
-                value = 0
-                for bit in range(8):
-                    color_index = indices[base_pixel + bit]
-                    if color_index & (1 << plane):
-                        value |= 0x80 >> bit
-
-                vram[half_base + plane * PLANE_SIZE + y_in_half * BYTES_PER_LINE + x_byte] = value
-
-    return bytes(vram)
+    half_pixels = WIDTH * HALF_HEIGHT
+    return b"".join(
+        encode_plane_major_row_planar(
+            indices[offset : offset + half_pixels], WIDTH, HALF_HEIGHT, 4
+        )
+        for offset in (0, half_pixels)
+    )
 
 
 def encode_rle(vram: bytes) -> bytes:

@@ -8,6 +8,8 @@ from pathlib import Path
 
 from PIL import Image
 
+from module.pc98_image.palette import decode_4bit_palette
+from module.pc98_image.planar import decode_plane_major_row_planar
 
 WIDTH = 640
 HEIGHT = 400
@@ -74,34 +76,18 @@ def load_palette(palette_path: Path, image_number: int) -> list[tuple[int, int, 
         raise ValueError(f"palette #{image_number} is not present in {palette_path}")
 
     offset = palette_index * 16 * 3
-    colors: list[tuple[int, int, int]] = []
-    for i in range(16):
-        b, r, g = data[offset + i * 3 : offset + i * 3 + 3]
-        colors.append((r * 17, g * 17, b * 17))
-    return colors
+    return list(decode_4bit_palette(data[offset : offset + 48], order="brg"))
 
 
 def planar_to_indices(vram: bytes) -> bytes:
-    pixels = bytearray(WIDTH * HEIGHT)
-
-    for y in range(HEIGHT):
-        half = y // HALF_HEIGHT
-        y_in_half = y % HALF_HEIGHT
-        half_base = half * HALF_SIZE
-
-        for x_byte in range(BYTES_PER_LINE):
-            line_offset = half_base + y_in_half * BYTES_PER_LINE + x_byte
-            plane_bytes = [vram[line_offset + plane * PLANE_SIZE] for plane in range(4)]
-
-            for bit in range(8):
-                mask = 0x80 >> bit
-                color_index = 0
-                for plane, plane_byte in enumerate(plane_bytes):
-                    if plane_byte & mask:
-                        color_index |= 1 << plane
-                pixels[y * WIDTH + x_byte * 8 + bit] = color_index
-
-    return bytes(pixels)
+    if len(vram) != IMAGE_SIZE:
+        raise ValueError(f"got {len(vram)} planar bytes, expected {IMAGE_SIZE}")
+    return b"".join(
+        decode_plane_major_row_planar(
+            vram[offset : offset + HALF_SIZE], WIDTH, HALF_HEIGHT, 4
+        )
+        for offset in (0, HALF_SIZE)
+    )
 
 
 def image_number_from_path(path: Path) -> int:

@@ -8,7 +8,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from pc98_image_codec import decode_planar, write_html_report
+from gspecific.taikou1.pc98_image_codec import decode_planar, write_html_report
 
 JOBS = (
     # ("source/ANIME.PUT", "anime.put.jpn", 16, 16, 3),

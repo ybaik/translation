@@ -5,7 +5,7 @@ import argparse
 import json
 from pathlib import Path
 
-from pc98_image_codec import decode_rle_lz, write_html_report
+from gspecific.taikou1.pc98_image_codec import decode_rle_lz, write_html_report
 
 
 JOBS = (

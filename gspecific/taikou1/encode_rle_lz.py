@@ -7,8 +7,8 @@ from pathlib import Path
 
 from PIL import Image
 
-from decode_rle_lz import JOBS
-from pc98_image_codec import decode_rle_lz, encode_rle_lz_image
+from gspecific.taikou1.decode_rle_lz import JOBS
+from gspecific.taikou1.pc98_image_codec import decode_rle_lz, encode_rle_lz_image
 
 
 def hex_offset(value):

@@ -4,8 +4,13 @@
 import json
 from pathlib import Path
 
-from decode_raw_planar import EMBEDDED_JOBS, FRAME_OVERRIDES, JOBS, frame_layout
-from pc98_image_codec import image_to_planar
+from gspecific.taikou1.decode_raw_planar import (
+    EMBEDDED_JOBS,
+    FRAME_OVERRIDES,
+    JOBS,
+    frame_layout,
+)
+from gspecific.taikou1.pc98_image_codec import image_to_planar
 
 
 def hex_offset(value):

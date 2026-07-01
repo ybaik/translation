@@ -29,8 +29,8 @@ dev = [
     "pytest",
 ]
 
-[tool.setuptools]
-packages = ["module"]
+[tool.setuptools.packages.find]
+include = ["module*", "gspecific*", "tools_image*"]
 
 [tool.ruff]
 line-length = 120
