@@ -1,7 +1,10 @@
 import cv2
 import numpy as np
 
+from pathlib import Path
 from typing import List, Dict, Set, Tuple
+
+from module.font_table import FontTable
 
 
 # Font image info
@@ -159,3 +162,72 @@ def draw_letters_on_canvas(
             ret_dict_code[korean] = code
 
     return ret_dict_code, code_idx
+
+
+def set_font(
+    base_dir: Path,
+    font_table: FontTable,
+    src_font_canvas: np.ndarray,
+    start_code: str,
+    num_letters: int,
+    input_cands: list,
+):
+    img_db = dict()
+    num_bytes = num_letters * 2
+
+    for korean, font_name in input_cands:
+        if font_name in img_db:
+            continue
+        img_db[font_name] = dict()
+        font_dir = f"byte{num_bytes}" if font_name == "default" else f"byte{num_bytes}{font_name}"
+        for letter_path in (base_dir / font_dir).rglob("*.bmp"):
+            img_db[font_name][letter_path.stem] = letter_path
+
+    for korean, font_name in input_cands:
+        if korean not in img_db[font_name]:
+            print(f"{korean} - no font")
+
+    code_list = list(font_table.code2char.keys())
+    code_idx = code_list.index(start_code)
+    code_list = code_list[code_idx:]
+
+    ret_dict_code, next_code_idx = draw_letters_on_canvas(
+        font_canvas=src_font_canvas,
+        input_cands=input_cands,
+        img_path_dict=img_db,
+        code_list=code_list,
+        num_letters=num_letters,
+    )
+
+    next_code = code_list[next_code_idx]
+    return ret_dict_code, next_code
+
+
+def set_2byte_merge(
+    base_dir: Path,
+    input_cand_2byte: list,
+    font_table: FontTable,
+    src_font_canvas: np.ndarray,
+    start_code: str = "959F",
+):
+    img_db_1byte = {
+        "default": dict(),
+    }
+    for letter_path in (base_dir / "byte1").rglob("*.bmp"):
+        img_db_1byte["default"][letter_path.stem] = letter_path
+
+    code_list = list(font_table.code2char.keys())
+    code_idx = code_list.index(start_code)
+    code_list = code_list[code_idx:]
+
+    ret_dict_code, next_code_idx = draw_letters_on_canvas(
+        font_canvas=src_font_canvas,
+        input_cands=input_cand_2byte,
+        img_path_dict=img_db_1byte,
+        code_list=code_list,
+        num_letters=1,
+        need_merge=True,
+    )
+
+    next_code = code_list[next_code_idx]
+    return ret_dict_code, next_code

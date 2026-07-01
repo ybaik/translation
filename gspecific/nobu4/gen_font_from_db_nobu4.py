@@ -1,11 +1,10 @@
 import cv2
 import json
-import numpy as np
 from PIL import Image
 from pathlib import Path
 from module.name_db import NameDB
 from module.font_table import FontTable
-from module.font_image import add_text_pairs, draw_letters_on_canvas, return_img_roi_1byte, imread_korean
+from module.font_image import add_text_pairs, imread_korean, return_img_roi_1byte, set_2byte_merge, set_font
 
 
 REGIONS = [
@@ -30,77 +29,6 @@ REGIONS = [
     # "하리마",
     # "히타치",
 ]
-
-
-def set_font(
-    base_dir: Path,
-    font_table: FontTable,
-    src_font_canvas: np.ndarray,
-    start_code: str,
-    num_letters: int,
-    input_cands: list,
-):
-    # Read image information
-    img_db = dict()
-
-    num_bytes = num_letters * 2
-
-    for korean, font_name in input_cands:
-        if font_name in img_db:
-            continue
-        img_db[font_name] = dict()
-        font_dir = f"byte{num_bytes}" if font_name == "default" else f"byte{num_bytes}{font_name}"
-        for letter_path in (base_dir / font_dir).rglob("*.bmp"):
-            img_db[font_name][letter_path.stem] = letter_path
-
-    # Check if the image file exists
-    for korean, font_name in input_cands:
-        if korean not in img_db[font_name]:
-            print(f"{korean} - no font")
-
-    # Get filtered list
-    code_list = list(font_table.code2char.keys())
-    code_idx = code_list.index(start_code)
-    code_list = code_list[code_idx:]
-
-    ret_dict_code, next_code_idx = draw_letters_on_canvas(
-        font_canvas=src_font_canvas,
-        input_cands=input_cands,
-        img_path_dict=img_db,
-        code_list=code_list,
-        num_letters=num_letters,
-    )
-
-    next_code = code_list[next_code_idx]
-
-    return ret_dict_code, next_code
-
-
-def set_2byte_merge(base_dir: Path, input_cand_2byte: list, font_table: FontTable, src_font_canvas: np.ndarray):
-    start_code = "959F"  # 福
-
-    # Read 4byte image information
-    img_db_1byte = {
-        "default": dict(),
-    }
-    for letter_path in (base_dir / "byte1").rglob("*.bmp"):
-        img_db_1byte["default"][letter_path.stem] = letter_path
-
-    # Get filtered list
-    code_list = list(font_table.code2char.keys())
-    code_idx = code_list.index(start_code)
-    code_list = code_list[code_idx:]
-
-    ret_dict_code, code_idx = draw_letters_on_canvas(
-        font_canvas=src_font_canvas,
-        input_cands=input_cand_2byte,
-        img_path_dict=img_db_1byte,
-        code_list=code_list,
-        num_letters=1,
-        need_merge=True,
-    )
-
-    return ret_dict_code
 
 
 def main():
@@ -274,7 +202,7 @@ def main():
 
     # Set merged 2byte letters
     letter_2byte = [[s, "default"] for s in letter_2byte]  # Change format
-    code_dict = set_2byte_merge(base_dir, letter_2byte, font_table, src_font_canvas)
+    code_dict, _ = set_2byte_merge(base_dir, letter_2byte, font_table, src_font_canvas)
 
     code_dict["야마우치"] = "EBB3"
     code_dict["후카야"] = "EBB4"

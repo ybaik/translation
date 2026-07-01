@@ -1,76 +1,10 @@
 import cv2
 import json
-import numpy as np
 from PIL import Image
 from pathlib import Path
 from module.name_db import NameDB
 from module.font_table import FontTable
-from module.font_image import add_text_pairs, draw_letters_on_canvas
-
-
-def set_4byte(base_dir: Path, font_table: FontTable, src_font_canvas: np.ndarray):
-    start_code = "9540"  # 鼻
-    input_cand_4byte = []
-
-    input_cand_4byte.append(["다이묘", "비스코"])
-    input_cand_4byte.append(["와-과", "비스코"])
-    input_cand_4byte.append(["은-는", "비스코"])
-    input_cand_4byte.append(["을-를", "비스코"])
-    input_cand_4byte.append(["이-가", "비스코"])
-
-    # Read 4byte image information
-    img_db_4byte = dict()
-
-    for korean, font_name in input_cand_4byte:
-        if font_name in img_db_4byte:
-            continue
-        img_db_4byte[font_name] = dict()
-        font_dir = "byte4" if font_name == "default" else f"byte4{font_name}"
-        for letter_path in (base_dir / font_dir).rglob("*.bmp"):
-            img_db_4byte[font_name][letter_path.stem] = letter_path
-
-    # Check if the image file exists
-    for korean, font_name in input_cand_4byte:
-        if korean not in img_db_4byte[font_name]:
-            print(f"{korean} - no font")
-
-    # Get filtered list
-    code_list = list(font_table.code2char.keys())
-    code_idx = code_list.index(start_code)
-    code_list = code_list[code_idx:]
-
-    return draw_letters_on_canvas(
-        font_canvas=src_font_canvas,
-        input_cands=input_cand_4byte,
-        img_path_dict=img_db_4byte,
-        code_list=code_list,
-        num_letters=2,
-    )
-
-
-def set_2byte(base_dir: Path, input_cand_2byte: list, font_table: FontTable, src_font_canvas: np.ndarray):
-    start_code = "959F"  # 福
-
-    # Read 4byte image information
-    img_db_1byte = {
-        "default": dict(),
-    }
-    for letter_path in (base_dir / "byte1").rglob("*.bmp"):
-        img_db_1byte["default"][letter_path.stem] = letter_path
-
-    # Get filtered list
-    code_list = list(font_table.code2char.keys())
-    code_idx = code_list.index(start_code)
-    code_list = code_list[code_idx:]
-
-    return draw_letters_on_canvas(
-        font_canvas=src_font_canvas,
-        input_cands=input_cand_2byte,
-        img_path_dict=img_db_1byte,
-        code_list=code_list,
-        num_letters=1,
-        need_merge=True,
-    )
+from module.font_image import add_text_pairs, set_2byte_merge, set_font
 
 
 def main():
@@ -112,11 +46,27 @@ def main():
     ret_code_dict = {}
 
     # set 4byte letters
-    ret_code_dict |= set_4byte(base_dir, font_table, src_font_canvas)
+    input_cand_4byte = []
+    input_cand_4byte.append(["다이묘", "비스코"])
+    input_cand_4byte.append(["와-과", "비스코"])
+    input_cand_4byte.append(["은-는", "비스코"])
+    input_cand_4byte.append(["을-를", "비스코"])
+    input_cand_4byte.append(["이-가", "비스코"])
+
+    code_dict, _ = set_font(
+        base_dir,
+        font_table,
+        src_font_canvas,
+        "9540",  # 鼻
+        2,
+        input_cand_4byte,
+    )
+    ret_code_dict |= code_dict
 
     # Set 2byte letters
     letter_2byte = [[s, "default"] for s in letter_2byte]  # Change format
-    ret_code_dict |= set_2byte(base_dir, letter_2byte, font_table, src_font_canvas)
+    code_dict, _ = set_2byte_merge(base_dir, letter_2byte, font_table, src_font_canvas)
+    ret_code_dict |= code_dict
 
     # Save font canvas image
     dst_font_canvas_path = base_dir / "nobu3-BISCO.bmp"
