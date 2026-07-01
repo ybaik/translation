@@ -1,5 +1,7 @@
+import argparse
 import struct
 from pathlib import Path
+from gspecific.image_workspace import ImageWorkspace
 from gspecific.mac1.decode import read_img
 
 
@@ -81,9 +83,16 @@ def main():
     """
     Main function to run the encoder and verify the output.
     """
-    base_dir = Path("customized/mac1/examples")
-    input_file = base_dir / "MG09.PLA"
-    reference_file = base_dir / "MG09.IMG"
+    parser = argparse.ArgumentParser(
+        description="Verify Mac1 compression against a workspace IMG"
+    )
+    parser.add_argument("--workspace", required=True, type=Path)
+    parser.add_argument("input", help="IMG filename relative to jpn-pc98")
+    args = parser.parse_args()
+    workspace = ImageWorkspace(args.workspace)
+    reference_file = workspace.source(args.input)
+    artifact_dir = workspace.artifacts(args.input)
+    input_file = artifact_dir / f"{reference_file.stem}.pln.jpn.bin"
 
     print(f"Reading raw data from: {input_file}")
     try:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Decode all fixed-size raw planar archives; intermediates are optional."""
+"""Decode fixed-size raw planar archives into workspace artifacts."""
 
 import argparse
 import json
@@ -8,30 +8,30 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
+from gspecific.image_workspace import ImageWorkspace, offset_stem, update_meta
 from gspecific.taikou1.pc98_image_codec import decode_planar, write_html_report
 
 JOBS = (
-    # ("source/ANIME.PUT", "anime.put.jpn", 16, 16, 3),
-    ("source/GRAPH.PUT", "graph.put.jpn", 32, 32, 3),
-    # ("source/HEX.PUT", "hex.put.jpn", 40, 24, 3),
-    ("source/HIME.PUT", "hime.put.jpn", 64, 80, 3),
-    ("source/KAO.PUT", "kao.put.jpn", 64, 80, 3),
-    # ("source/MONTA.PUT", "monta.put.jpn", 48, 24, 4),
-    # ("source/SAIKORO.PUT", "saikoro.put.jpn", 24, 18, 4),
-    # ("source/UNIT.PUT", "unit.put.jpn", 16, 16, 3),
-    ("source/PTN.DAT", "ptn.dat.jpn", 32, 32, 3),
+    # ("ANIME.PUT", 16, 16, 3),
+    ("GRAPH.PUT", 32, 32, 3),
+    # ("HEX.PUT", 40, 24, 3),
+    ("HIME.PUT", 64, 80, 3),
+    ("KAO.PUT", 64, 80, 3),
+    # ("MONTA.PUT", 48, 24, 4),
+    # ("SAIKORO.PUT", 24, 18, 4),
+    # ("UNIT.PUT", 16, 16, 3),
+    ("PTN.DAT", 32, 32, 3),
 )
 
 FRAME_OVERRIDES = {
-    "source/GRAPH.PUT": {
+    "GRAPH.PUT": {
         0x000180: (64, 48, 3),
     },
 }
 
 EMBEDDED_JOBS = (
     (
-        "source/MAIN.EXE",
-        "main.exe.jpn",
+        "MAIN.EXE",
         ((0x060B90, 32, 32, 3),),
     ),
 )
@@ -76,9 +76,9 @@ def decode_file(
     columns=16,
     scale=1,
     *,
-    include_intermediate=False,
     frame_overrides=None,
     frame_ranges=None,
+    source_label=None,
 ):
     source = Path(source)
     data = source.read_bytes()
@@ -109,15 +109,35 @@ def decode_file(
     report_frames = []
     for index, (offset, frame_width, frame_height, frame_planes, frame_size) in enumerate(layout):
         next_offset = offset + frame_size
-        stem = f"{offset:06X}"
+        stem = offset_stem(offset)
         planar = data[offset:next_offset]
         image, pixels = decode_planar(
             planar, frame_width, frame_height, frame_planes
         )
-        plane_name = f"{stem}.plane.raw"
-        png_name = f"{stem}.png"
+        plane_name = f"{stem}.pln.jpn.bin"
+        pixels_name = f"{stem}.idx.jpn.bin"
+        png_name = f"{stem}.jpn.png"
         (output / plane_name).write_bytes(planar)
+        (output / pixels_name).write_bytes(pixels)
         image.save(output / png_name)
+        update_meta(
+            output / f"{stem}.meta.json",
+            source=str(source_label or source),
+            offset=hex_offset(offset),
+            original_size=frame_size,
+            encoded_size=None,
+            stored_size=None,
+            padding_byte=None,
+            compression="none",
+            width=frame_width,
+            height=frame_height,
+            planes=frame_planes,
+            plane_order="BRG" if frame_planes == 3 else "BRGI",
+            planar_layout="interleaved",
+            bit_order="msb-first",
+            stride=frame_width // 8 * frame_planes,
+            palette="pc98-8color" if frame_planes == 3 else "pc98-16color",
+        )
         sheet_frames.append(image.convert("RGB"))
         report_frames.append(
             {
@@ -130,14 +150,11 @@ def decode_file(
                 "planes": frame_planes,
                 "files": {
                     "plane": plane_name,
+                    "pixels": pixels_name,
                     "png": png_name,
                 },
             }
         )
-        if include_intermediate:
-            pixels_name = f"{stem}.pixels.raw"
-            (output / pixels_name).write_bytes(pixels)
-            report_frames[-1]["files"]["pixels"] = pixels_name
 
     rows = math.ceil(count / columns)
     label_height = 10
@@ -182,27 +199,33 @@ def main():
         description="Decode fixed-size raw planar archives"
     )
     parser.add_argument(
-        "--intermediate",
-        action="store_true",
-        help="also save decoded pixels.raw intermediate files",
+        "--workspace",
+        required=True,
+        type=Path,
+        help="workspace containing jpn-pc98 and image-pc98",
     )
     args = parser.parse_args()
-    for source, output_dir, width, height, planes in JOBS:
-        frame_overrides = FRAME_OVERRIDES.get(source)
+    workspace = ImageWorkspace(args.workspace)
+    for relative_source, width, height, planes in JOBS:
+        source = workspace.source(relative_source)
+        output_dir = workspace.artifacts(relative_source)
+        frame_overrides = FRAME_OVERRIDES.get(relative_source)
         count, remainder, block_size = decode_file(
             source,
             output_dir,
             width,
             height,
             planes,
-            include_intermediate=args.intermediate,
             frame_overrides=frame_overrides,
+            source_label=relative_source,
         )
         print(
             f"{source}: decoded={count} remainder={remainder} "
             f"block_size={block_size} output={output_dir}"
         )
-    for source, output_dir, frame_ranges in EMBEDDED_JOBS:
+    for relative_source, frame_ranges in EMBEDDED_JOBS:
+        source = workspace.source(relative_source)
+        output_dir = workspace.artifacts(relative_source)
         width, height, planes = frame_ranges[0][1:]
         count, remainder, block_size = decode_file(
             source,
@@ -210,8 +233,8 @@ def main():
             width,
             height,
             planes,
-            include_intermediate=args.intermediate,
             frame_ranges=frame_ranges,
+            source_label=relative_source,
         )
         print(
             f"{source}: decoded={count} embedded frame(s) "

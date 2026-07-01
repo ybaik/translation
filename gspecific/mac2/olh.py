@@ -7,11 +7,18 @@ This module depends on the 'Pillow' library for reading PNG files and the
 'numpy' library for image data manipulation.
 """
 
+import argparse
 import io
 import struct
+from pathlib import Path
+
 import numpy as np
+from gspecific.image_workspace import ImageWorkspace, native_artifact_name, update_meta
 from module.pc98_image.palette import check_duplicated_elements, match_color
-from module.pc98_image.planar import decode_plane_major_column_planar
+from module.pc98_image.planar import (
+    decode_plane_major_column_planar,
+    encode_plane_major_column_planar,
+)
 
 
 try:
@@ -752,3 +759,98 @@ def OutputLiterals(srcbuf, outbuf, ofs, rep):
         outbuf.append(srcbuf[ofs])
         suffix -= 1
         ofs += 1
+
+
+def decode_workspace_file(source_path: Path, output_dir: Path) -> None:
+    codec = OLH()
+    if not codec.read_olh(source_path):
+        raise ValueError(f"{source_path}: no OLH frames found")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    (output_dir / native_artifact_name(source_path.name, "jpn")).write_bytes(
+        source_path.read_bytes()
+    )
+    single_frame = len(codec.frames) == 1
+    for index, frame in enumerate(codec.frames):
+        stem = source_path.stem if single_frame else f"frame{index:03d}"
+        output_png = output_dir / f"{stem}.jpn.png"
+        codec.save_frame_as_png(index, output_png)
+        planar = bytes(frame["vplanar_data"])
+        indices = bytes(frame["data_8bpp"])
+        (output_dir / f"{stem}.pln.jpn.bin").write_bytes(planar)
+        (output_dir / f"{stem}.idx.jpn.bin").write_bytes(indices)
+        update_meta(
+            output_dir / f"{stem}.meta.json",
+            source=source_path.name,
+            frame=index,
+            offset=None,
+            original_size=len(frame["compressed_data"]),
+            encoded_size=None,
+            stored_size=None,
+            padding_byte=None,
+            compression="olh-command",
+            width=frame["width"],
+            height=frame["height"],
+            planes=4,
+            plane_order="BRGI",
+            planar_layout="plane-major-column",
+            bit_order="msb-first",
+            stride=frame["height"],
+            palette="embedded" if frame["palette"] else "grayscale",
+        )
+
+
+def encode_workspace_file(source_path: Path, output_dir: Path) -> Path:
+    codec = OLH()
+    if not codec.read_olh(source_path):
+        raise ValueError(f"{source_path}: no OLH frames found")
+    if len(codec.frames) != 1:
+        raise ValueError("workspace OLH encoding currently supports one frame only")
+
+    stem = source_path.stem
+    input_png = output_dir / f"{stem}.kor.png"
+    if not input_png.exists():
+        raise FileNotFoundError(input_png)
+    codec.read_png_as_8bpp(input_png)
+    frame = codec.frames[0]
+    indices = bytes(frame["data_8bpp"])
+    planar = encode_plane_major_column_planar(
+        indices,
+        frame["width"],
+        frame["height"],
+        4,
+    )
+    (output_dir / f"{stem}.idx.kor.bin").write_bytes(indices)
+    (output_dir / f"{stem}.pln.kor.bin").write_bytes(planar)
+
+    output_path = output_dir / native_artifact_name(source_path.name, "kor")
+    codec.compress(output_path)
+    update_meta(
+        output_dir / f"{stem}.meta.json",
+        encoded_size=output_path.stat().st_size,
+        stored_size=output_path.stat().st_size,
+        padding_byte=None,
+    )
+    return output_path
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Decode or encode workspace OLH files")
+    parser.add_argument("action", choices=("decode", "encode"))
+    parser.add_argument("--workspace", required=True, type=Path)
+    parser.add_argument("inputs", nargs="+", help="OLH paths relative to jpn-pc98")
+    args = parser.parse_args()
+    workspace = ImageWorkspace(args.workspace)
+
+    for relative_source in args.inputs:
+        source_path = workspace.source(relative_source)
+        output_dir = workspace.artifacts(relative_source)
+        if args.action == "decode":
+            decode_workspace_file(source_path, output_dir)
+            print(output_dir)
+        else:
+            print(encode_workspace_file(source_path, output_dir))
+
+
+if __name__ == "__main__":
+    main()

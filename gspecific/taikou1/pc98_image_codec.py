@@ -166,7 +166,11 @@ def image_to_rle_lz_groups(image_source):
             blue_pattern = red_pattern = green_pattern = 0
             for pixel_index in range(4):
                 x = group * 4 + pixel_index
-                color = 0 if x >= width else nearest_palette_index(pixels[x, y])
+                color = (
+                    0
+                    if x >= width
+                    else nearest_palette_index(pixels[x, y], PALETTE_3BPP)
+                )
                 mask = 1 << (3 - pixel_index)
                 if color & 1:
                     blue_pattern |= mask

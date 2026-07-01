@@ -1,7 +1,9 @@
+import argparse
 import cv2
 import struct
 import numpy as np
 from pathlib import Path
+from gspecific.image_workspace import ImageWorkspace, native_artifact_name, update_meta
 from module.pc98_image.planar import decode_plane_major_row_planar
 
 
@@ -84,57 +86,61 @@ def decompress_img(raw: bytearray, width: int, height: int) -> bytearray:
 
 
 def main():
-    DEBUG = False
-    base_dir = Path("customized/mac1/examples")
-    file_path = base_dir / "MG09.IMG"
+    parser = argparse.ArgumentParser(description="Decode Mac1 IMG files from a workspace")
+    parser.add_argument(
+        "--workspace",
+        required=True,
+        type=Path,
+        help="workspace containing jpn-pc98 and image-pc98",
+    )
+    parser.add_argument(
+        "inputs",
+        nargs="+",
+        help="IMG filenames relative to jpn-pc98",
+    )
+    args = parser.parse_args()
+    workspace = ImageWorkspace(args.workspace)
 
-    if "MG09.IMG" in str(file_path):
-        DEBUG = True
-        with open(base_dir / "MG09.PLA", "rb") as f:
-            reference = f.read()
-    try:
-        tag, width, height, compresssed_data = read_img(file_path)
-    except FileNotFoundError:
-        print(f"Error: Input file not found at {file_path}")
-        return
-
-    planar_data = decompress_img(compresssed_data, width, height)
-
-    if DEBUG and bytearray(reference) != planar_data:
-        ValueError("Value error")
-    else:
-        print("success")
-
-    # --- Start of added code (Using Standard Planar Conversion) ---
-    try:
-        print(f"Processing {width}x{height} image (Standard Planar)...")
-
-        # Convert the planar data in planar_data to a standard 8bpp indexed ("chunky") format.
-        indexed_8bpp_data = decode_plane_major_row_planar(
+    for relative_source in args.inputs:
+        file_path = workspace.source(relative_source)
+        output_dir = workspace.artifacts(relative_source)
+        tag, width, height, compressed_data = read_img(file_path)
+        planar_data = decompress_img(compressed_data, width, height)
+        indexed_data = decode_plane_major_row_planar(
             planar_data, width, height, 4
         )
+        image = np.frombuffer(indexed_data, dtype=np.uint8).reshape((height, width))
+        grayscale = (image * 17).astype(np.uint8)
+        stem = file_path.stem
 
-        # Create a NumPy array from the converted 1D data and reshape it to a 2D image.
-        image_indexed_2d = np.frombuffer(indexed_8bpp_data, dtype=np.uint8).reshape((height, width))
-
-        # Convert the 4-bit indexed image (values 0-15) to an 8bpp grayscale image (values 0-255).
-        image_8bpp_grayscale = (image_indexed_2d * 17).astype(np.uint8)
-
-        output_filename = str(file_path).replace(".IMG", ".BMP")
-        cv2.imwrite(output_filename, image_8bpp_grayscale)
-        print(f"Successfully decoded and saved to {output_filename}")
-
-    except NameError:
-        print("\n---")
-        print("Could not process image because 'cv2' or 'numpy' module is not available.")
-        print("Please install 'opencv-python' and 'numpy' using: pip install opencv-python numpy")
-    except Exception as e:
-        print(f"\nAn error occurred while processing the image: {e}")
-        import traceback
-
-        traceback.print_exc()
-        print("Please check if 'w' and 'h' are loaded correctly and 'buf_4bpp' has enough data.")
-    # --- End of added code ---
+        (output_dir / native_artifact_name(file_path.name, "jpn")).write_bytes(
+            file_path.read_bytes()
+        )
+        (output_dir / f"{stem}.pln.jpn.bin").write_bytes(planar_data)
+        (output_dir / f"{stem}.idx.jpn.bin").write_bytes(indexed_data)
+        output_png = output_dir / f"{stem}.jpn.png"
+        if not cv2.imwrite(str(output_png), grayscale):
+            raise OSError(f"failed to write {output_png}")
+        update_meta(
+            output_dir / f"{stem}.meta.json",
+            source=str(relative_source),
+            offset="0x000000",
+            original_size=file_path.stat().st_size,
+            encoded_size=None,
+            stored_size=None,
+            padding_byte=None,
+            compression="mac1-xor-delta-rle",
+            tag=tag,
+            width=width,
+            height=height,
+            planes=4,
+            plane_order="BRGI",
+            planar_layout="plane-major-row",
+            bit_order="msb-first",
+            stride=width // 8,
+            palette="grayscale-index-0-15",
+        )
+        print(output_png)
 
 
 if __name__ == "__main__":

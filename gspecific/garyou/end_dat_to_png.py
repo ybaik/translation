@@ -8,6 +8,7 @@ from pathlib import Path
 
 from PIL import Image
 
+from gspecific.image_workspace import ImageWorkspace, native_artifact_name, update_meta
 from module.pc98_image.palette import decode_4bit_palette
 from module.pc98_image.planar import decode_plane_major_row_planar
 
@@ -113,6 +114,54 @@ def convert(dat_path: Path, palette_path: Path, output_path: Path, image_number:
     Image.frombytes("RGB", (WIDTH, HEIGHT), bytes(rgb)).save(output_path)
 
 
+def decode_workspace_file(
+    dat_path: Path,
+    palette_path: Path,
+    output_dir: Path,
+    image_number: int | None = None,
+) -> None:
+    if image_number is None:
+        image_number = image_number_from_path(dat_path)
+
+    source = dat_path.read_bytes()
+    vram = decode_end_dat(dat_path)
+    indices = planar_to_indices(vram)
+    colors = load_palette(palette_path, image_number)
+    stem = dat_path.stem
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    (output_dir / native_artifact_name(dat_path.name, "jpn")).write_bytes(source)
+    (output_dir / f"{stem}.pln.jpn.bin").write_bytes(vram)
+    (output_dir / f"{stem}.idx.jpn.bin").write_bytes(indices)
+
+    rgb = bytearray(WIDTH * HEIGHT * 3)
+    for i, color_index in enumerate(indices):
+        rgb[i * 3 : i * 3 + 3] = bytes(colors[color_index])
+    Image.frombytes("RGB", (WIDTH, HEIGHT), bytes(rgb)).save(
+        output_dir / f"{stem}.jpn.png"
+    )
+
+    update_meta(
+        output_dir / f"{stem}.meta.json",
+        source=dat_path.name,
+        offset="0x000000",
+        original_size=len(source),
+        encoded_size=None,
+        stored_size=None,
+        padding_byte=None,
+        compression="garyou-rle",
+        width=WIDTH,
+        height=HEIGHT,
+        planes=4,
+        plane_order="BRGI",
+        planar_layout="plane-major-row",
+        bit_order="msb-first",
+        stride=BYTES_PER_LINE,
+        planar_segments=2,
+        palette=f"{palette_path.name}#{image_number}",
+    )
+
+
 def default_palette_path(data_dir: Path) -> Path:
     for name in ("ENDPAL.GRG", "ENDPAL.BRG"):
         path = data_dir / name
@@ -123,18 +172,37 @@ def default_palette_path(data_dir: Path) -> Path:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Convert D7END END_S*.DAT images to PNG.")
-    parser.add_argument("inputs", nargs="*", type=Path, help="END_S*.DAT files. Defaults to data/END_S*.DAT")
-    parser.add_argument("-p", "--palette", type=Path, help="Palette file. Defaults to data/ENDPAL.GRG, then data/ENDPAL.BRG")
-    parser.add_argument("-o", "--out-dir", type=Path, default=Path("out"), help="Output directory")
+    parser.add_argument(
+        "--workspace",
+        required=True,
+        type=Path,
+        help="workspace containing jpn-pc98 and image-pc98",
+    )
+    parser.add_argument(
+        "inputs",
+        nargs="*",
+        help="filenames relative to jpn-pc98; defaults to END_S*.DAT",
+    )
+    parser.add_argument(
+        "-p",
+        "--palette",
+        type=Path,
+        help="palette path; defaults to ENDPAL.GRG/BRG in jpn-pc98",
+    )
     args = parser.parse_args()
 
-    inputs = args.inputs or sorted(Path("data").glob("END_S*.DAT"), key=image_number_from_path)
-    palette_path = args.palette or default_palette_path(Path("data"))
+    workspace = ImageWorkspace(args.workspace)
+    inputs = (
+        [workspace.source(path) for path in args.inputs]
+        if args.inputs
+        else sorted(workspace.source_root.glob("END_S*.DAT"), key=image_number_from_path)
+    )
+    palette_path = args.palette or default_palette_path(workspace.source_root)
 
     for dat_path in inputs:
-        out_path = args.out_dir / f"{dat_path.stem}.png"
-        convert(dat_path, palette_path, out_path)
-        print(out_path)
+        output_dir = workspace.artifacts(dat_path.relative_to(workspace.source_root))
+        decode_workspace_file(dat_path, palette_path, output_dir)
+        print(output_dir)
 
 
 if __name__ == "__main__":

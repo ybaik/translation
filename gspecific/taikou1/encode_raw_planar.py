@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Encode offset-named PNG files in matching .kor folders as raw planar blocks."""
+"""Encode workspace *.kor.png files as raw planar blocks."""
 
+import argparse
 import json
 from pathlib import Path
 
+from gspecific.image_workspace import ImageWorkspace, update_meta
 from gspecific.taikou1.decode_raw_planar import (
     EMBEDDED_JOBS,
     FRAME_OVERRIDES,
@@ -18,9 +20,9 @@ def hex_offset(value):
 
 
 def offset_pngs(directory):
-    for path in sorted(directory.glob("*.png")):
+    for path in sorted(directory.glob("*.kor.png")):
         try:
-            offset = int(path.stem, 16)
+            offset = int(path.name.removesuffix(".kor.png"), 16)
         except ValueError:
             continue
         yield offset, path
@@ -28,7 +30,7 @@ def offset_pngs(directory):
 
 def encode_folder(
     source,
-    jpn_dir,
+    artifact_dir,
     width,
     height,
     planes,
@@ -36,9 +38,9 @@ def encode_folder(
     frame_overrides=None,
     frame_ranges=None,
 ):
-    kor_dir = Path(str(jpn_dir).removesuffix(".jpn") + ".kor")
-    if not kor_dir.is_dir():
-        print(f"skip: {kor_dir} does not exist")
+    artifact_dir = Path(artifact_dir)
+    if not artifact_dir.is_dir():
+        print(f"skip: {artifact_dir} does not exist")
         return 0
 
     source_path = Path(source)
@@ -62,7 +64,7 @@ def encode_folder(
             for offset, frame_width, frame_height, frame_planes in frame_ranges
         }
     entries = []
-    for offset, png_path in offset_pngs(kor_dir):
+    for offset, png_path in offset_pngs(artifact_dir):
         if offset not in layout:
             raise ValueError(f"{png_path}: offset is not a known frame boundary")
         frame_width, frame_height, frame_planes, frame_size = layout[offset]
@@ -70,8 +72,15 @@ def encode_folder(
         encoded, _pixels = image_to_planar(
             png_path, frame_width, frame_height, frame_planes
         )
-        output_name = f"{offset:06X}.plane.raw"
-        (kor_dir / output_name).write_bytes(encoded)
+        stem = f"{offset:06X}"
+        output_name = f"{stem}.pln.kor.bin"
+        (artifact_dir / output_name).write_bytes(encoded)
+        update_meta(
+            artifact_dir / f"{stem}.meta.json",
+            encoded_size=len(encoded),
+            stored_size=len(encoded),
+            padding_byte=None,
+        )
         entries.append(
             {
                 "offset": hex_offset(offset),
@@ -91,28 +100,43 @@ def encode_folder(
         "block_size": block_size,
         "entries": entries,
     }
-    (kor_dir / "encode_index.json").write_text(
+    (artifact_dir / "encode_index.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
-    print(f"{kor_dir}: encoded={len(entries)}")
+    print(f"{artifact_dir}: encoded={len(entries)}")
     return len(entries)
 
 
 def main():
-    for source, jpn_dir, width, height, planes in JOBS:
+    parser = argparse.ArgumentParser(
+        description="Encode workspace *.kor.png files as raw planar blocks"
+    )
+    parser.add_argument(
+        "--workspace",
+        required=True,
+        type=Path,
+        help="workspace containing jpn-pc98 and image-pc98",
+    )
+    args = parser.parse_args()
+    workspace = ImageWorkspace(args.workspace)
+    for relative_source, width, height, planes in JOBS:
+        source = workspace.source(relative_source)
+        artifact_dir = workspace.artifacts(relative_source)
         encode_folder(
             source,
-            jpn_dir,
+            artifact_dir,
             width,
             height,
             planes,
-            frame_overrides=FRAME_OVERRIDES.get(source),
+            frame_overrides=FRAME_OVERRIDES.get(relative_source),
         )
-    for source, jpn_dir, frame_ranges in EMBEDDED_JOBS:
+    for relative_source, frame_ranges in EMBEDDED_JOBS:
+        source = workspace.source(relative_source)
+        artifact_dir = workspace.artifacts(relative_source)
         width, height, planes = frame_ranges[0][1:]
         encode_folder(
             source,
-            jpn_dir,
+            artifact_dir,
             width,
             height,
             planes,
