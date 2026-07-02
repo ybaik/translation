@@ -29,8 +29,6 @@ def main():
     with open(font_fnt_path, "rb") as f:
         data = bytearray(f.read())
 
-    total = (len(data) - 0xBE40) // 32
-
     mem_pos = 0xBE40 + idx * 32
 
     # debug_draw(data, 0xBE40)

@@ -1,6 +1,4 @@
 import numpy as np
-from PIL import Image
-from pathlib import Path
 import cv2
 
 
@@ -15,13 +13,8 @@ def debug_draw(
 
     target_data = data[offset : offset + 32]
 
-    if font_width == 8:
-        bitchk = 7
-    elif font_width == 16:
-        font_width == 16
-        bitchk = 15
-    else:
-        assert 0, f"font_width should be 8 or 16, but {font_width} is given."
+    if font_width not in (8, 16):
+        raise ValueError(f"font_width should be 8 or 16, but {font_width} is given.")
 
     bit_index = 0
     for y in range(font_height):
@@ -62,7 +55,6 @@ def main():
     # For 16x16, 1 letter is 2x16 = 32 bytes.
     # 32 bytes is the basic offset for a letter.
     print(len(font_jpn_data))
-    offset = (16 * 7 + 1) * 32  # ,
     offset_start = (16 * 95 + 2) * 32  # "889F": "亜", "가"
     offset_end = (16 * 241 + 15) * 32  # "94FC": "美", "힝"
     offset_end += 32

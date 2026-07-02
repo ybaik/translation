@@ -119,11 +119,10 @@ class LZSS_GSS2:
             
             if max_search_len >= self.threshold:
                 for pos in range(self.dict_size):
-                    l = 0
+                    match_len = 0
                     # Simulate the circular buffer matching
                     # to handle cases where match_pos and dict_pos overlap
                     cur_match_pos = pos
-                    cur_dict_pos = dict_pos
                     # We can't easily modify the dictionary during search without backup
                     # but we can observe that:
                     # dictionary[cur_match_pos] is what we'd read.
@@ -132,7 +131,7 @@ class LZSS_GSS2:
                     # we just wrote to during *this* match.
                     
                     # For simplicity and speed, let's use a small simulation:
-                    while l < max_search_len:
+                    while match_len < max_search_len:
                         # Value that would be at cur_match_pos
                         # It's either from the current dictionary or from 
                         # bytes we've already matched in this specific loop.
@@ -148,9 +147,9 @@ class LZSS_GSS2:
                         # The "distance" from dict_pos to cur_match_pos is (cur_match_pos - dict_pos) % 256.
                         # If this distance is < l, it means we are reading a byte we just wrote.
                         
-                        if l > 0:
+                        if match_len > 0:
                             dist = (cur_match_pos - dict_pos) % self.dict_size
-                            if dist < l:
+                            if dist < match_len:
                                 # We are reading a byte we just matched
                                 # The byte we wrote at distance 'dist' from dict_pos
                                 # was data[i + dist]
@@ -160,14 +159,14 @@ class LZSS_GSS2:
                         else:
                             val = dictionary[cur_match_pos]
                             
-                        if data[i + l] == val:
-                            l += 1
+                        if data[i + match_len] == val:
+                            match_len += 1
                             cur_match_pos = (cur_match_pos + 1) & 0xFF
                         else:
                             break
                     
-                    if l > best_len:
-                        best_len = l
+                    if match_len > best_len:
+                        best_len = match_len
                         best_pos = pos
                         if best_len == max_search_len:
                             break

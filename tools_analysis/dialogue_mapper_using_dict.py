@@ -2,7 +2,6 @@ import json
 from pathlib import Path
 from rich.console import Console
 from module.script import Script
-from module.font_table import FontTable
 
 
 def main():
@@ -22,13 +21,6 @@ def main():
     with open(dictionary_path, "r", encoding="utf-8") as f:
         dictionary = json.load(f)
 
-    # Read a custom word dictionary
-    custom_word_path = script_base_dir / "custom_word.json"
-    custom_words = {}
-    if custom_word_path.exists():
-        with open(custom_word_path, "r", encoding="utf-8") as f:
-            custom_words = json.load(f)
-
     # Read a pair of scripts
     for file in script_base_dir.rglob("*.json"):  # Use rglob to search subdirectories
         console.print(file.name)
@@ -45,15 +37,6 @@ def main():
         src_script = Script(str(file))
         dst_script = Script(str(dst_path))
 
-        src_font_table = FontTable(
-            file_path=Path("./font_table/font_table-jpn.json"),
-            custom_char_path=script_base_dir / "custom_char.json",
-        )
-        dst_font_table = FontTable(
-            file_path=Path("./font_table/font_table-kor-jin.json"),
-            custom_char_path=script_base_dir / "custom_char.json",
-        )
-
         # Check addresses in the source script
         modified = False
         for address, src_content in src_script.script.items():
@@ -66,32 +49,8 @@ def main():
             if address not in dst_script.script:
                 continue
 
-            dst_sentence = dst_script.script[address].text
-            # length = src_font_table.check_length_from_address(address)
-            len_src_sentence = src_font_table.check_length_from_sentence(
-                sentence=src_sentence
-            )
-            len_dst_sentence = dst_font_table.check_length_from_sentence(
-                sentence=dst_sentence, custom_words=custom_words
-            )
-            # if len_src_sentence != len_dst_sentence:
-            #     console.print(f"{address},{file_tag}", style=color)
-            #     print(len(src_sentence), len(dst_sentence))
-            #     assert 0, f"Sentence length is not matched. {src_sentence} != {dst_sentence}"
-            #     continue
-
-            # print(file.name, address)
-            # print(src_sentence)
-            # print(dst_sentence)
             translated = dictionary[src_sentence]["translated"]
             if len(translated) == 1:
-                len_translated = dst_font_table.check_length_from_sentence(
-                    sentence=translated[0], custom_words=custom_words
-                )
-                # if len_dst_sentence != len_translated:
-                #     console.print(f"Length mismatch: {address},{file_tag}", style="red")
-                #     continue
-
                 if dst_script.script[address].text != translated[0]:
                     dst_script.script[address].text = translated[0]
                     modified = True

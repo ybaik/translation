@@ -18,7 +18,6 @@ def main():
     # --- Configuration ---
     # It is recommended to replace these hardcoded paths with command-line arguments
     # for better flexibility.
-    base_dir = Path("../ozm/output")
     ref_base_dir = Path("../ozm/m2")
     target_dir = Path("../ozm/m2_kor")
     # --- End Configuration ---

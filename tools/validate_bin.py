@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 from module.script import Script
 from module.font_table import FontTable

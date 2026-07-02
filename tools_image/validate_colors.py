@@ -89,7 +89,7 @@ def validate_png_colors(png_path: str, palette_path: str) -> None:
         png_colors_set = {pix for pix in img.getdata()}
 
 
-    print(f"\n--- PNG Color Validation ---")
+    print("\n--- PNG Color Validation ---")
     print(f"Found {len(png_colors_set)} unique colors in '{png_path}'.")
 
     # 3. Compare the sets to find any unsupported colors

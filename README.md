@@ -21,9 +21,24 @@ A modern Python package for reverse engineering and translating Japanese video g
    cd translation
    ```
 
-2. Install in editable mode with development dependencies:
+2. Install in editable mode with development dependencies and Git hooks:
    ```bash
-   pip install -e ".[dev]"
+   make dev-install
+   ```
+
+   `make dev-install` runs the following commands:
+   ```bash
+   python -m pip install -e ".[dev]"
+   python -m pre_commit install --install-hooks
+   ```
+
+   It installs the package and its runtime dependencies (`fonttools`, `numpy`,
+   `pillow`, `opencv-python`, and `rich`), development tools (`pytest`, `ruff`,
+   and `pre-commit`), and the Git pre-commit hook.
+
+   To install only the package and runtime dependencies:
+   ```bash
+   make install
    ```
 
 ## Usage

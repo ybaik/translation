@@ -2,7 +2,6 @@ import json
 from pathlib import Path
 from rich.console import Console
 from module.content import Content
-from module.font_table import FontTable
 
 control_codes = [
     "|S|U|F|0|0|5",

@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from module.script import Script
 

@@ -13,7 +13,6 @@ def main():
     file_name = "SNDATA2.TR2"
     # file_name = "MAIN.EXE"
     script_jpn = Script(f"{base_dir}/{file_name}_jpn.json")
-    script_kor = Script(f"{base_dir}/{file_name}_kor.json")
 
     fn_jpn = ""
     gn_jpn = ""

@@ -126,7 +126,6 @@ class OLH:
 
             # Find the 0x1A marker, which indicates the start of the header.
             marker_found = False
-            limit = src.tell() + 32
             search_buf = src.read(32)
             marker_pos = search_buf.find(b"\x1a\x00")
 

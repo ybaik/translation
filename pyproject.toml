@@ -17,16 +17,18 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
+    "fonttools",
     "numpy",
     "pillow",
     "opencv-python",
-    "tqdm",
+    "rich",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "ruff",
+    "pre-commit",
     "pytest",
+    "ruff",
 ]
 
 [tool.setuptools.packages.find]
@@ -34,4 +36,4 @@ include = ["module*", "gspecific*", "tools_image*"]
 
 [tool.ruff]
 line-length = 120
-target-version = "py312"
+target-version = "py39"

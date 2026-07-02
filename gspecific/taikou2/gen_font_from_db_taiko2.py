@@ -22,8 +22,6 @@ def main():
     letter_2byte = set()
 
     # Name
-    fset = set()
-    gset = set()
     db = NameDB()
     for _, korean_name, _ in db.iter_name_pairs("taiko2"):
         family_name, given_name = korean_name.family, korean_name.given
@@ -31,26 +29,13 @@ def main():
             print(korean_name)
             continue
 
-        fa = False
-        ga = False
         if len(family_name) % 2:
             family_name += "_"
-            fa = True
         if len(given_name) % 2:
             given_name = "_" + given_name
-            ga = True
-
-        # if fa and ga:
-        #     print(kors)
-        #     fset.add(family_name[-2])
-        #     gset.add(given_name[-1])
 
         add_text_pairs(family_name, letter_2byte)
         add_text_pairs(given_name, letter_2byte)
-
-    # print(len(fset), len(gset))
-    # print(fset)
-    # print(gset)
 
     # 추가
     letter_2byte.add("미마")

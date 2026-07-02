@@ -1,5 +1,4 @@
 from pathlib import Path
-from rich.console import Console
 
 from module.script import Script
 

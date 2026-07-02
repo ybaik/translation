@@ -1,10 +1,13 @@
 import re
 import json
+import logging
 from pathlib import Path
 from typing import Dict, Tuple, Union
 from module.content import Content
 from module.font_table import FontTable
 from module.decoding import decode, encode
+
+logger = logging.getLogger(__name__)
 
 
 def write_code(data: bytearray, hex_start: str, hex_end: str, code_hex: str, count: int) -> bytearray:

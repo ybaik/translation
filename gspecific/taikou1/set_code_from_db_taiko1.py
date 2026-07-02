@@ -1,7 +1,6 @@
 from module.name_db import NameDB
 from module.name_codec import align_encoded_length, format_korean_name_prefer_given_leading_space
 from module.script import Script
-from rich.console import Console
 
 
 def main():

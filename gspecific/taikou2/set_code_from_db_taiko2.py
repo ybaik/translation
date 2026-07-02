@@ -1,13 +1,10 @@
 from module.name_db import NameDB
 from module.name_codec import align_encoded_length
 from module.script import Script
-from rich.console import Console
 
 
 def main():
-    console = Console()
     name_db = NameDB()
-    game = "taiko2"
     ws_num = 2
     base_dir = f"c:/work_han/workspace{ws_num}/script-dos"
 

@@ -5,7 +5,7 @@ import logging
 import pickle
 from copy import deepcopy
 from pathlib import Path
-from typing import Optional, Any, cast
+from typing import Optional, cast
 from .jisx0201 import jisx0201_table
 
 logger = logging.getLogger(__name__)

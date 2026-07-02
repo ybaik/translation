@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 from rich.console import Console
 from module.script import Script
@@ -35,11 +34,6 @@ def main():
         dst_script = Script(str(dst_path))
         # console.print(file.name)
 
-        # check address
-        buf_address = ""
-        buf_src_sentence = ""
-        buf_dst_sentence = ""
-
         if not find_source:
             for address, dst_content in dst_script.script.items():
                 dst_sentence = dst_content.text
@@ -51,16 +45,9 @@ def main():
                     if sentence_kor in dst_sentence:
                         found = True
                 if not found:
-                    # if sentence_kor != dst_sentence:
-                    buf_address = address
-                    buf_dst_sentence = dst_sentence
-                    buf_src_sentence = src_script.script[address].text
                     continue
 
                 print("=============================")
-                # print(buf_address)
-                # print(buf_src_sentence)
-                # print(buf_dst_sentence)
                 console.print(f"{address} {file_tag}", style="green")
                 print(src_script.script[address].text)
                 print(dst_sentence)
@@ -76,8 +63,6 @@ def main():
                     if sentence in src_sentence:
                         found = True
                 if not found:
-                    buf_address = address
-                    buf_src_sentence = src_sentence
                     continue
 
                 #     if not address in dst:
@@ -94,9 +79,6 @@ def main():
                 #         continue
 
                 print("=============================")
-                # print(buf_address)
-                # print(buf_src_sentence)
-                # print(buf_dst_sentence)
                 console.print(f"{address} {file_tag}", style="green")
                 print(src_sentence)
                 print(dst_script.script[address].text)

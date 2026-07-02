@@ -1,7 +1,6 @@
 from module.name_db import NameDB
 from module.name_codec import align_encoded_length
 from module.script import Script
-from rich.console import Console
 
 
 target_files = ["MAIN.EXE", "SNDATA1.CIM", "SNDATA1T.CIM", "SNDATA2.CIM", "SNDATA2T.CIM", "SNDATA3.CIM", "SNDATA3T.CIM"]

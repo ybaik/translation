@@ -57,9 +57,7 @@ def frame_layout(data_size, width, height, planes, overrides=None):
     overrides = overrides or {}
     offset = 0
     while offset < data_size:
-        frame_width, frame_height, frame_planes = overrides.get(
-            offset, (width, height, planes)
-        )
+        frame_width, frame_height, frame_planes = overrides.get(offset, (width, height, planes))
         frame_size = frame_width * frame_height * frame_planes // 8
         if offset + frame_size > data_size:
             break
@@ -111,9 +109,7 @@ def decode_file(
         next_offset = offset + frame_size
         stem = offset_stem(offset)
         planar = data[offset:next_offset]
-        image, pixels = decode_planar(
-            planar, frame_width, frame_height, frame_planes
-        )
+        image, pixels = decode_planar(planar, frame_width, frame_height, frame_planes)
         plane_name = f"{stem}.pln.jpn.bin"
         pixels_name = f"{stem}.idx.jpn.bin"
         png_name = f"{stem}.jpn.png"
@@ -168,9 +164,7 @@ def decode_file(
         x = (index % columns) * cell_width
         y = (index // columns) * cell_height
         if scale != 1:
-            image = image.resize(
-                (image.width * scale, image.height * scale), Image.Resampling.NEAREST
-            )
+            image = image.resize((image.width * scale, image.height * scale), Image.Resampling.NEAREST)
         image_x = x + (cell_width - image.width) // 2
         sheet.paste(image, (image_x, y))
         draw.text((x, y + max_height * scale), str(index), fill=(255, 255, 255))
@@ -187,20 +181,17 @@ def decode_file(
             "offset": hex_offset(consumed),
             "remaining_bytes": remainder,
         }
-    (output / "index.json").write_text(
-        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    (output / "index.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     write_html_report(report, output)
     return count, remainder, block_size
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Decode fixed-size raw planar archives"
-    )
+    parser = argparse.ArgumentParser(description="Decode fixed-size raw planar archives")
     parser.add_argument(
         "--workspace",
         required=True,
+        default=Path("c:/work_han/translation/workspace"),
         type=Path,
         help="workspace containing jpn-pc98 and image-pc98",
     )
@@ -219,10 +210,7 @@ def main():
             frame_overrides=frame_overrides,
             source_label=relative_source,
         )
-        print(
-            f"{source}: decoded={count} remainder={remainder} "
-            f"block_size={block_size} output={output_dir}"
-        )
+        print(f"{source}: decoded={count} remainder={remainder} block_size={block_size} output={output_dir}")
     for relative_source, frame_ranges in EMBEDDED_JOBS:
         source = workspace.source(relative_source)
         output_dir = workspace.artifacts(relative_source)
@@ -236,10 +224,7 @@ def main():
             frame_ranges=frame_ranges,
             source_label=relative_source,
         )
-        print(
-            f"{source}: decoded={count} embedded frame(s) "
-            f"block_size={block_size} output={output_dir}"
-        )
+        print(f"{source}: decoded={count} embedded frame(s) block_size={block_size} output={output_dir}")
 
 
 if __name__ == "__main__":

@@ -135,7 +135,6 @@ class OLH:
 
             # Find the 0x1A marker, which indicates the start of the header.
             marker_found = False
-            limit = src.tell() + 32
             search_buf = src.read(32)
             marker_pos = search_buf.find(b"\x1a\x00")
 
@@ -735,14 +734,14 @@ def OutputLiterals(srcbuf, outbuf, ofs, rep):
     # 리터럴 출력의 경우에도 처리 가능한 최대 바이트 수를 미리 체크해서 효률 우선으로 처리
     ignore = CheckLiterals(srcbuf, ofs, rep) < rep
     # Bytes 0x00..1F and 0xF0..FF can be output verbatim.
-    while (rep > 0) and ((srcbuf[ofs] < 0x20) or (srcbuf[ofs] >= 0xF0)) and False == ignore:
+    while (rep > 0) and ((srcbuf[ofs] < 0x20) or (srcbuf[ofs] >= 0xF0)) and not ignore:
         outbuf.append(srcbuf[ofs])
         rep -= 1
         ofs += 1
 
     # Any 00..1F,F0..FF bytes at the end also can be output verbatim, minimising the length byte.
     suffix = 0
-    while (rep > 0) and ((srcbuf[ofs + rep - 1] < 0x20) or (srcbuf[ofs + rep - 1] >= 0xF0)) and False == ignore:
+    while (rep > 0) and ((srcbuf[ofs + rep - 1] < 0x20) or (srcbuf[ofs + rep - 1] >= 0xF0)) and not ignore:
         suffix += 1
         rep -= 1
 

@@ -49,10 +49,7 @@ def backward_check(
                     sentence += "|" + char
                 elif 0x20 <= code_int <= 0x7E:
                     # Fallback for simple ASCII not in the font table
-                    try:
-                        sentence += chr(code_int)
-                    except:
-                        sentence += "?"
+                    sentence += chr(code_int)
                 else:
                     sentence += "?"  # Placeholder for other unmapped bytes
                 i += 1

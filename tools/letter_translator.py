@@ -5,7 +5,6 @@ sys.path.append("./")
 from pathlib import Path
 from module.font_table import FontTable
 from module.sound import hiragana_pronunciation
-from module.jisx0201 import jisx0201_to_unicode
 
 
 def main():

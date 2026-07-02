@@ -141,7 +141,7 @@ class FontToolUI:
                 indices = list(range(len(ttc)))
                 self.index_combo["values"] = indices
                 self.index_combo.set(0)
-            except:
+            except Exception:
                 self.index_combo["values"] = [0]
                 self.index_combo.set(0)
         else:
@@ -155,9 +155,9 @@ class FontToolUI:
             return
 
         try:
-            font = ImageFont.truetype(self.ttf_path.get(), 20, index=self.font_index.get())
+            ImageFont.truetype(self.ttf_path.get(), 20, index=self.font_index.get())
             self.preview_canvas.create_text(150, 25, text="한글 ABC 123", font=("Arial", 12), fill="black")
-        except:
+        except (OSError, ValueError):
             self.preview_canvas.create_text(150, 25, text="폰트 로드 실패", fill="red")
 
     def run(self):
