@@ -21,55 +21,125 @@ A modern Python package for reverse engineering and translating Japanese video g
    cd translation
    ```
 
-2. Install in editable mode with development dependencies and Git hooks:
-   ```bash
-   make dev-install
-   ```
-
-   `make dev-install` runs the following commands:
+2. Install the package and development dependencies:
    ```bash
    python -m pip install -e ".[dev]"
+   ```
+
+3. Install the Git pre-commit hook:
+   ```bash
    python -m pre_commit install --install-hooks
    ```
 
-   It installs the package and its runtime dependencies (`fonttools`, `numpy`,
-   `pillow`, `opencv-python`, and `rich`), development tools (`pytest`, `ruff`,
-   and `pre-commit`), and the Git pre-commit hook.
+   Run both commands in the same Python environment and shell used for
+   `git commit`. For example, if commits are created from Windows Git Bash,
+   install the hook from Windows Git Bash rather than WSL.
 
-   To install only the package and runtime dependencies:
+4. Verify the hook:
    ```bash
-   make install
+   python -m pre_commit run --all-files
    ```
+
+This installs the runtime dependencies (`fonttools`, `numpy`, `pillow`,
+`opencv-python`, and `rich`) and development tools (`pytest`, `ruff`, and
+`pre-commit`).
+
+To install only the package and runtime dependencies:
+```bash
+python -m pip install -e .
+```
 
 ## Usage
 
-### 1. Extract Scripts
-Extract Japanese text from game data:
+The automation scripts use a workspace next to this repository. Before
+running them, read [Workspace structure](doc/workspace_structure.md) and set
+the target `ws_num` and `platform` values near the top of each script's
+`main()` function.
+
+Typical text workflow:
+
+```text
+jpn-<platform>/
+  -> extract_script_auto.py
+script_init-<platform>/
+  -> select files and create translations
+script-<platform>/
+  -> write_script_auto.py
+kor-<platform>/
+```
+
+### 1. Prepare the workspace
+
+Place the original game binaries under
+`workspace<N>/jpn-<platform>/`, preserving their relative paths. Configure
+`ws_num` and `platform` in `extract_script_auto.py` for that workspace.
+
+### 2. Extract the initial scripts
+
 ```bash
 python extract_script_auto.py
 ```
 
-### 2. Translate
-Translate the extracted JSON (e.g., `S01_VIS_jpn.json`) to Korean (e.g., `S01_VIS_kor.json`).
+The extracted `*_jpn.json` files are written to
+`script_init-<platform>/`. This directory is a regenerable extraction result,
+not the translation workspace.
 
-### 3. Patch Game Data
-Inject the translated script back into the binary:
+### 3. Select and translate scripts
+
+Copy the files being translated from `script_init-<platform>/` to
+`script-<platform>/`, preserving their relative paths. Keep the Japanese
+`*_jpn.json` file and create a paired `*_kor.json` file.
+
+Translation must preserve address ranges, byte lengths, control codes, and
+supported characters. Follow the
+[translation strategy and validation rules](doc/translation_strategy.md)
+before writing translated data.
+
+Place script-specific mapping files in `script-<platform>/`:
+
+- `custom_char.json`: character-code overrides shared by source and output
+  font tables.
+- `custom_word.json`: Korean byte substitutions and custom one-byte
+  sequences.
+
+### 4. Build the translated binaries
+
+Configure the same `ws_num` and `platform` in `write_script_auto.py`, then
+run:
+
 ```bash
 python write_script_auto.py
 ```
 
-### Script-specific Tables
+The script reads the original files from `jpn-<platform>/`, applies the
+paired files under `script-<platform>/`, and writes results to
+`kor-<platform>/`. Binary replacement assets referenced by script metadata
+must be placed under `binary_inputs-<platform>/`.
 
-Place script-specific tables next to the `_jpn.json` and `_kor.json` files:
+Do not treat output under `kor-<platform>/` as the source of later builds;
+each build starts from the original files under `jpn-<platform>/`.
 
-- `custom_char.json`: Character-code overrides shared by Japanese source and Korean output tables.
-- `custom_word.json`: Korean output byte substitutions, including custom 1-byte characters.
+### 5. Convert game images
+
+Image work uses `image-pc98/` and `image-dos/` independently. Naming,
+metadata, decode/encode stages, palette requirements, and supported formats
+are documented in [Image conversion](doc/image_conversion.md).
+
+## Documentation
+
+- [Workspace structure and generated files](doc/workspace_structure.md)
+- [Translation strategy and validation rules](doc/translation_strategy.md)
+- [Image conversion workflow and formats](doc/image_conversion.md)
 
 ## Project Structure
-- `module/`: Core library (Script, FontTable, etc.)
-- `tools/`: Utility scripts for translation and conversion.
-- `font_table/`: Predefined font tables for various platforms.
-- `name_db/`: Databases for consistent character name translation.
+
+- `module/`: Core script, font-table, compression, and image codecs.
+- `gspecific/`: Game-specific codecs and conversion tools.
+- `tools*/`: Analysis, editing, font, image, and validation utilities.
+- `font_table/`: Shared Japanese and Korean character tables.
+- `name_db/`: Character, region, and item name databases.
+- `tests/`: Automated codec and database tests.
+- `doc/`: Workspace, translation, and image workflow documentation.
 
 ## License
 MIT License
